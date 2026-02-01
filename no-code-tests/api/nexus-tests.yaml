@@ -1,0 +1,276 @@
+# ============================================================================
+# NEXUS REPOSITORY MANAGER - COMPLETE TEST SUITE
+# ============================================================================
+# 
+# This consolidated test suite includes all Nexus API tests in one organized file.
+# Uses centralized service configuration from config/services.yaml
+#
+# Tests are organized by:
+#   1. SMOKE TESTS - Quick connectivity and health checks
+#   2. AUTHENTICATION TESTS - Verify auth is working
+#   3. REPOSITORY TESTS - Repository management operations
+#   4. COMPONENT TESTS - Component search and retrieval
+#   5. INTEGRATION TESTS - End-to-end workflows
+#
+# Run all tests: npm run test:nocode no-code-tests/api/nexus-tests.yaml
+# ============================================================================
+
+name: "Nexus Repository Manager - Complete Test Suite"
+description: "Comprehensive test suite for all Nexus API endpoints using service configuration"
+
+config:
+  service: "nexus"  # Uses config/services.yaml for base_url, auth, headers, timeout
+  # Service config automatically provides:
+  #   - base_url: ${ORDER_NEXUS_BASE_URL}
+  #   - auth: Bearer ${NEXUS_AUTH_TOKEN}
+  #   - headers: Accept, Content-Type
+  #   - timeout: 30000ms
+
+tests:
+  # ==========================================================================
+  # SMOKE TESTS - Quick Health Checks
+  # ==========================================================================
+  # These tests verify basic connectivity and that the service is responsive
+  # Run these first for quick validation after deployments
+  # ==========================================================================
+
+  - name: "SMOKE - Service Reachability Check"
+    description: "Verify Nexus service is reachable (expects 403 without auth - server is up)"
+    request:
+      endpoint: "health"  # Uses /service/rest/v1/status from service config
+      method: "GET"
+      headers:
+        Authorization: ""  # Override service config - test without auth
+    assertions:
+      - type: "status_code"
+        expected: 403  # Server requires auth even for status endpoint
+      - type: "response_time"
+        max_ms: 3000
+
+  - name: "SMOKE - Health Check (Authenticated)"
+    description: "Verify Nexus health endpoint with authentication"
+    request:
+      endpoint: "health"
+      method: "GET"
+      # Uses auth from service config
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "response_time"
+        max_ms: 3000
+    extract_variables:
+      - name: "nexus_is_healthy"
+        json_path: "$"
+
+  # ==========================================================================
+  # AUTHENTICATION TESTS
+  # ==========================================================================
+  # Verify authentication is working correctly
+  # ==========================================================================
+
+  - name: "AUTH - Verify Auth Required for Repositories"
+    description: "Attempt to access repositories without auth - should fail with 401/403"
+    request:
+      endpoint: "repositories"
+      method: "GET"
+      headers:
+        Authorization: ""  # Override service config auth to test without credentials
+    assertions:
+      - type: "status_code"
+        expected: 403  # Forbidden - proves auth is required
+
+  # ==========================================================================
+  # REPOSITORY TESTS
+  # ==========================================================================
+  # Test repository management operations
+  # ==========================================================================
+
+  - name: "REPOS - List All Repositories"
+    description: "Retrieve all repositories from Nexus (requires authentication)"
+    request:
+      endpoint: "repositories"  # Uses /service/rest/v1/repositories
+      method: "GET"
+      # Auth automatically injected from service config
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "response_time"
+        max_ms: 5000
+      - type: "json_path"
+        path: "$[0].name"
+        exists: true
+      - type: "contains"
+        contains: "name"  # Response should contain repository names
+    extract_variables:
+      - name: "first_repo_name"
+        json_path: "$[0].name"
+      - name: "first_repo_type"
+        json_path: "$[0].type"
+
+  - name: "REPOS - Get Specific Repository (maven-releases)"
+    description: "Retrieve details of the maven-releases repository"
+    request:
+      endpoint: "/service/rest/v1/repositories/maven-releases"
+      method: "GET"
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "json_path"
+        path: "$.name"
+        expected: "maven-releases"
+      - type: "json_path"
+        path: "$.type"
+        exists: true
+      - type: "json_path"
+        path: "$.url"
+        exists: true
+
+  - name: "REPOS - Get First Repository from List"
+    description: "Retrieve details of the first repository found in the list"
+    request:
+      endpoint: "/service/rest/v1/repositories/{{first_repo_name}}"
+      method: "GET"
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "json_path"
+        path: "$.name"
+        expected: "{{first_repo_name}}"
+      - type: "json_path"
+        path: "$.type"
+        expected: "{{first_repo_type}}"
+
+  # ==========================================================================
+  # COMPONENT TESTS
+  # ==========================================================================
+  # Test component search and retrieval operations
+  # ==========================================================================
+
+  - name: "COMPONENTS - Search All"
+    description: "Search for all components across repositories"
+    request:
+      endpoint: "search"  # Uses /service/rest/v1/search
+      method: "GET"
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "response_time"
+        max_ms: 5000
+      - type: "json_path"
+        path: "$.items"
+        exists: true
+    extract_variables:
+      - name: "total_components_found"
+        json_path: "$.items.length"
+
+  - name: "COMPONENTS - Search by Repository"
+    description: "Search for components in maven-releases repository"
+    request:
+      endpoint: "components"  # Uses /service/rest/v1/components
+      method: "GET"
+      query_params:
+        repository: "maven-releases"
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "json_path"
+        path: "$.items"
+        exists: true
+
+  - name: "COMPONENTS - Search with Multiple Filters"
+    description: "Search components with repository and name filters"
+    request:
+      endpoint: "search"
+      method: "GET"
+      query_params:
+        repository: "maven-releases"
+        format: "maven2"
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "response_time"
+        max_ms: 5000
+
+  # ==========================================================================
+  # INTEGRATION TESTS
+  # ==========================================================================
+  # End-to-end workflows combining multiple operations
+  # ==========================================================================
+
+  - name: "INTEGRATION - Full Repository Workflow"
+    description: "List repos → Get first repo details → Search components in that repo"
+    request:
+      endpoint: "components"
+      method: "GET"
+      query_params:
+        repository: "{{first_repo_name}}"
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "json_path"
+        path: "$.items"
+        exists: true
+
+  # ==========================================================================
+  # PERFORMANCE TESTS
+  # ==========================================================================
+  # Verify API response times are acceptable
+  # ==========================================================================
+
+  - name: "PERF - Health Check Response Time (Authenticated)"
+    description: "Verify health endpoint responds quickly (< 2s) with authentication"
+    request:
+      endpoint: "health"
+      method: "GET"
+      # Uses auth from service config
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "response_time"
+        max_ms: 2000  # Health should be fast
+
+  - name: "PERF - Repository List Response Time"
+    description: "Verify repository list responds within acceptable time (< 5s)"
+    request:
+      endpoint: "repositories"
+      method: "GET"
+    assertions:
+      - type: "status_code"
+        expected: 200
+      - type: "response_time"
+        max_ms: 5000
+
+# ============================================================================
+# TEST EXECUTION NOTES
+# ============================================================================
+#
+# Run all tests:
+#   npm run test:nocode no-code-tests/api/nexus-tests.yaml
+#
+# Run specific test (by name):
+#   npm run test:nocode no-code-tests/api/nexus-tests.yaml --grep "SMOKE"
+#
+# Environment Configuration:
+#   Tests use config/services.yaml which reads from .env files:
+#   - config/.env.stag (staging)
+#   - config/.env.prod (production)
+#   - config/.env.dev (development)
+#
+# Required Environment Variables:
+#   ORDER_NEXUS_BASE_URL - Nexus server URL
+#   NEXUS_AUTH_TOKEN - Bearer authentication token
+#
+# Test Organization:
+#   SMOKE - Quick connectivity checks (run first)
+#   AUTH - Authentication verification
+#   REPOS - Repository operations
+#   COMPONENTS - Component search/retrieval
+#   INTEGRATION - End-to-end workflows
+#   PERF - Performance validation
+#
+# Variables Used:
+#   {{first_repo_name}} - Extracted from first repository in list
+#   {{first_repo_type}} - Extracted from first repository in list
+#   {{total_components_found}} - Count of components found
+#
+# ============================================================================

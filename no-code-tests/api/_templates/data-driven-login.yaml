@@ -1,0 +1,25 @@
+name: Data-Driven Login Tests
+description: Parameterized login tests using CSV data
+
+curl: |
+  curl 'https://reqres.in/api/login' \
+    -H 'Content-Type: application/json' \
+    --data-raw '{"email":"test@example.com","password":"password123"}'
+
+# Data-driven configuration
+data_driven:
+  source: ./test-data/login-data.csv
+  format: csv
+
+test_cases:
+  - name: Login test with CSV data
+    description: Test login with different credentials from CSV
+    modify_request:
+      body:
+        email: "{{email}}"
+        password: "{{password}}"
+    assertions:
+      - type: status_code
+        expected: "{{expected_status}}"
+      - type: response_time
+        max_ms: 2000

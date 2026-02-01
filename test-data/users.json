@@ -1,0 +1,23 @@
+{
+  "validUsers": [
+    {
+      "username": "test_user_1",
+      "email": "test1@example.com",
+      "password": "SecurePass123!",
+      "role": "user"
+    },
+    {
+      "username": "test_user_2",
+      "email": "test2@example.com",
+      "password": "SecurePass456!",
+      "role": "admin"
+    }
+  ],
+  "invalidUsers": [
+    {
+      "username": "",
+      "email": "invalid",
+      "password": "123"
+    }
+  ]
+}
