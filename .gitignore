@@ -36,4 +36,5 @@ build/
 # Cache
 .cache/
 .npm/
+.npm-cache/
 playwright/.auth/
