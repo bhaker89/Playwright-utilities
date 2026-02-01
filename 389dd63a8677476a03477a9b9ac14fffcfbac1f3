@@ -1,0 +1,23 @@
+.gitignore
+  3899081d5bb54ce2 39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.40",
+  "base_commit_sha": "389dd63a8677476a03477a9b9ac14fffcfbac1f3",
+  "prompts": {
+    "3899081d5bb54ce2": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "370250",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
