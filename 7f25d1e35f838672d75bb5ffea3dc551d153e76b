@@ -1,0 +1,25 @@
+utils/schema-validator.js
+  24450e07a48f7b64 176-178
+playwright.config.js
+  24450e07a48f7b64 84,86-93,96,105,114,123,134,142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "7f25d1e35f838672d75bb5ffea3dc551d153e76b",
+  "prompts": {
+    "24450e07a48f7b64": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "371058",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 36,
+      "total_deletions": 42,
+      "accepted_lines": 19,
+      "overriden_lines": 0
+    }
+  }
+}
