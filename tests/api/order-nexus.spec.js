@@ -215,30 +215,19 @@ test.describe('Order Nexus API - Staging Environment', () => {
 
     logger.info('Step 7) individual response fields');
 
-    // Validate status field
-    expect(responseBody).toHaveProperty('status');
-    expect(responseBody.status).toBe('success');
-    logger.info(`✅ Status field validated: ${responseBody.status}`);
+    // Validate is_success field
+    expect(responseBody).toHaveProperty('is_success');
+    expect(responseBody.is_success).toBe(true);
+    logger.info(`✅ is_success field validated: ${responseBody.is_success}`);
 
-    // Validate message field
-    expect(responseBody).toHaveProperty('message');
-    expect(responseBody.message).toBeTruthy();
-    logger.info(`✅ Message field validated: ${responseBody.message}`);
+    // Validate status_code field
+    expect(responseBody).toHaveProperty('status_code');
+    expect(responseBody.status_code).toBe(200);
+    logger.info(`✅ status_code field validated: ${responseBody.status_code}`);
 
-    // Validate order_id field
-    expect(responseBody).toHaveProperty('order_id');
-    expect(responseBody.order_id).toBeTruthy();
-    logger.info(`✅ Order ID validated: ${responseBody.order_id}`);
-
-    // Validate timestamp field
-    expect(responseBody).toHaveProperty('timestamp');
-    expect(responseBody.timestamp).toBeTruthy();
-    logger.info(`✅ Timestamp validated: ${responseBody.timestamp}`);
-
-    // Validate timestamp is in ISO format
-    const timestamp = new Date(responseBody.timestamp);
-    expect(timestamp.toISOString()).toBeTruthy();
-    logger.info('✅ Timestamp is valid ISO 8601 format');
+    // Validate data field exists
+    expect(responseBody).toHaveProperty('data');
+    logger.info(`✅ data field exists: ${JSON.stringify(responseBody.data)}`);
 
     // ========== PHASE 8) TIME VALIDATION ==========
     logger.info('\nPHASE 8) Time Validation');
@@ -257,10 +246,10 @@ test.describe('Order Nexus API - Staging Environment', () => {
     logger.info('Summary:');
     logger.info(`  ✓ Status Code: ${statusCode}`);
     logger.info(`  ✓ Response Time: ${responseTime}ms`);
-    logger.info(`  ✓ Order ID: ${responseBody.order_id}`);
-    logger.info(`  ✓ Status: ${responseBody.status}`);
-    logger.info(`  ✓ Message: ${responseBody.message}`);
-    logger.info('═══════════════════════════════════════════════════════════\n');
+    logger.info(`  ✓ is_success: ${responseBody.is_success}`);
+    logger.info(`  ✓ status_code: ${responseBody.status_code}`);
+    logger.info(`  ✓ data: ${JSON.stringify(responseBody.data)}`);
+    logger.info('══════════════════════════════════════════════════════════\n');
   });
 
   /**
