@@ -81,9 +81,19 @@ module.exports = defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // Desktop Browsers
+    // API Testing Project (no browser needed) - runs only once
+    {
+      name: 'api',
+      testMatch: /.*\/api\/.*\.spec\.js/,  // Matches all files in tests/api/ directory
+      use: {
+        baseURL: process.env.API_BASE_URL || 'https://api.example.com',
+      },
+    },
+
+    // Desktop Browsers - excludes API tests
     {
       name: 'chromium',
+      testIgnore: /.*\/api\/.*\.spec\.js/,  // Ignore API tests for browser projects
       use: { 
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 },
@@ -92,6 +102,7 @@ module.exports = defineConfig({
 
     {
       name: 'firefox',
+      testIgnore: /.*\/api\/.*\.spec\.js/,
       use: { 
         ...devices['Desktop Firefox'],
         viewport: { width: 1920, height: 1080 },
@@ -100,6 +111,7 @@ module.exports = defineConfig({
 
     {
       name: 'webkit',
+      testIgnore: /.*\/api\/.*\.spec\.js/,
       use: { 
         ...devices['Desktop Safari'],
         viewport: { width: 1920, height: 1080 },
@@ -108,6 +120,7 @@ module.exports = defineConfig({
 
     {
       name: 'edge',
+      testIgnore: /.*\/api\/.*\.spec\.js/,
       use: { 
         ...devices['Desktop Edge'],
         viewport: { width: 1920, height: 1080 },
@@ -118,6 +131,7 @@ module.exports = defineConfig({
     /* Test against mobile viewports. */
     {
       name: 'Mobile Chrome',
+      testIgnore: /.*\/api\/.*\.spec\.js/,
       use: { 
         ...devices['Pixel 5'],
       },
@@ -125,17 +139,9 @@ module.exports = defineConfig({
 
     {
       name: 'Mobile Safari',
+      testIgnore: /.*\/api\/.*\.spec\.js/,
       use: { 
         ...devices['iPhone 13'],
-      },
-    },
-
-    // API Testing Project (no browser needed)
-    {
-      name: 'api',
-      testMatch: /.*\.api\.spec\.js/,
-      use: {
-        baseURL: process.env.API_BASE_URL || 'https://api.example.com',
       },
     },
   ],

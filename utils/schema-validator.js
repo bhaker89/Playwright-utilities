@@ -173,10 +173,9 @@ class OrderNexusSchemas {
    * @type {import('joi').ObjectSchema}
    */
   static createOrUpdateOrderResponse = Joi.object({
-    status: Joi.string().valid('success', 'failure', 'error').required(),
-    message: Joi.string().required(),
-    order_id: Joi.string().required(),
-    timestamp: Joi.string().isoDate().required(),
+    data: Joi.object().optional(),
+    is_success: Joi.boolean().required(),
+    status_code: Joi.number().required(),
   }).options({ allowUnknown: true }); // Allow additional fields from API
 
   /**
