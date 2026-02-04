@@ -1,0 +1,31 @@
+test-data/order-nexus-payloads.js
+  5ed8c6fffda7e828 1-236
+utils/order-nexus-helper.js
+  5ed8c6fffda7e828 1-239
+config/environment.config.js
+  5ed8c6fffda7e828 58,64
+tests/api/order-nexus.spec.js
+  5ed8c6fffda7e828 2-4,25-35,40,44,47-59,62-65,67-72,75-76,81-82,84-87,90-92,94-96,98-100,109-110,113-120,124,127-132,135-136,138-142,144-148,151-153,155,157-162
+playwright.config.js
+  5ed8c6fffda7e828 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "0c9de40f61ff6de51f284681c79b7f8331403473",
+  "prompts": {
+    "5ed8c6fffda7e828": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "371650",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 580,
+      "total_deletions": 225,
+      "accepted_lines": 575,
+      "overriden_lines": 0
+    }
+  }
+}
