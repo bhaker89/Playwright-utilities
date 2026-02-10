@@ -1,0 +1,10 @@
+name: AI Generated Suite
+description: 'Generated from: check health of nexus'
+tests:
+  - name: Sample Test
+    type: api
+    method: GET
+    url: https://api.stag.1mg.com/health
+    assertions:
+      - type: status_code
+        expected: 200
