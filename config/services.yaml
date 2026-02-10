@@ -101,6 +101,14 @@ environments:
     order-service:
       base_url: "https://stag-orders.1mg.com"
 
+  steve:
+    nexus:
+      base_url: "https://steveinternalapi.1mg.com"
+    user-service:
+      base_url: "https://steve-users.1mg.com"
+    order-service:
+      base_url: "https://steve-orders.1mg.com"
+
   prod:
     nexus:
       base_url: "https://internalapi.1mg.com"
@@ -116,6 +124,7 @@ environments:
       base_url: "http://localhost:3001"
     order-service:
       base_url: "http://localhost:3002"
+
 
 # Default Configuration
 defaults:

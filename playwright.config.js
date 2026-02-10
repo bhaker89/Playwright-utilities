@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 // Load environment variables
-const environment = process.env.TEST_ENV || 'dev';
+const environment = process.env.TEST_ENV || 'stag';
 dotenv.config({ path: path.resolve(__dirname, `config/.env.${environment}`) });
 
 /**
@@ -12,6 +12,7 @@ dotenv.config({ path: path.resolve(__dirname, `config/.env.${environment}`) });
  */
 module.exports = defineConfig({
   testDir: './tests',
+  globalSetup: require.resolve('./global-setup'),
 
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -31,10 +32,10 @@ module.exports = defineConfig({
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
     ['json', { outputFile: 'test-results/results.json' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
-    ['allure-playwright', { 
+    ['allure-playwright', {
       outputFolder: 'allure-results',
       detail: true,
-      suiteTitle: true 
+      suiteTitle: true
     }]
   ],
 
@@ -84,7 +85,7 @@ module.exports = defineConfig({
     // API Testing Project (no browser needed) - runs only once
     {
       name: 'api',
-      testMatch: /.*\/api\/.*\.spec\.js/,  // Matches all files in tests/api/ directory
+      testMatch: /.*\/(api|legacy)\/.*\.spec\.js/,  // Matches files in api/ or legacy/ directories
       use: {
         baseURL: process.env.API_BASE_URL || 'https://api.example.com',
       },
@@ -94,7 +95,7 @@ module.exports = defineConfig({
     {
       name: 'chromium',
       testIgnore: /.*\/api\/.*\.spec\.js/,  // Ignore API tests for browser projects
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 },
       },
@@ -103,7 +104,7 @@ module.exports = defineConfig({
     {
       name: 'firefox',
       testIgnore: /.*\/api\/.*\.spec\.js/,
-      use: { 
+      use: {
         ...devices['Desktop Firefox'],
         viewport: { width: 1920, height: 1080 },
       },
@@ -112,7 +113,7 @@ module.exports = defineConfig({
     {
       name: 'webkit',
       testIgnore: /.*\/api\/.*\.spec\.js/,
-      use: { 
+      use: {
         ...devices['Desktop Safari'],
         viewport: { width: 1920, height: 1080 },
       },
@@ -121,10 +122,10 @@ module.exports = defineConfig({
     {
       name: 'edge',
       testIgnore: /.*\/api\/.*\.spec\.js/,
-      use: { 
+      use: {
         ...devices['Desktop Edge'],
         viewport: { width: 1920, height: 1080 },
-        channel: 'msedge' 
+        channel: 'msedge'
       },
     },
 
@@ -132,7 +133,7 @@ module.exports = defineConfig({
     {
       name: 'Mobile Chrome',
       testIgnore: /.*\/api\/.*\.spec\.js/,
-      use: { 
+      use: {
         ...devices['Pixel 5'],
       },
     },
@@ -140,7 +141,7 @@ module.exports = defineConfig({
     {
       name: 'Mobile Safari',
       testIgnore: /.*\/api\/.*\.spec\.js/,
-      use: { 
+      use: {
         ...devices['iPhone 13'],
       },
     },

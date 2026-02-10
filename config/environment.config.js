@@ -31,23 +31,9 @@ const path = require('path');
 
 /**
  * @typedef {Object} EnvironmentConfig
- * @property {string} testEnv
- * @property {string} baseURL
- * @property {string} uiBaseURL
- * @property {string} apiBaseURL
- * @property {string} authUsername
- * @property {string} authPassword
- * @property {string} apiKey
- * @property {string} [dbHost] - Legacy DB config (for backward compatibility)
- * @property {number} [dbPort] - Legacy DB config (for backward compatibility)
- * @property {string} [dbName] - Legacy DB config (for backward compatibility)
- * @property {string} [dbUser] - Legacy DB config (for backward compatibility)
- * @property {string} [dbPassword] - Legacy DB config (for backward compatibility)
- * @property {PostgresConfig} [postgres] - PostgreSQL configuration
- * @property {MongoDBConfig} [mongodb] - MongoDB configuration
- * @property {string} orderNexusBaseURL - Order Nexus base URL
- * @property {string} orderNexusToken - Order Nexus authentication token
- * @property {string} orderNexusApiVersion - Order Nexus API version
+ * @property {string} [AI_PROVIDER] - AI Provider (anthropic, openai)
+ * @property {string} [AI_API_KEY] - AI API Key
+ * @property {string} [AI_MODEL] - AI Model name
  */
 
 /**
@@ -55,16 +41,19 @@ const path = require('path');
  * @returns {EnvironmentConfig} The loaded environment configuration
  */
 function loadEnvironment() {
-  const environment = process.env.TEST_ENV || 'dev';
+  const environment = process.env.TEST_ENV || 'stag';
   const envPath = path.resolve(__dirname, `.env.${environment}`);
 
   dotenv.config({ path: envPath });
 
   return {
-    testEnv: process.env.TEST_ENV || 'dev',
+    testEnv: process.env.TEST_ENV || 'stag',
     baseURL: process.env.BASE_URL || 'https://example.com',
     uiBaseURL: process.env.UI_BASE_URL || process.env.BASE_URL || 'https://steve.1mg.com',
     apiBaseURL: process.env.API_BASE_URL || 'https://api.example.com',
+    internalApiBaseURL: process.env.INTERNAL_API_BASE_URL || '',
+    externalApiBaseURL: process.env.EXTERNAL_API_BASE_URL || '',
+    svcClusterUrl: process.env.SVC_CLUSTER_URL || '',
     authUsername: process.env.AUTH_USERNAME || '',
     authPassword: process.env.AUTH_PASSWORD || '',
     apiKey: process.env.API_KEY || '',
@@ -88,11 +77,11 @@ function loadEnvironment() {
     },
     // MongoDB configuration
     mongodb: {
-      uri: process.env.MONGO_URI || 
-           (process.env.MONGO_HOST 
-             ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT || '27017'}`
-             : 'mongodb://localhost:27017'
-           ),
+      uri: process.env.MONGO_URI ||
+        (process.env.MONGO_HOST
+          ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT || '27017'}`
+          : 'mongodb://localhost:27017'
+        ),
       database: process.env.MONGO_DB || 'test_db',
       options: {
         maxPoolSize: parseInt(process.env.MONGO_MAX_POOL_SIZE || '10'),
@@ -103,8 +92,13 @@ function loadEnvironment() {
     },
     // Order Nexus configuration
     orderNexusBaseURL: process.env.ORDER_NEXUS_BASE_URL || process.env.API_BASE_URL || 'https://staginternalapi.1mg.com',
-    orderNexusToken: process.env.STAG_ORDER_NEXUS_TOKEN || '',
+    orderNexusToken: process.env.NEXUS_AUTH_TOKEN || '',
     orderNexusApiVersion: process.env.ORDER_NEXUS_API_VERSION || 'v1',
+
+    // AI Configuration
+    AI_PROVIDER: process.env.AI_PROVIDER || 'anthropic',
+    AI_API_KEY: process.env.AI_API_KEY || '',
+    AI_MODEL: process.env.AI_MODEL || '',
   };
 }
 

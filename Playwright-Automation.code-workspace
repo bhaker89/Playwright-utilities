@@ -1,5 +1,5 @@
 {
-    "folders": [
+	"folders": [
 		{
 			"path": "."
 		},
@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "../../of-automation-suite"
+		},
+		{
+			"path": "../../order_service"
 		}
 	]
 }
