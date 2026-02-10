@@ -1,0 +1,25 @@
+tests/api/order-nexus.spec.js
+  5ed8c6fffda7e828 2,4,26-27,29-30,32,34
+playwright.config.js
+  5ed8c6fffda7e828 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.0.42",
+  "base_commit_sha": "8696df3a1d5077bc5797ff135e15b0ea3dfbed85",
+  "prompts": {
+    "5ed8c6fffda7e828": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "371650",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 493,
+      "overriden_lines": 0
+    }
+  }
+}
