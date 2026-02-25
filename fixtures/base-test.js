@@ -2,7 +2,6 @@ const playwrightTest = require('@playwright/test');
 const base = playwrightTest.test;
 const { APIClient } = require('../utils/api-client');
 const { logger } = require('../utils/logger');
-const { takeScreenshot } = require('../utils/test-helpers');
 const { env } = require('../config/environment.config');
 const { SharedTestContext } = require('../utils/shared-test-context');
 

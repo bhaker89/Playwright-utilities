@@ -1,11 +1,16 @@
-const { expect } = require('@playwright/test');
-const { logger } = require('../utils/logger');
-const { takeScreenshot } = require('../utils/test-helpers');
+const { logger } = require('../utils/base/logger');
+const { takeScreenshot } = require('../utils/ui/ui-actions');
 
 /**
  * Base Page Object Model class
  * Uses composition over inheritance and optimal Locator patterns
  * Optimized for scalability across multiple microservices
+ * 
+ * DESIGN PRINCIPLE: Keep BasePage THIN
+ * - Only core page navigation and locator methods
+ * - For advanced UI actions (popup, upload, download, toast, etc.) use utils/ui/ui-actions.js
+ * - For network actions (mocking, response capture) use utils/network/network-actions.js
+ * 
  * @abstract
  */
 class BasePage {
