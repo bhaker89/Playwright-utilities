@@ -1,0 +1,67 @@
+package.json
+  4c02fc6cdf362d57 33-35
+docs/INTERVIEW_QA_PLAYWRIGHT.md
+  d50399102c51f782 1-462
+utils/ui/index.js
+  50bc74100dfba0f0 1-8
+utils/clean-logs.js
+  4c02fc6cdf362d57 1-231
+utils/ui/ui-actions.js
+  50bc74100dfba0f0 1-441
+utils/network/index.js
+  50bc74100dfba0f0 1-8
+utils/base/test-helpers.js
+  50bc74100dfba0f0 2-14,17-35,37,39,41-43,45-46,49-68
+pages/base.page.js
+  50bc74100dfba0f0 1-2,8-13
+utils/network/network-actions.js
+  50bc74100dfba0f0 1-390
+docs/HELPER_METHODS_GUIDE.md
+  50bc74100dfba0f0 1-842
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.4",
+  "base_commit_sha": "c31df84ef08fd27f31054e67eac469e778eb5049",
+  "prompts": {
+    "4c02fc6cdf362d57": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "383315",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 243,
+      "total_deletions": 9,
+      "accepted_lines": 234,
+      "overriden_lines": 0
+    },
+    "50bc74100dfba0f0": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "383550",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 1759,
+      "total_deletions": 112,
+      "accepted_lines": 1759,
+      "overriden_lines": 0
+    },
+    "d50399102c51f782": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "383358",
+        "model": "OPENROUTER_GPT_5_POINT_2"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 462,
+      "total_deletions": 0,
+      "accepted_lines": 462,
+      "overriden_lines": 0
+    }
+  }
+}
