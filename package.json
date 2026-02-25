@@ -30,6 +30,9 @@
     "clean": "rm -rf test-results playwright-report allure-results allure-report",
     "clean:reports": "rm -rf test-results playwright-report",
     "clean:allure": "rm -rf allure-results allure-report",
+    "clean:logs": "node utils/clean-logs.js",
+    "clean:logs:all": "node utils/clean-logs.js --all",
+    "clean:logs:force": "cd logs && mv combined.log combined.log.$(date +%Y-%m-%d_%H-%M-%S).backup 2>/dev/null || true && touch combined.log && echo '✅ Log forcefully archived!'",
     "pretest": "npm run clean:reports",
     "test:nocode": "node no-code-runner/cli.js run",
     "test:nocode:validate": "node no-code-runner/cli.js validate"
