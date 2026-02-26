@@ -1,0 +1,92 @@
+package.json
+  6513b37c513543f1 37-39,75
+IMPLEMENTATION_SUMMARY.md
+  6513b37c513543f1 1-319
+platform/generators/context-gatherer.js
+  6513b37c513543f1 1-308
+platform/engines/api-executor.js
+  6513b37c513543f1 1-194
+platform/generators/prompt-builder.js
+  6513b37c513543f1 1-219
+.env.example
+  6513b37c513543f1 1-32
+platform/generators/openapi-generator.js
+  6513b37c513543f1 1-382
+platform/generators/api-helper-generator.js
+  9d8a0395cbc20b4a 225,230-237,240
+  6513b37c513543f1 1-224,226-229,238-239,241-290
+platform/cli/index.js
+  6513b37c513543f1 100-137,139,284-321
+docs/API_TEST_GENERATOR_SETUP.md
+  6513b37c513543f1 1-425
+platform/generators/llm-client.js
+  6513b37c513543f1 1-269
+docs/LLM_GENERATOR_QUICK_REFERENCE.md
+  8e61bc5bf705ed0a 1-58,61-63,65,70-121,129-130,133-134,138-140,144-237,241-242,247-322
+  8490cce9e4ce8e17 59-60,64,66-69,122-128,131-132,135-137,141-143,238-240,243-246
+platform/core/orchestrator.js
+  6513b37c513543f1 1-221
+platform/generators/test-code-generator.js
+  6513b37c513543f1 1-203
+platform/generators/README.md
+  6513b37c513543f1 1-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.4",
+  "base_commit_sha": "29ffe4f19f8f240b92ab954d2cfc2ab1141a57fa",
+  "prompts": {
+    "6513b37c513543f1": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "385851",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 3111,
+      "total_deletions": 3,
+      "accepted_lines": 3099,
+      "overriden_lines": 3
+    },
+    "8490cce9e4ce8e17": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "385108",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 215,
+      "total_deletions": 13,
+      "accepted_lines": 29,
+      "overriden_lines": 0
+    },
+    "8e61bc5bf705ed0a": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "384082",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 305,
+      "total_deletions": 0,
+      "accepted_lines": 293,
+      "overriden_lines": 0
+    },
+    "9d8a0395cbc20b4a": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "385937",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 9,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    }
+  }
+}
