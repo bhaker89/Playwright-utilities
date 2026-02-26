@@ -97,7 +97,46 @@ class CLI {
           await this.generateCommand(argv);
         }
       )
+      .command(
+        'generate-from-curl',
+        'Generate API test from cURL command (complete flow)',
+        (yargs) => {
+          return yargs
+            .option('curl', {
+              alias: 'c',
+              describe: 'cURL command string',
+              type: 'string',
+              demandOption: true
+            })
+            .option('service', {
+              alias: 's',
+              describe: 'Service name (e.g., payment-service)',
+              type: 'string',
+              demandOption: true
+            })
+            .option('api', {
+              alias: 'a',
+              describe: 'API name (e.g., process-payment)',
+              type: 'string',
+              demandOption: true
+            })
+            .option('skip-execute', {
+              describe: 'Skip API execution (use mock response)',
+              type: 'boolean',
+              default: false
+            })
+            .option('llm-provider', {
+              describe: 'LLM provider to use',
+              choices: ['openai', 'claude', 'ollama'],
+              default: 'openai'
+            });
+        },
+        async (argv) => {
+          await this.generateFromCurlCommand(argv);
+        }
+      )
       .example('$0 generate ui "Login and verify dashboard"', 'Generate UI test')
+      .example('$0 generate-from-curl --curl "curl -X POST..." --service payment-service --api process-payment', 'Generate from cURL')
       .example('$0 run tests/api-tests.yaml', 'Run tests from YAML file')
       .example('$0 run tests/api-tests.json', 'Run tests from JSON file')
       .example('$0 validate tests/api-tests.yaml', 'Validate test file')
@@ -240,6 +279,46 @@ class CLI {
     console.log(`\n✓ Successfully converted to: ${outputPath}`);
     console.log(`  Tests generated: ${suite.tests.length}`);
     console.log(`  Run with: node platform/cli/index.js run ${path.relative(process.cwd(), outputPath)}`);
+  }
+
+  /**
+   * Generate from cURL command handler (NEW FLOW)
+   */
+  async generateFromCurlCommand(argv) {
+    console.log('🚀 API Test Generator - Complete Flow');
+    console.log('='.repeat(80));
+
+    try {
+      const { Orchestrator } = require('../core/orchestrator');
+      const orchestrator = new Orchestrator();
+
+      const result = await orchestrator.generateFromCurl({
+        curlCommand: argv.curl,
+        serviceName: argv.service,
+        apiName: argv.api,
+        skipExecution: argv.skipExecute,
+        llmProvider: argv.llmProvider
+      });
+
+      if (result.success) {
+        console.log('\n✅ SUCCESS! All artifacts generated:');
+        console.log(`  1. Helper: ${result.artifacts.helperFile}`);
+        console.log(`  2. OpenAPI: ${result.artifacts.openApiSpec}`);
+        console.log(`  3. Test: ${result.artifacts.testFile}`);
+        console.log('\n🎯 Run your test:');
+        console.log(`  npx playwright test ${result.artifacts.testFile}`);
+        process.exit(0);
+      } else {
+        console.error('\n❌ Generation failed. Check logs for details.');
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error('\n❌ Fatal error:', error.message);
+      if (argv.verbose) {
+        console.error(error.stack);
+      }
+      process.exit(1);
+    }
   }
 
   /**
