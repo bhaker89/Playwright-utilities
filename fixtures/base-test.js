@@ -1,9 +1,9 @@
 const playwrightTest = require('@playwright/test');
 const base = playwrightTest.test;
-const { APIClient } = require('../utils/api-client');
-const { logger } = require('../utils/logger');
+const { APIClient } = require('../utils/api/api-client');
+const { logger } = require('../utils/base/logger');
 const { env } = require('../config/environment.config');
-const { SharedTestContext } = require('../utils/shared-test-context');
+const { SharedTestContext } = require('../platform/core/shared-test-context');
 
 /**
  * ============================================================================
@@ -65,13 +65,13 @@ const test = base.extend({
    * API Client fixture
    * Automatically initializes and disposes the API client
    */
-  apiClient: async ({}, use) => {
+  apiClient: async ({ }, use) => {
     const client = new APIClient(env.apiBaseURL);
     await client.init();
     logger.info('API client initialized');
-    
+
     await use(client);
-    
+
     await client.dispose();
     logger.info('API client disposed');
   },
@@ -81,17 +81,17 @@ const test = base.extend({
    * Provides access to the singleton SharedTestContext instance
    * Automatically clears test-scoped context after each test
    */
-  sharedContext: async ({}, use, testInfo) => {
+  sharedContext: async ({ }, use, testInfo) => {
     const context = SharedTestContext.getInstance();
-    
+
     // Set test and suite names for scoped context
     context.setSuiteName(testInfo.titlePath[0]);
     context.setTestName(testInfo.title);
-    
+
     logger.info(`SharedContext available for test: ${testInfo.title}`);
-    
+
     await use(context);
-    
+
     // Clear test-scoped context after each test
     context.clearScope('test');
     logger.info(`SharedContext test scope cleared for: ${testInfo.title}`);
@@ -106,7 +106,7 @@ const expect = playwrightTest.expect;
 /**
  * Re-export SharedTestContext utilities
  */
-const { ContextHelpers } = require('../utils/shared-test-context');
+const { ContextHelpers } = require('../platform/core/shared-test-context');
 
 module.exports = {
   test,

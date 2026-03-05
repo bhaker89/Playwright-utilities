@@ -49,7 +49,7 @@ You are an expert Playwright test automation engineer. Generate a complete, prod
 ## API Specification
 
 \`\`\`yaml
-${openApiSpec}
+${this._truncateSpec(openApiSpec)}
 \`\`\`
 
 ## Service Information
@@ -184,7 +184,7 @@ Now generate the complete test file:
       return 'No example tests available. Follow Playwright best practices.';
     }
 
-    return examples.map(ex => 
+    return examples.map(ex =>
       `### ${ex.fileName}\n\n\`\`\`javascript\n${ex.content}\n\`\`\``
     ).join('\n\n');
   }
@@ -198,10 +198,22 @@ Now generate the complete test file:
       return '- expect(response.status).toBe(200);\n- expect(response.body).toHaveProperty("id");';
     }
 
-    return patterns.map(p => 
+    return patterns.map(p =>
       `### ${p.type.charAt(0).toUpperCase() + p.type.slice(1)} Assertions\n\n` +
       p.examples.map(ex => `- \`${ex}\``).join('\n')
     ).join('\n\n');
+  }
+
+  /**
+   * Truncate OpenAPI spec if it's too large
+   * @private
+   */
+  _truncateSpec(spec, maxLines = 1000) {
+    const lines = spec.split('\n');
+    if (lines.length <= maxLines) return spec;
+
+    logger.warn(`  ⚠️  OpenAPI spec is very large (${lines.length} lines). Truncating to ${maxLines} lines for LLM.`);
+    return lines.slice(0, maxLines).join('\n') + '\n# ... (rest of spec truncated to stay within token limits) ...';
   }
 
   /**

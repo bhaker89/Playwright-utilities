@@ -8,7 +8,7 @@ const { logger } = require('../../utils/base/logger');
  * Provides unified interface for:
  * - OpenAI (GPT-4)
  * - Anthropic (Claude)
- * - Ollama (Local LLMs)
+ * - Groq (Fast Inference)
  * 
  * USAGE:
  * ------
@@ -42,8 +42,8 @@ class LLMClient {
       case 'anthropic':
         this._initializeAnthropic();
         break;
-      case 'ollama':
-        this._initializeOllama();
+      case 'groq':
+        this._initializeGroq();
         break;
       default:
         throw new Error(`Unsupported LLM provider: ${this.provider}`);
@@ -56,7 +56,7 @@ class LLMClient {
    */
   _initializeOpenAI() {
     const apiKey = process.env.OPENAI_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY environment variable is required');
     }
@@ -76,7 +76,7 @@ class LLMClient {
    */
   _initializeAnthropic() {
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY environment variable is required');
     }
@@ -90,19 +90,27 @@ class LLMClient {
     }
   }
 
+
   /**
-   * Initialize Ollama client
+   * Initialize Groq client
    * @private
    */
-  _initializeOllama() {
-    const baseURL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-    
+  _initializeGroq() {
+    const apiKey = process.env.GROQ_API_KEY;
+
+    if (!apiKey) {
+      throw new Error('GROQ_API_KEY environment variable is required');
+    }
+
     try {
-      const { Ollama } = require('ollama');
-      this.client = new Ollama({ host: baseURL });
-      logger.info(`  Ollama client initialized (${baseURL})`);
+      const { OpenAI } = require('openai');
+      this.client = new OpenAI({
+        apiKey: apiKey,
+        baseURL: 'https://api.groq.com/openai/v1'
+      });
+      logger.info('  Groq client initialized (OpenAI compatible)');
     } catch (error) {
-      throw new Error('Ollama package not installed. Run: npm install ollama');
+      throw new Error('OpenAI package not installed. Run: npm install openai');
     }
   }
 
@@ -116,9 +124,10 @@ class LLMClient {
    */
   async generate(options) {
     const { prompt, maxTokens = 2000, temperature = 0.7 } = options;
+    const providerName = this.provider.toUpperCase();
 
-    logger.info(`  Calling ${this.provider} LLM...`);
-    logger.info(`  Max tokens: ${maxTokens}, Temperature: ${temperature}`);
+    logger.info(`  [${providerName}] Request started...`);
+    logger.info(`  [${providerName}] Max tokens: ${maxTokens}, Temperature: ${temperature}`);
 
     const startTime = Date.now();
 
@@ -133,22 +142,29 @@ class LLMClient {
         case 'anthropic':
           response = await this._generateAnthropic(prompt, maxTokens, temperature);
           break;
-        case 'ollama':
-          response = await this._generateOllama(prompt, maxTokens, temperature);
+        case 'groq':
+          response = await this._generateGroq(prompt, maxTokens, temperature);
           break;
       }
 
       const endTime = Date.now();
       const duration = endTime - startTime;
 
-      logger.info(`  ✓ LLM response received (${duration}ms)`);
-      logger.info(`  Tokens used: ${response.tokensUsed || 'N/A'}`);
-      logger.info(`  Estimated cost: $${response.estimatedCost || '0.00'}`);
+      logger.info(`  ✓ [${providerName}] Response received in ${duration}ms`);
+
+      if (response.tokensUsed) {
+        logger.info(`  [${providerName}] Tokens used: ${response.tokensUsed}`);
+      }
+
+      if (response.estimatedCost > 0) {
+        logger.info(`  [${providerName}] Estimated cost: $${response.estimatedCost}`);
+      }
 
       return response;
 
     } catch (error) {
-      logger.error(`  ❌ LLM generation failed: ${error.message}`);
+      logger.error(`  ❌ [${providerName}] Generation failed after ${Date.now() - startTime}ms`);
+      logger.error(`  Error: ${error.message}`);
       throw error;
     }
   }
@@ -218,24 +234,37 @@ class LLMClient {
     };
   }
 
+
   /**
-   * Generate using Ollama
+   * Generate using Groq
    * @private
    */
-  async _generateOllama(prompt, maxTokens, temperature) {
-    const response = await this.client.generate({
-      model: process.env.OLLAMA_MODEL || 'codellama',
-      prompt: prompt,
-      options: {
-        num_predict: maxTokens,
-        temperature: temperature
-      }
+  async _generateGroq(prompt, maxTokens, temperature) {
+    const model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+
+    const response = await this.client.chat.completions.create({
+      model: model,
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert Playwright test automation engineer. Generate clean, maintainable test code following best practices.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      max_tokens: maxTokens,
+      temperature: temperature
     });
 
+    const content = response.choices[0].message.content;
+    const tokensUsed = response.usage.total_tokens;
+
     return {
-      content: response.response,
-      tokensUsed: 0, // Ollama doesn't report tokens
-      estimatedCost: 0.0, // Local, no cost
+      content,
+      tokensUsed,
+      estimatedCost: 0.0, // Groq prices are extremely low, often free/subsidized right now
       model: response.model
     };
   }
@@ -258,10 +287,10 @@ class LLMClient {
     // Claude pricing (approximate)
     const inputCostPer1k = 0.003; // $0.003 per 1K input tokens
     const outputCostPer1k = 0.015; // $0.015 per 1K output tokens
-    
+
     const inputCost = (inputTokens / 1000) * inputCostPer1k;
     const outputCost = (outputTokens / 1000) * outputCostPer1k;
-    
+
     return (inputCost + outputCost).toFixed(4);
   }
 }
