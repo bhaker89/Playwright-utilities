@@ -1,0 +1,36 @@
+openapi: 3.0.0
+info:
+  title: Get Single Post API
+  description: Auto-generated OpenAPI spec for jsonplaceholder-service/get-single-post
+  version: 1.0.0
+  x-generated-at: '2026-02-27T09:05:36.842Z'
+  x-service: jsonplaceholder-service
+  x-api-name: get-single-post
+servers:
+  - url: https://jsonplaceholder.typicode.com
+    description: API Server
+paths:
+  /posts/1:
+    get:
+      summary: Get Single Post
+      description: GET get-single-post operation
+      operationId: get_get_single_post
+      tags:
+        - get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            text/html; charset=UTF-8:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    ResponseBody:
+      type: string

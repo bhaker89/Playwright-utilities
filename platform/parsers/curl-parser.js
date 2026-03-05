@@ -17,6 +17,7 @@ class CurlParser {
   parseCommand(curlCommand, testName = 'Imported CURL Test') {
     try {
       logger.info(`Parsing CURL command: ${testName}`);
+      logger.debug(`  [DEBUG] Raw CURL: ${curlCommand}`);
 
       // Convert CURL to JavaScript (Playwright/Node structure)
       const converted = curlconverter.toNode(curlCommand);
@@ -29,8 +30,13 @@ class CurlParser {
       const methodMatch = curlCommand.match(/-X\s+([A-Z]+)/i) || curlCommand.match(/--request\s+([A-Z]+)/i);
       const method = methodMatch ? methodMatch[1] : (curlCommand.includes('--data') || curlCommand.includes('-d') ? 'POST' : 'GET');
 
-      const urlMatch = curlCommand.match(/'(https?:\/\/[^']+)'/) || curlCommand.match(/"(https?:\/\/[^"]+)"/);
-      const url = urlMatch ? urlMatch[1] : '';
+      // Improved URL matching: handle quoted and unquoted URLs
+      const urlMatch = curlCommand.match(/'(https?:\/\/[^']+)'/) ||
+        curlCommand.match(/"(https?:\/\/[^"]+)"/) ||
+        curlCommand.match(/(https?:\/\/[^\s'"]+)/);
+      const url = urlMatch ? (urlMatch[1] || urlMatch[0]) : '';
+
+      logger.debug(`  [DEBUG] Extracted URL: ${url}`);
 
       const testCase = {
         name: testName,

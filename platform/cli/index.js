@@ -127,7 +127,7 @@ class CLI {
             })
             .option('llm-provider', {
               describe: 'LLM provider to use',
-              choices: ['openai', 'claude', 'ollama'],
+              choices: ['openai', 'claude', 'groq'],
               default: 'openai'
             });
         },
@@ -135,8 +135,47 @@ class CLI {
           await this.generateFromCurlCommand(argv);
         }
       )
+      .command(
+        'generate-from-openapi',
+        'Generate Playwright API tests directly from an OpenAPI spec file using an LLM',
+        (yargs) => {
+          return yargs
+            .option('spec', {
+              alias: 's',
+              describe: 'Path to OpenAPI spec file (.yaml or .json)',
+              type: 'string',
+              demandOption: true
+            })
+            .option('service', {
+              describe: 'Service name (e.g., payment-service)',
+              type: 'string',
+              demandOption: true
+            })
+            .option('api', {
+              alias: 'a',
+              describe: 'API/operation name (e.g., create-order)',
+              type: 'string',
+              demandOption: true
+            })
+            .option('llm-provider', {
+              alias: 'l',
+              describe: 'LLM provider to use',
+              choices: ['openai', 'claude', 'groq'],
+              default: 'groq'
+            })
+            .option('output', {
+              alias: 'o',
+              describe: 'Custom output directory for generated test file',
+              type: 'string'
+            });
+        },
+        async (argv) => {
+          await this.generateFromOpenApiCommand(argv);
+        }
+      )
       .example('$0 generate ui "Login and verify dashboard"', 'Generate UI test')
       .example('$0 generate-from-curl --curl "curl -X POST..." --service payment-service --api process-payment', 'Generate from cURL')
+      .example('$0 generate-from-openapi --spec services/order/openapi.yaml --service order-service --api create-order --llm-provider groq', 'Generate tests from OpenAPI spec using Groq')
       .example('$0 run tests/api-tests.yaml', 'Run tests from YAML file')
       .example('$0 run tests/api-tests.json', 'Run tests from JSON file')
       .example('$0 validate tests/api-tests.yaml', 'Validate test file')
@@ -317,6 +356,63 @@ class CLI {
       if (argv.verbose) {
         console.error(error.stack);
       }
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Generate tests from OpenAPI spec command handler
+   */
+  async generateFromOpenApiCommand(argv) {
+    console.log('🤖 OpenAPI → Playwright Test Generator (Powered by Groq)');
+    console.log('='.repeat(80));
+
+    const specPath = path.resolve(argv.spec);
+
+    if (!fs.existsSync(specPath)) {
+      console.error(`❌ OpenAPI spec file not found: ${specPath}`);
+      process.exit(1);
+    }
+
+    const llmProvider = argv.llmProvider || process.env.AI_PROVIDER || 'groq';
+    console.log(`  📄 Spec:     ${specPath}`);
+    console.log(`  🔧 Service:  ${argv.service}`);
+    console.log(`  📌 API:      ${argv.api}`);
+    console.log(`  🧠 LLM:      ${llmProvider}`);
+    console.log('');
+
+    try {
+      // Load env so GROQ_API_KEY is available
+      require('../../config/environment.config');
+
+      // Set the provider env var so LLMClient picks it up
+      process.env.GROQ_API_KEY = process.env.GROQ_API_KEY ||
+        require('dotenv').config({ path: require('path').resolve(__dirname, '../../config/.env.stag') }).parsed?.GROQ_API_KEY;
+
+      const { OpenApiTestOrchestrator } = require('./openapi-test-orchestrator');
+      const orchestrator = new OpenApiTestOrchestrator();
+
+      const result = await orchestrator.generate({
+        specPath,
+        serviceName: argv.service,
+        apiName: argv.api,
+        llmProvider,
+        outputDir: argv.output
+      });
+
+      if (result.success) {
+        console.log('\n✅ SUCCESS! Test file generated:');
+        console.log(`  📝 ${result.testFilePath}`);
+        console.log(`\n🎯 Run your tests:`);
+        console.log(`  npx playwright test ${result.testFilePath}`);
+        process.exit(0);
+      } else {
+        console.error('\n❌ Generation failed. Check logs above for details.');
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error('\n❌ Fatal error:', error.message);
+      console.error(error.stack);
       process.exit(1);
     }
   }

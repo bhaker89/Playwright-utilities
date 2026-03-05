@@ -99,6 +99,7 @@ function loadEnvironment() {
     AI_PROVIDER: process.env.AI_PROVIDER || 'anthropic',
     AI_API_KEY: process.env.AI_API_KEY || '',
     AI_MODEL: process.env.AI_MODEL || '',
+    GROQ_API_KEY: process.env.GROQ_API_KEY || '',
   };
 }
 

@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-02-27T09:05:36.847Z",
+  "request": {
+    "method": "GET",
+    "url": "https://jsonplaceholder.typicode.com/posts/1",
+    "hasHeaders": false,
+    "hasBody": false
+  },
+  "response": {
+    "status": 200,
+    "statusText": "OK",
+    "time": 175,
+    "contentType": "text/html; charset=UTF-8"
+  }
+}
