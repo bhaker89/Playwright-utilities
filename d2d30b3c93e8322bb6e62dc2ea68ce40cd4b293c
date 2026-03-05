@@ -1,0 +1,23 @@
+run-e2e-test.sh
+  67b7ed1311aebb44 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "d2d30b3c93e8322bb6e62dc2ea68ce40cd4b293c",
+  "prompts": {
+    "67b7ed1311aebb44": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "386478",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 56,
+      "total_deletions": 1,
+      "accepted_lines": 49,
+      "overriden_lines": 1
+    }
+  }
+}
