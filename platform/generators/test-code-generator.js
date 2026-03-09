@@ -66,10 +66,11 @@ class TestCodeGenerator {
       logger.info('  ✓ OpenAPI spec loaded');
 
       // 2. Gather framework context
-      const context = await this.contextGatherer.gatherContext(serviceName);
+      const method = this._extractMethodFromSpec(openApiSpec);
+      const context = await this.contextGatherer.gatherContext(serviceName, { method });
 
       // 3. Build LLM prompt
-      const prompt = this.promptBuilder.buildTestGenerationPrompt({
+      const { systemPrompt, userPrompt } = this.promptBuilder.buildTestGenerationPrompt({
         openApiSpec,
         context,
         helperInfo,
@@ -82,7 +83,8 @@ class TestCodeGenerator {
       const llmClient = new LLMClient(llmProvider);
 
       const llmResponse = await llmClient.generate({
-        prompt,
+        prompt: userPrompt,
+        systemPrompt,
         maxTokens: 2500, // Slightly more for complex APIs
         temperature: 0.7
       });
@@ -201,6 +203,25 @@ class TestCodeGenerator {
     fs.writeFileSync(testFilePath, testCode, 'utf8');
 
     return testFilePath;
+  }
+
+  /**
+   * Extract HTTP method from OpenAPI spec
+   * @private
+   */
+  _extractMethodFromSpec(specContent) {
+    try {
+      const spec = yaml.load(specContent);
+      if (!spec || !spec.paths) return null;
+
+      const firstPath = Object.values(spec.paths)[0];
+      if (firstPath) {
+        return Object.keys(firstPath)[0];
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
   }
 }
 

@@ -171,7 +171,7 @@ class OpenApiGenerator {
     // Add response body schema
     if (response.body) {
       const contentType = response.headers['content-type'] || 'application/json';
-      
+
       responses[statusCode].content[contentType] = {
         schema: this._inferSchema(response.body, 'Response')
       };
@@ -218,7 +218,7 @@ class OpenApiGenerator {
     Object.keys(obj).forEach(key => {
       const value = obj[key];
       schema.properties[key] = this._inferPropertySchema(value);
-      
+
       // Mark as required if value is present
       if (value !== null && value !== undefined) {
         schema.required.push(key);

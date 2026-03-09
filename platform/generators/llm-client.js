@@ -136,14 +136,14 @@ class LLMClient {
 
       switch (this.provider) {
         case 'openai':
-          response = await this._generateOpenAI(prompt, maxTokens, temperature);
+          response = await this._generateOpenAI(prompt, maxTokens, temperature, options.systemPrompt);
           break;
         case 'claude':
         case 'anthropic':
-          response = await this._generateAnthropic(prompt, maxTokens, temperature);
+          response = await this._generateAnthropic(prompt, maxTokens, temperature, options.systemPrompt);
           break;
         case 'groq':
-          response = await this._generateGroq(prompt, maxTokens, temperature);
+          response = await this._generateGroq(prompt, maxTokens, temperature, options.systemPrompt);
           break;
       }
 
@@ -152,8 +152,8 @@ class LLMClient {
 
       logger.info(`  ✓ [${providerName}] Response received in ${duration}ms`);
 
-      if (response.tokensUsed) {
-        logger.info(`  [${providerName}] Tokens used: ${response.tokensUsed}`);
+      if (response.tokens) {
+        logger.info(`  [${providerName}] Tokens: ${response.tokens.total} (Input: ${response.tokens.input}, Output: ${response.tokens.output})`);
       }
 
       if (response.estimatedCost > 0) {
@@ -173,13 +173,13 @@ class LLMClient {
    * Generate using OpenAI
    * @private
    */
-  async _generateOpenAI(prompt, maxTokens, temperature) {
+  async _generateOpenAI(prompt, maxTokens, temperature, systemPrompt) {
     const response = await this.client.chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
       messages: [
         {
           role: 'system',
-          content: 'You are an expert Playwright test automation engineer. Generate clean, maintainable test code following best practices.'
+          content: systemPrompt || 'You are an expert Playwright test automation engineer. Generate clean, maintainable test code following best practices.'
         },
         {
           role: 'user',
@@ -191,12 +191,16 @@ class LLMClient {
     });
 
     const content = response.choices[0].message.content;
-    const tokensUsed = response.usage.total_tokens;
-    const estimatedCost = this._calculateOpenAICost(tokensUsed);
+    const tokens = {
+      input: response.usage.prompt_tokens,
+      output: response.usage.completion_tokens,
+      total: response.usage.total_tokens
+    };
+    const estimatedCost = this._calculateOpenAICost(tokens.total);
 
     return {
       content,
-      tokensUsed,
+      tokens,
       estimatedCost,
       model: response.model
     };
@@ -206,11 +210,12 @@ class LLMClient {
    * Generate using Anthropic Claude
    * @private
    */
-  async _generateAnthropic(prompt, maxTokens, temperature) {
+  async _generateAnthropic(prompt, maxTokens, temperature, systemPrompt) {
     const response = await this.client.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-3-sonnet-20240229',
       max_tokens: maxTokens,
       temperature: temperature,
+      system: systemPrompt || 'You are an expert Playwright test automation engineer.',
       messages: [
         {
           role: 'user',
@@ -220,7 +225,11 @@ class LLMClient {
     });
 
     const content = response.content[0].text;
-    const tokensUsed = response.usage.input_tokens + response.usage.output_tokens;
+    const tokens = {
+      input: response.usage.input_tokens,
+      output: response.usage.output_tokens,
+      total: response.usage.input_tokens + response.usage.output_tokens
+    };
     const estimatedCost = this._calculateAnthropicCost(
       response.usage.input_tokens,
       response.usage.output_tokens
@@ -228,7 +237,7 @@ class LLMClient {
 
     return {
       content,
-      tokensUsed,
+      tokens,
       estimatedCost,
       model: response.model
     };
@@ -239,7 +248,7 @@ class LLMClient {
    * Generate using Groq
    * @private
    */
-  async _generateGroq(prompt, maxTokens, temperature) {
+  async _generateGroq(prompt, maxTokens, temperature, systemPrompt) {
     const model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 
     const response = await this.client.chat.completions.create({
@@ -247,7 +256,7 @@ class LLMClient {
       messages: [
         {
           role: 'system',
-          content: 'You are an expert Playwright test automation engineer. Generate clean, maintainable test code following best practices.'
+          content: systemPrompt || 'You are an expert Playwright test automation engineer. Generate clean, maintainable test code following best practices.'
         },
         {
           role: 'user',
@@ -259,11 +268,15 @@ class LLMClient {
     });
 
     const content = response.choices[0].message.content;
-    const tokensUsed = response.usage.total_tokens;
+    const tokens = {
+      input: response.usage.prompt_tokens,
+      output: response.usage.completion_tokens,
+      total: response.usage.total_tokens
+    };
 
     return {
       content,
-      tokensUsed,
+      tokens,
       estimatedCost: 0.0, // Groq prices are extremely low, often free/subsidized right now
       model: response.model
     };
