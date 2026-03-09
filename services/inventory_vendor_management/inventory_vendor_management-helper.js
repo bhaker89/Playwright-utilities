@@ -34,6 +34,37 @@ class Inventory_vendor_managementHelper {
         return response;
     }
 
+
+    /**
+     * Check Sku Availability
+     * Auto-generated from cURL
+     * POST https://staginternalapi.1mg.com/inventory_vendor_management/__onemg-internal__/v3/inventories/skus_availability
+     * 
+     * @param {Object} apiContext - Playwright API context
+     * @param {Object} payload - Request payload
+     * @param {String} payload.cart_id - cart_id value
+     * @param {String} payload.cart_type - cart_type value
+     * @param {String} payload.user_id - user_id value
+     * @param {Array} payload.addresses - addresses value
+     * @param {Array} payload.skus - skus value
+     * @param {Boolean} payload.is_loyal_user - is_loyal_user value
+     * @param {Array} payload.pincodes - pincodes value
+     * @param {Number} payload.vendors_per_sku - vendors_per_sku value
+     * @returns {Promise<Object>} API response
+     */
+    static async checkSkuAvailability(apiContext, payload) {
+        logger.info(`🔸 Check Sku Availability: ${JSON.stringify(payload).substring(0, 100)}`);
+
+        const response = await apiContext.post('https://staginternalapi.1mg.com/inventory_vendor_management/__onemg-internal__/v3/inventories/skus_availability', {
+            data: payload,
+            headers: {
+          "Content-Type": "application/json"
+}
+        });
+
+        return response;
+    }
+
 }
 
 module.exports = { Inventory_vendor_managementHelper };

@@ -36,11 +36,11 @@ class ContextGatherer {
    * @param {string} serviceName - Service name for context
    * @returns {Promise<Object>} Context object
    */
-  async gatherContext(serviceName) {
+  async gatherContext(serviceName, options = {}) {
     logger.info('  Gathering framework context...');
 
     const context = {
-      exampleTests: await this._getExampleTests(serviceName),
+      exampleTests: await this._getExampleTests(serviceName, options.method),
       fixturePatterns: await this._getFixturePatterns(),
       importPatterns: await this._getImportPatterns(),
       assertionPatterns: await this._getAssertionPatterns(),
@@ -60,25 +60,35 @@ class ContextGatherer {
    * Get example test files
    * @private
    */
-  async _getExampleTests(serviceName) {
+  async _getExampleTests(serviceName, method = null) {
     const examples = [];
+    const maxExamples = 2;
+    const truncationLimit = 150; // Reduced from 500 to save tokens
 
     try {
       // Try to find tests for the same service
       const serviceTestDir = path.join(this.testsDir, serviceName);
-      
+
       if (fs.existsSync(serviceTestDir)) {
-        const files = fs.readdirSync(serviceTestDir)
-          .filter(f => f.endsWith('.spec.js'))
-          .slice(0, 2); // Get max 2 examples
+        let files = fs.readdirSync(serviceTestDir)
+          .filter(f => f.endsWith('.spec.js'));
+
+        // Optimization: Filter by method if provided (e.g., 'POST' -> files containing 'post')
+        if (method) {
+          const methodLower = method.toLowerCase();
+          const filteredFiles = files.filter(f => f.toLowerCase().includes(methodLower));
+          if (filteredFiles.length > 0) files = filteredFiles;
+        }
+
+        files = files.slice(0, maxExamples);
 
         for (const file of files) {
           const filePath = path.join(serviceTestDir, file);
           const content = fs.readFileSync(filePath, 'utf8');
-          
+
           examples.push({
             fileName: file,
-            content: this._truncateContent(content, 500)
+            content: this._truncateContent(content, truncationLimit)
           });
         }
       }
@@ -106,7 +116,7 @@ class ContextGatherer {
     try {
       if (fs.existsSync(this.testsDir)) {
         const entries = fs.readdirSync(this.testsDir, { withFileTypes: true });
-        
+
         for (const entry of entries) {
           if (entry.isDirectory()) {
             const dirPath = path.join(this.testsDir, entry.name);
@@ -117,7 +127,7 @@ class ContextGatherer {
             for (const file of files) {
               const filePath = path.join(dirPath, file);
               const content = fs.readFileSync(filePath, 'utf8');
-              
+
               examples.push({
                 fileName: `${entry.name}/${file}`,
                 content: this._truncateContent(content, 500)
@@ -126,7 +136,7 @@ class ContextGatherer {
               if (examples.length >= 2) break;
             }
           }
-          
+
           if (examples.length >= 2) break;
         }
       }
@@ -146,13 +156,13 @@ class ContextGatherer {
 
     try {
       const baseTestPath = path.join(this.fixturesDir, 'base-test.js');
-      
+
       if (fs.existsSync(baseTestPath)) {
         const content = fs.readFileSync(baseTestPath, 'utf8');
-        
+
         // Extract fixture names
         const fixtureMatches = content.match(/(\w+):\s*async\s*\(/g);
-        
+
         if (fixtureMatches) {
           fixtureMatches.forEach(match => {
             const fixtureName = match.match(/(\w+):/)[1];
@@ -254,10 +264,10 @@ class ContextGatherer {
 
       if (fs.existsSync(helperPath)) {
         const content = fs.readFileSync(helperPath, 'utf8');
-        
+
         // Extract method names
         const methodMatches = content.matchAll(/static\s+async\s+(\w+)\s*\(/g);
-        
+
         for (const match of methodMatches) {
           methods.push({
             name: match[1],
@@ -296,7 +306,7 @@ class ContextGatherer {
    */
   _truncateContent(content, maxLines) {
     const lines = content.split('\n');
-    
+
     if (lines.length <= maxLines) {
       return content;
     }
