@@ -1,5 +1,6 @@
 const { logger } = require('../utils/base/logger');
 const { takeScreenshot } = require('../utils/ui/ui-actions');
+const { SharedTestContext } = require('../platform/core/shared-test-context');
 
 /**
  * Base Page Object Model class
@@ -24,6 +25,8 @@ class BasePage {
     this.pageUrl = '';
     /** @protected @type {string | undefined} */
     this.serviceName = undefined;
+    /** @protected @type {SharedTestContext} */
+    this.context = SharedTestContext.getInstance();
   }
 
   /**
@@ -170,6 +173,27 @@ class BasePage {
   async goBack() {
     logger.info('Navigating back');
     await this.page.goBack();
+  }
+
+  /**
+   * ENHANCED: Fill with logging (shared with AI-UI Generator)
+   * @param {import('@playwright/test').Locator} locator
+   * @param {string} value
+   * @param {string} fieldName
+   */
+  async fill(locator, value, fieldName) {
+    logger.info(`Filling ${fieldName || 'field'} with value: ${value}`);
+    await locator.fill(value);
+  }
+
+  /**
+   * ENHANCED: Click with logging (shared with AI-UI Generator)
+   * @param {import('@playwright/test').Locator} locator
+   * @param {string} elementName
+   */
+  async click(locator, elementName) {
+    logger.info(`Clicking element: ${elementName || 'element'}`);
+    await locator.click();
   }
 }
 

@@ -22,17 +22,16 @@ const { env } = require('../../config/environment.config');
 
 /**
  * Enhanced API Client for REST API testing
+ * Wraps Playwright's native APIRequestContext for better tracing and reporting.
  */
 class APIClient {
   /**
-   * @param {string} [baseURL]
+   * @param {import('@playwright/test').APIRequestContext} requestContext
    * @param {Record<string, string>} [headers]
    */
-  constructor(baseURL, headers) {
-    /** @private @type {import('@playwright/test').APIRequestContext | null} */
-    this.context = null;
-    /** @private @type {string} */
-    this.baseURL = baseURL || env.apiBaseURL;
+  constructor(requestContext, headers) {
+    /** @private */
+    this.context = requestContext;
     /** @private @type {Record<string, string>} */
     this.defaultHeaders = {
       'Content-Type': 'application/json',
@@ -42,80 +41,21 @@ class APIClient {
   }
 
   /**
-   * Initialize the API request context
-   * @param {Object} [options]
-   * @param {string} [options.baseURL]
-   * @param {Record<string, string>} [options.extraHTTPHeaders]
-   * @param {boolean} [options.ignoreHTTPSErrors]
-   * @returns {Promise<void>}
-   */
-  async init(options) {
-    this.context = await request.newContext({
-      baseURL: options?.baseURL || this.baseURL,
-      extraHTTPHeaders: {
-        ...this.defaultHeaders,
-        ...options?.extraHTTPHeaders,
-      },
-      ignoreHTTPSErrors: options?.ignoreHTTPSErrors || false,
-    });
-    logger.info(`API Context initialized with baseURL: ${this.baseURL}`);
-  }
-
-  /**
-   * Set authentication token
+   * Set authentication token manually (if needed to override global storageState)
    * @param {string} token
    * @param {'Bearer' | 'Basic'} [type='Bearer']
-   * @returns {void}
    */
   setAuthToken(token, type = 'Bearer') {
     this.defaultHeaders['Authorization'] = `${type} ${token}`;
-    logger.info('Authentication token set');
+    logger.info('Authentication token set (override)');
   }
 
   /**
-   * Set API key in headers
-   * @param {string} key
-   * @param {string} [headerName='X-API-Key']
-   * @returns {void}
-   */
-  setAPIKey(key, headerName = 'X-API-Key') {
-    this.defaultHeaders[headerName] = key;
-    logger.info(`API key set in header: ${headerName}`);
-  }
-
-  /**
-   * Set custom headers (multiple headers at once)
-   * Useful for services requiring multiple custom headers like Order Nexus
+   * Set Custom Headers
    * @param {Record<string, string>} headers
-   * @returns {void}
    */
   setCustomHeaders(headers) {
     this.defaultHeaders = { ...this.defaultHeaders, ...headers };
-    logger.info(`Custom headers set: ${Object.keys(headers).join(', ')}`);
-  }
-
-  /**
-   * Set or change the base URL
-   * Useful when testing multiple services with different base URLs
-   * @param {string} url
-   * @returns {void}
-   */
-  setBaseURL(url) {
-    this.baseURL = url;
-    logger.info(`Base URL updated to: ${url}`);
-  }
-
-  /**
-   * Re-initialize context with current configuration
-   * Call this after changing base URL or headers to apply changes
-   * @returns {Promise<void>}
-   */
-  async reinit() {
-    if (this.context) {
-      await this.context.dispose();
-    }
-    await this.init({ baseURL: this.baseURL, extraHTTPHeaders: this.defaultHeaders });
-    logger.info('API Context re-initialized with updated configuration');
   }
 
   /**
@@ -174,22 +114,17 @@ class APIClient {
    * @returns {Promise<APIResponse<T>>}
    */
   async request(method, endpoint, options) {
-    if (!this.context) {
-      await this.init();
-    }
-
     const startTime = Date.now();
-
     logger.info(`${method} ${endpoint}`);
 
     try {
+      // Use the native fetch which automatically integrates with Tracing/Reporting
       const response = await this.context.fetch(endpoint, {
         method,
         headers: { ...this.defaultHeaders, ...options?.headers },
         params: options?.params,
         data: options?.data,
         timeout: options?.timeout,
-        ignoreHTTPSErrors: options?.ignoreHTTPSErrors,
       });
 
       const responseTime = Date.now() - startTime;
@@ -205,7 +140,6 @@ class APIClient {
       };
 
       logger.info(`${method} ${endpoint} - ${response.status()} (${responseTime}ms)`);
-
       return apiResponse;
     } catch (error) {
       logger.error(`${method} ${endpoint} failed`, error);
@@ -217,7 +151,7 @@ class APIClient {
    * Parse response body
    * @private
    * @template T
-   * @param {any} response
+   * @param {import('@playwright/test').APIResponse} response
    * @returns {Promise<T>}
    */
   async parseResponse(response) {
@@ -226,17 +160,6 @@ class APIClient {
       return await response.json();
     }
     return await response.text();
-  }
-
-  /**
-   * Dispose the API context
-   * @returns {Promise<void>}
-   */
-  async dispose() {
-    if (this.context) {
-      await this.context.dispose();
-      logger.info('API Context disposed');
-    }
   }
 }
 

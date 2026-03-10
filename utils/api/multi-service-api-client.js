@@ -1,6 +1,6 @@
 const { request } = require('@playwright/test');
-const { logger } = require('./logger');
-const { ServiceRegistry } = require('../config/services.config');
+const { logger } = require('../base/logger');
+const { ServiceRegistry } = require('../../config/services.config');
 
 /**
  * @typedef {Object} APIResponse
@@ -24,16 +24,17 @@ const { ServiceRegistry } = require('../config/services.config');
 /**
  * Multi-Service API Client
  * Supports testing across multiple microservices with service-specific configurations
- * Uses Factory Pattern for service-specific client creation
+ * Modernized to wrap Playwright's native APIRequestContext.
  */
 class MultiServiceAPIClient {
   /**
    * @param {string} serviceName
+   * @param {import('@playwright/test').APIRequestContext} requestContext
    * @param {Record<string, string>} [additionalHeaders]
    */
-  constructor(serviceName, additionalHeaders) {
-    /** @private @type {import('@playwright/test').APIRequestContext | null} */
-    this.context = null;
+  constructor(serviceName, requestContext, additionalHeaders) {
+    /** @private */
+    this.context = requestContext;
     /** @private @type {import('../config/services.config').ServiceConfig} */
     this.serviceConfig = ServiceRegistry.getService(serviceName);
     /** @private @type {Record<string, string>} */
@@ -45,29 +46,8 @@ class MultiServiceAPIClient {
   }
 
   /**
-   * Initialize the API request context for this service
-   * @param {Object} [options]
-   * @param {Record<string, string>} [options.extraHTTPHeaders]
-   * @param {boolean} [options.ignoreHTTPSErrors]
-   * @returns {Promise<void>}
-   */
-  async init(options) {
-    this.context = await request.newContext({
-      baseURL: this.serviceConfig.endpoints.apiURL,
-      extraHTTPHeaders: {
-        ...this.defaultHeaders,
-        ...options?.extraHTTPHeaders,
-      },
-      ignoreHTTPSErrors: options?.ignoreHTTPSErrors || false,
-      timeout: this.serviceConfig.timeout || 30000,
-    });
-    logger.info(`API Context initialized for service: ${this.serviceConfig.displayName}`);
-  }
-
-  /**
    * Set authentication based on service configuration
    * @param {string} token
-   * @returns {void}
    */
   setAuth(token) {
     if (!this.serviceConfig.auth) return;
@@ -126,48 +106,6 @@ class MultiServiceAPIClient {
   }
 
   /**
-   * PATCH request
-   * @template T
-   * @param {string} endpoint
-   * @param {any} [data]
-   * @param {APIRequestOptions} [options]
-   * @returns {Promise<APIResponse<T>>}
-   */
-  async patch(endpoint, data, options) {
-    return this.request('PATCH', endpoint, { ...options, data });
-  }
-
-  /**
-   * DELETE request
-   * @template T
-   * @param {string} endpoint
-   * @param {APIRequestOptions} [options]
-   * @returns {Promise<APIResponse<T>>}
-   */
-  async delete(endpoint, options) {
-    return this.request('DELETE', endpoint, options);
-  }
-
-  /**
-   * Health check for the service
-   * @returns {Promise<boolean>}
-   */
-  async healthCheck() {
-    if (!this.serviceConfig.endpoints.healthCheck) {
-      logger.warn(`No health check endpoint configured for ${this.serviceConfig.name}`);
-      return false;
-    }
-
-    try {
-      const response = await this.get(this.serviceConfig.endpoints.healthCheck);
-      return response.status >= 200 && response.status < 300;
-    } catch (error) {
-      logger.error(`Health check failed for ${this.serviceConfig.name}`, error);
-      return false;
-    }
-  }
-
-  /**
    * Generic request method with retry logic
    * @private
    * @template T
@@ -177,10 +115,6 @@ class MultiServiceAPIClient {
    * @returns {Promise<APIResponse<T>>}
    */
   async request(method, endpoint, options) {
-    if (!this.context) {
-      await this.init();
-    }
-
     const maxRetries = this.serviceConfig.retries || 1;
     let lastError;
 
@@ -195,7 +129,6 @@ class MultiServiceAPIClient {
           params: options?.params,
           data: options?.data,
           timeout: options?.timeout || this.serviceConfig.timeout,
-          ignoreHTTPSErrors: options?.ignoreHTTPSErrors,
         });
 
         const responseTime = Date.now() - startTime;
@@ -225,7 +158,6 @@ class MultiServiceAPIClient {
       }
     }
 
-    logger.error(`[${this.serviceConfig.name}] ${method} ${endpoint} failed after ${maxRetries} attempts`);
     throw lastError;
   }
 
@@ -233,7 +165,7 @@ class MultiServiceAPIClient {
    * Parse response body
    * @private
    * @template T
-   * @param {any} response
+   * @param {import('@playwright/test').APIResponse} response
    * @returns {Promise<T>}
    */
   async parseResponse(response) {
@@ -243,59 +175,27 @@ class MultiServiceAPIClient {
     }
     return await response.text();
   }
-
-  /**
-   * Get service configuration
-   * @returns {import('../config/services.config').ServiceConfig}
-   */
-  getServiceConfig() {
-    return this.serviceConfig;
-  }
-
-  /**
-   * Dispose the API context
-   * @returns {Promise<void>}
-   */
-  async dispose() {
-    if (this.context) {
-      await this.context.dispose();
-      logger.info(`[${this.serviceConfig.name}] API Context disposed`);
-    }
-  }
 }
 
 /**
  * Factory for creating service-specific API clients
  */
 class APIClientFactory {
-  /** @private @type {Map<string, MultiServiceAPIClient>} */
-  static clients = new Map();
-
   /**
-   * Get or create API client for a specific service
+   * Create an API client for a specific service using a provided native context
    * @param {string} serviceName
-   * @returns {Promise<MultiServiceAPIClient>}
+   * @param {import('@playwright/test').APIRequestContext} requestContext
+   * @returns {MultiServiceAPIClient}
    */
-  static async getClient(serviceName) {
-    if (!this.clients.has(serviceName)) {
-      const client = new MultiServiceAPIClient(serviceName);
-      await client.init();
-      this.clients.set(serviceName, client);
-    }
-    return this.clients.get(serviceName);
-  }
-
-  /**
-   * Dispose all clients
-   * @returns {Promise<void>}
-   */
-  static async disposeAll() {
-    for (const client of this.clients.values()) {
-      await client.dispose();
-    }
-    this.clients.clear();
+  static createClient(serviceName, requestContext) {
+    return new MultiServiceAPIClient(serviceName, requestContext);
   }
 }
+
+module.exports = {
+  MultiServiceAPIClient,
+  APIClientFactory,
+};
 
 module.exports = {
   MultiServiceAPIClient,

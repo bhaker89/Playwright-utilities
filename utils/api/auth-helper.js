@@ -1,5 +1,5 @@
-const { logger } = require('./logger');
-const { env } = require('../config/environment.config');
+const { logger } = require('../base/logger');
+const { env } = require('../../config/environment.config');
 
 /**
  * @typedef {Object} LoginCredentials
@@ -73,22 +73,36 @@ class AuthHelper {
     logger.info(`[AuthHelper] 🔐 Logging in with: ${emailOrMobile}`);
 
     // Navigate to login page
-    await this.page.goto(this.loginUrl);
-    await this.page.waitForLoadState('networkidle');
-    logger.info('[AuthHelper] Login page loaded');
+    // We wait for domcontentloaded only; the subsequent .waitFor() handles the rest.
+    await this.page.goto(this.loginUrl, { waitUntil: 'domcontentloaded' });
+    logger.info('[AuthHelper] Login page navigation started');
 
     // Enter email or mobile
     await this.emailOrMobileInput().waitFor({ state: 'visible', timeout: 10000 });
     await this.emailOrMobileInput().fill(emailOrMobile);
     logger.info(`[AuthHelper] Entered: ${emailOrMobile}`);
 
-    // Click Send OTP button
-    await this.sendOtpButton().click();
-    logger.info('[AuthHelper] Clicked SEND OTP');
+    // Click Send OTP button with retry for spinner/loading cases
+    let otpScreenAppeared = false;
+    for (let i = 0; i < 3; i++) {
+      logger.info(`[AuthHelper] Clicking SEND OTP (Attempt ${i + 1}/3)...`);
+      await this.sendOtpButton().click();
 
-    // Wait for OTP input to appear
-    await this.otpInput().waitFor({ state: 'visible', timeout: 15000 });
-    logger.info('[AuthHelper] OTP screen appeared');
+      try {
+        // Wait for OTP input to appear
+        await this.otpInput().waitFor({ state: 'visible', timeout: 10000 });
+        otpScreenAppeared = true;
+        logger.info('[AuthHelper] OTP screen appeared');
+        break;
+      } catch (error) {
+        logger.warn(`[AuthHelper] OTP screen did not appear after attempt ${i + 1}`);
+        if (i < 2) await this.page.waitForTimeout(2000);
+      }
+    }
+
+    if (!otpScreenAppeared) {
+      throw new Error('[AuthHelper] ❌ Failed to reach OTP screen after multiple attempts');
+    }
 
     if (otp) {
       // Enter OTP
@@ -97,17 +111,14 @@ class AuthHelper {
 
       // Click Done button
       await this.doneButton().click();
-      logger.info('[AuthHelper] Clicked DONE');
+      logger.info('[AuthHelper] Clicked DONE. Waiting for session to establish...');
 
-      // Wait for navigation after login
-      await this.page.waitForLoadState('networkidle', { timeout: 30000 });
-
-      // Verify login success
-      const isLoggedIn = await this.isUserLoggedIn();
+      // Verify login success with retries
+      const isLoggedIn = await this.isUserLoggedIn(5); // 5 retries for slow staging redirects
       if (isLoggedIn) {
         logger.info('[AuthHelper] ✅ Login successful');
       } else {
-        throw new Error('[AuthHelper] ❌ Login failed - user not detected as logged in');
+        throw new Error('[AuthHelper] ❌ Login failed - user not detected as logged in after multiple retries. Possible invalid OTP or timeout.');
       }
     } else {
       logger.warn('[AuthHelper] ⚠️  OTP not provided - manual OTP entry required');
@@ -116,52 +127,61 @@ class AuthHelper {
 
   /**
    * Check if user is logged in
-   * Looks for common indicators of logged-in state
+   * Looks for common indicators of logged-in state with retries
+   * @param {number} [retries=3]
    * @returns {Promise<boolean>}
    */
-  async isUserLoggedIn() {
-    // Check if login modal/popup is closed
-    const loginInputVisible = await this.emailOrMobileInput()
-      .isVisible({ timeout: 3000 })
-      .catch(() => false);
+  async isUserLoggedIn(retries = 3) {
+    for (let i = 0; i < retries; i++) {
+      logger.info(`[AuthHelper] Checking login status (Attempt ${i + 1}/${retries})...`);
 
-    if (loginInputVisible) {
-      logger.info('[AuthHelper] Login form still visible - not logged in');
-      return false;
-    }
-
-    // Check for common logged-in indicators
-    const loggedInSelectors = [
-      'text=My Account',
-      'text=Profile',
-      'text=Logout',
-      '[data-testid="user-profile"]',
-      '[data-testid="user-name"]',
-      '.user-profile',
-      '.profile-name',
-      'button:has-text("Logout")',
-    ];
-
-    for (const selector of loggedInSelectors) {
-      const isVisible = await this.page.locator(selector)
-        .first()
+      // Check if login modal/popup is closed
+      const loginInputVisible = await this.emailOrMobileInput()
         .isVisible({ timeout: 2000 })
         .catch(() => false);
 
-      if (isVisible) {
-        logger.info(`[AuthHelper] ✅ User logged in - detected: ${selector}`);
-        return true;
+      if (loginInputVisible) {
+        logger.info('[AuthHelper] Login form still visible');
+      } else {
+        // Check for common logged-in indicators
+        const loggedInSelectors = [
+          'text=My Account',
+          'text=Profile',
+          'text=Logout',
+          '[data-testid="user-profile"]',
+          '[data-testid="user-name"]',
+          '.user-profile',
+          '.profile-name',
+          'button:has-text("Logout")',
+        ];
+
+        for (const selector of loggedInSelectors) {
+          const isVisible = await this.page.locator(selector)
+            .first()
+            .isVisible({ timeout: 2000 })
+            .catch(() => false);
+
+          if (isVisible) {
+            logger.info(`[AuthHelper] ✅ User logged in - detected: ${selector}`);
+            return true;
+          }
+        }
+
+        // Check URL change (login modal typically closes after successful login)
+        const currentUrl = this.page.url();
+        if (!currentUrl.includes('login=true')) {
+          logger.info('[AuthHelper] ✅ User logged in - URL changed');
+          return true;
+        }
+      }
+
+      // Wait a bit before next retry if not last attempt
+      if (i < retries - 1) {
+        await this.page.waitForTimeout(3000);
       }
     }
 
-    // Check URL change (login modal typically closes after successful login)
-    const currentUrl = this.page.url();
-    if (!currentUrl.includes('login=true')) {
-      logger.info('[AuthHelper] ✅ User logged in - URL changed');
-      return true;
-    }
-
-    logger.warn('[AuthHelper] ⚠️  Could not confirm login status');
+    logger.warn('[AuthHelper] ⚠️  Could not confirm login status after retries');
     return false;
   }
 

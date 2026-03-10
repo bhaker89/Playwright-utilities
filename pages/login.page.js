@@ -1,6 +1,6 @@
 const { BasePage } = require('./base.page');
 const { env } = require('../config/environment.config');
-const { logger } = require('../utils/logger');
+const { logger } = require('../utils/base/logger');
 
 /**
  * Login Page Object Model
@@ -12,7 +12,7 @@ class LoginPage extends BasePage {
    */
   constructor(page) {
     super(page);
-    
+
     /** @protected */
     this.pageUrl = `${env.baseURL}/login`;
     /** @protected */
