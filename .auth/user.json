@@ -1,0 +1,145 @@
+{
+  "cookies": [
+    {
+      "name": "city",
+      "value": "Gurgaon",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1775727631,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "geolocation",
+      "value": "false",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1775727635,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "abVisitorId",
+      "value": "517714",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 4891363200,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "abExperimentShow",
+      "value": "false",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 4891363200,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "amoSessionId",
+      "value": "c16deec2-9623-47a7-a9ec-6217c6b8bd11",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1773137431,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "synapse-init",
+      "value": "false",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "synapse-platform",
+      "value": "web",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "loggedIn",
+      "value": "true",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1773279643,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "userId",
+      "value": "%222f789c5c-129c-4084-99a3-5aa6658dbb79%22",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1775727643,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "authToken",
+      "value": "44fecc35-ae7c-47a8-aadf-81cc75fffd5f",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1773279643,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "cashback_token",
+      "value": "undefined",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1773279643,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "isLoyalUser",
+      "value": "true",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1773279643,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "VISITOR-ID",
+      "value": "c8452e4c-e898-4fa9-be9b-61828a272a77_kmZjAqRbz2_0134_1763190551777",
+      "domain": ".stag.1mg.com",
+      "path": "/",
+      "expires": 4926735643,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "session",
+      "value": "swpyDaUeh42mvjrMvLSFNQ.2hZOqSJHsTBdcirb89HYnDKx3i29cVmthTwVtsxJ1WjFPOyGVEwZ12ByIfDkIcmuL5SgsZ3uMCR8ZUoaHgcpCtiwb6O6Z6wxZq0HAWgwhObzlWDf5bxlHox67VV39UyEs8GW3i-uhz_9yOUqNEgcrSPQuX6z9s8oMBKaLAiNLla611zjr-HQBi5X_pHVxlhLN_5RsqusZowO2E0Xx0CMH0c2GeF5yi0T-vfnq5YIOu31mgoTOEnXxlEhFAbIHJ7Ys2ZYwTA0ndDyX0id22aVZ4qs45i5pg0HNqoGEAU1Fcko_4sSx7PKowep8xeItHuZ0d4VIvUTdLnuEvNVYl-ZyQSVtjpvXsvzdhTqAyS2iJyy9Go9UTF85yiUSssZKqCkTbPP5zNVBy5p_5fa_3vKrZm7j8hILK7Pn_qk2zaftGh81E5Oms3-eEhuX30Z0kc_.1773135643115.144000000.HJkygarqdEMM8q-2FBGiKGdz1N0-Qz4oobF7X_Jr3aM",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1773279636,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

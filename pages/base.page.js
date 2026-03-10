@@ -27,6 +27,10 @@ class BasePage {
     this.serviceName = undefined;
     /** @protected @type {SharedTestContext} */
     this.context = SharedTestContext.getInstance();
+
+    // Initialize SmartLocator Engine
+    const { SmartLocator } = require('../platform/core/smart-locator');
+    this.healer = new SmartLocator(page, this.constructor.name);
   }
 
   /**
@@ -176,24 +180,28 @@ class BasePage {
   }
 
   /**
-   * ENHANCED: Fill with logging (shared with AI-UI Generator)
+   * ENHANCED: Fill with logging and SmartLocator Rescue (shared with AI-UI Generator)
    * @param {import('@playwright/test').Locator} locator
    * @param {string} value
    * @param {string} fieldName
    */
   async fill(locator, value, fieldName) {
     logger.info(`Filling ${fieldName || 'field'} with value: ${value}`);
-    await locator.fill(value);
+    await this.healer.executeWithHealing(fieldName || 'field', locator, async (loc) => {
+      await loc.fill(value);
+    });
   }
 
   /**
-   * ENHANCED: Click with logging (shared with AI-UI Generator)
+   * ENHANCED: Click with logging and SmartLocator Rescue (shared with AI-UI Generator)
    * @param {import('@playwright/test').Locator} locator
    * @param {string} elementName
    */
   async click(locator, elementName) {
     logger.info(`Clicking element: ${elementName || 'element'}`);
-    await locator.click();
+    await this.healer.executeWithHealing(elementName || 'element', locator, async (loc) => {
+      await loc.click();
+    });
   }
 }
 
