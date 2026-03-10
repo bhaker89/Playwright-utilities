@@ -1,4 +1,4 @@
-const { test, expect } = require('../../platform/core/fixtures');
+const { test, expect } = require('../../fixtures/base-test');
 
 /**
  * User Service - Clean API Tests

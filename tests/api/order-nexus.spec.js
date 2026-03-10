@@ -1,4 +1,4 @@
-const { test, expect } = require('../../platform/core/fixtures');
+const { test, expect } = require('../../fixtures/base-test');
 const { generateOrderPayload } = require('../../services/order-nexus/nexus-payloads');
 
 test.describe('Order Nexus API - Clean Refactor', () => {

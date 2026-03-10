@@ -84,48 +84,63 @@ module.exports = defineConfig({
   projects: [
     // API Testing Project (no browser needed) - runs only once
     {
+      name: 'setup',
+      testMatch: /.*\.setup\.js/,
+    },
+
+    {
       name: 'api',
-      testMatch: /.*\/(api|legacy)\/.*\.spec\.js/,  // Matches files in api/ or legacy/ directories
+      testMatch: /.*\/(api|legacy)\/.*\.spec\.js/,
+      dependencies: ['setup'], // Dependency on auth setup
       use: {
         baseURL: process.env.API_BASE_URL || 'https://api.example.com',
+        storageState: '.auth/user.json', // Injected native auth
       },
     },
 
     // Desktop Browsers - excludes API tests
     {
       name: 'chromium',
-      testIgnore: /.*\/api\/.*\.spec\.js/,  // Ignore API tests for browser projects
+      testIgnore: /.*\/api\/.*\.spec\.js/,
+      dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 },
+        storageState: '.auth/user.json',
       },
     },
 
     {
       name: 'firefox',
       testIgnore: /.*\/api\/.*\.spec\.js/,
+      dependencies: ['setup'],
       use: {
         ...devices['Desktop Firefox'],
         viewport: { width: 1920, height: 1080 },
+        storageState: '.auth/user.json',
       },
     },
 
     {
       name: 'webkit',
       testIgnore: /.*\/api\/.*\.spec\.js/,
+      dependencies: ['setup'],
       use: {
         ...devices['Desktop Safari'],
         viewport: { width: 1920, height: 1080 },
+        storageState: '.auth/user.json',
       },
     },
 
     {
       name: 'edge',
       testIgnore: /.*\/api\/.*\.spec\.js/,
+      dependencies: ['setup'],
       use: {
         ...devices['Desktop Edge'],
         viewport: { width: 1920, height: 1080 },
-        channel: 'msedge'
+        channel: 'msedge',
+        storageState: '.auth/user.json',
       },
     },
 
@@ -133,16 +148,20 @@ module.exports = defineConfig({
     {
       name: 'Mobile Chrome',
       testIgnore: /.*\/api\/.*\.spec\.js/,
+      dependencies: ['setup'],
       use: {
         ...devices['Pixel 5'],
+        storageState: '.auth/user.json',
       },
     },
 
     {
       name: 'Mobile Safari',
       testIgnore: /.*\/api\/.*\.spec\.js/,
+      dependencies: ['setup'],
       use: {
         ...devices['iPhone 13'],
+        storageState: '.auth/user.json',
       },
     },
   ],
