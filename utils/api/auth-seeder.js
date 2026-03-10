@@ -99,9 +99,15 @@ class AuthSeeder {
     _getCommonHeaders() {
         return {
             'accept': 'application/vnd.healthkartplus.v11+json',
+            'accept-language': 'en-US,en;q=0.9',
             'content-type': 'application/json',
             'hkp-platform': 'Healthkartplus-0.0.1-mobileweb',
-            'x-platform': 'mobileweb-0.0.1'
+            'origin': 'https://stag.1mg.com',
+            'referer': 'https://stag.1mg.com/?login=true&followup=/cart/checkout/success',
+            'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1',
+            'visitor-id': 'c8452e4c-e898-4fa9-be9b-61828a272a77_kmZjAqRbz2_0134_1763190551777',
+            'x-platform': 'mobileweb-0.0.1',
+            'x-visitor-id': 'c8452e4c-e898-4fa9-be9b-61828a272a77_kmZjAqRbz2_0134_1763190551777'
         };
     }
 }
