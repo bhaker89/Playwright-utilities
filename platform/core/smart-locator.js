@@ -107,7 +107,14 @@ class SmartLocator {
     }
 
     _isHealableError(error) {
-        return error.name === 'TimeoutError' || error.message.includes('waiting for locator');
+        // Broaden the net: If Playwright throws an error during an interaction (click/fill)
+        // on a locator, 99% of the time it is because the element could not be found, 
+        // was obscured, or timed out.
+        const msg = error.message || '';
+        return msg.includes('Timeout') ||
+            msg.includes('waiting for locator') ||
+            msg.includes('Target closed') ||
+            error.name === 'TimeoutError';
     }
 
     async _highlight(locator) {

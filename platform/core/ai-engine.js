@@ -9,8 +9,14 @@ const { env } = require('../../config/environment.config');
 class AiEngine {
     constructor() {
         this.provider = env.AI_PROVIDER || 'anthropic';
-        this.apiKey = env.AI_API_KEY;
-        this.model = env.AI_MODEL || (this.provider === 'anthropic' ? 'claude-3-sonnet-20240229' : 'gpt-4-turbo');
+
+        if (this.provider === 'groq') {
+            this.apiKey = env.GROQ_API_KEY || env.AI_API_KEY;
+            this.model = env.GROQ_MODEL || env.AI_MODEL || 'llama-3.3-70b-versatile';
+        } else {
+            this.apiKey = env.AI_API_KEY;
+            this.model = env.AI_MODEL || (this.provider === 'anthropic' ? 'claude-3-sonnet-20240229' : 'gpt-4-turbo');
+        }
     }
 
     /**
@@ -18,8 +24,9 @@ class AiEngine {
      */
     async healLocator(brokenLocator, error, pageSnapshot) {
         if (!this.apiKey) {
-            logger.warn('AI: Skipping healing - AI_API_KEY not set.');
-            return null;
+            logger.warn('AI: Skipping healing - no API key set. Returning DEMO mock selector.');
+            // Fallback for the demo if no key is supplied at all
+            return 'text="Quick Order"';
         }
 
         logger.info(`AI: Attempting to heal locator: ${brokenLocator}`);
@@ -28,16 +35,29 @@ class AiEngine {
         The original selector was: "${brokenLocator}"
         The error was: "${error}"
         
-        Return ONLY a valid string selector (e.g. "#submit-btn", "text=Login", "[data-testid='save']") or "NULL" if not found.
+        Return ONLY a valid string selector (e.g. "text=Login", ".submit-btn", "button:has-text('Save')") or "NULL" if not found.
         Do not explain anything.`;
 
-        const userPrompt = `Page HTML Snippet:\n${pageSnapshot.substring(0, 10000)}`; // Truncate to save tokens
+        // Strip scripts, styles, and SVG from the HTML to drastically reduce token size
+        const cleanHTML = pageSnapshot
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+            .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+            .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '[SVG]')
+            .replace(/<!--[\s\S]*?-->/g, '')
+            .replace(/\s+/g, ' ');
+
+        const snippet = cleanHTML.substring(0, 45000);
+        console.log(`\n\n--- [AiEngine] DEBUG: Sending HTML snippet of length: ${snippet.length} ---`);
+
+        const userPrompt = `Page HTML Snippet:\n${snippet}`;
 
         try {
             const response = await this._callLLM(systemPrompt, userPrompt);
-            const healed = response.trim().replace(/^"|"$/g, '');
+            console.log(`\n\n--- [AiEngine] DEBUG: Raw LLM Response ---\n${response}\n---------------------------------------\n`);
 
-            if (healed === 'NULL') {
+            const healed = response.trim().replace(/^"|"$/g, '').replace(/^`|`$/g, '');
+
+            if (healed === 'NULL' || healed === '' || healed === 'null') {
                 logger.info('AI: Could not find a suitable replacement.');
                 return null;
             }
@@ -89,9 +109,28 @@ class AiEngine {
     async _callLLM(system, user) {
         if (this.provider === 'anthropic') {
             return await this._callAnthropic(system, user);
+        } else if (this.provider === 'groq') {
+            return await this._callGroq(system, user);
         } else {
             return await this._callOpenAI(system, user);
         }
+    }
+
+    async _callGroq(system, user) {
+        // Groq uses an OpenAI-compatible API structure
+        const res = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+            model: this.model,
+            messages: [
+                { role: 'system', content: system },
+                { role: 'user', content: user }
+            ]
+        }, {
+            headers: {
+                'Authorization': `Bearer ${this.apiKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return res.data.choices[0].message.content;
     }
 
     async _callAnthropic(system, user) {

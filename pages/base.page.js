@@ -188,7 +188,9 @@ class BasePage {
   async fill(locator, value, fieldName) {
     logger.info(`Filling ${fieldName || 'field'} with value: ${value}`);
     await this.healer.executeWithHealing(fieldName || 'field', locator, async (loc) => {
-      await loc.fill(value);
+      // Enforce a strict, shorter timeout for the interaction so SmartLocator catches it 
+      // before the global test timeout occurs.
+      await loc.fill(value, { timeout: 3000 });
     });
   }
 
@@ -200,7 +202,8 @@ class BasePage {
   async click(locator, elementName) {
     logger.info(`Clicking element: ${elementName || 'element'}`);
     await this.healer.executeWithHealing(elementName || 'element', locator, async (loc) => {
-      await loc.click();
+      // Enforce a strict, shorter timeout for the interaction so SmartLocator catches it
+      await loc.click({ timeout: 3000 });
     });
   }
 }
