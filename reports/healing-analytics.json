@@ -1,0 +1,58 @@
+{
+  "reportGeneratedAt": "2026-03-18T09:01:23.396Z",
+  "testDuration": 67,
+  "summary": {
+    "totalTests": 0,
+    "passedTests": 0,
+    "failedTests": 0,
+    "testsWithHealing": 0,
+    "totalHealingAttempts": 0,
+    "successfulHeals": 0,
+    "failedHeals": 0,
+    "healingSuccessRate": 0,
+    "totalHealingTime": 0,
+    "avgHealingTime": 0,
+    "estimatedCost": "0.0000",
+    "registryHitRate": 0
+  },
+  "stageBreakdown": {
+    "stage1": {
+      "attempts": 0,
+      "successes": 0,
+      "failures": 0,
+      "totalTime": 0,
+      "avgTime": 0
+    },
+    "stage2": {
+      "attempts": 0,
+      "successes": 0,
+      "failures": 0,
+      "totalTime": 0,
+      "avgTime": 0
+    },
+    "stage3": {
+      "attempts": 0,
+      "successes": 0,
+      "failures": 0,
+      "totalTime": 0,
+      "avgTime": 0,
+      "cost": 0
+    }
+  },
+  "healingEvents": [],
+  "topHealedElements": [],
+  "costAnalysis": {
+    "aiProvider": "groq",
+    "aiModel": "claude-3-sonnet-20240229",
+    "stage3Calls": 0,
+    "estimatedCostPerCall": 0.003,
+    "totalCost": "0.0000"
+  },
+  "performanceMetrics": {
+    "fastestHeal": null,
+    "slowestHeal": null,
+    "avgStage1Time": 0,
+    "avgStage2Time": 0,
+    "avgStage3Time": 0
+  }
+}

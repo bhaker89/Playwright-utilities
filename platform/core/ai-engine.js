@@ -46,7 +46,7 @@ class AiEngine {
             .replace(/<!--[\s\S]*?-->/g, '')
             .replace(/\s+/g, ' ');
 
-        const snippet = cleanHTML.substring(0, 45000);
+        const snippet = cleanHTML.substring(0, 15000);
         console.log(`\n\n--- [AiEngine] DEBUG: Sending HTML snippet of length: ${snippet.length} ---`);
 
         const userPrompt = `Page HTML Snippet:\n${snippet}`;

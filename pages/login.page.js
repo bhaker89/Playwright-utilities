@@ -4,58 +4,88 @@ const { logger } = require('../utils/base/logger');
 
 /**
  * Login Page Object Model
- * Demonstrates optimal Locator usage and composition pattern
+ * NOW WITH: Singleton pattern + PlaywrightWrapper + SmartLocator healing
+ * 
+ * USAGE:
+ * ```js
+ * const loginPage = LoginPage.getInstance(page);
+ * await loginPage.navigate();
+ * await loginPage.loginWithOTP('9876543210', '123456');
+ * ```
  */
 class LoginPage extends BasePage {
+  /** @private */
+  static _instance = null;
+  /** @private */
+  static _currentPage = null;
+
   /**
+   * @private
    * @param {import('@playwright/test').Page} page
    */
   constructor(page) {
     super(page);
 
     /** @protected */
-    this.pageUrl = `${env.baseURL}/login`;
+    this.pageUrl = `${env.uiBaseURL}/?login=true&followup=/login`;
     /** @protected */
     this.serviceName = 'authentication-service';
 
     // Locators using modern Playwright patterns (getByRole, getByTestId, etc.)
     /** @readonly @type {import('@playwright/test').Locator} */
-    this.usernameInput = this.getByLabel(/username|email/i);
+    this.emailOrMobileInput = this.getByRole('textbox', { name: 'Enter Email ID or Mobile' });
     /** @readonly @type {import('@playwright/test').Locator} */
-    this.passwordInput = this.getByLabel(/password/i);
+    this.sendOtpButton = this.getByRole('link', { name: 'SEND OTP' });
     /** @readonly @type {import('@playwright/test').Locator} */
-    this.loginButton = this.getByRole('button', { name: /log in|sign in/i });
+    this.otpInput = this.getByRole('textbox', { name: 'One Time Password' });
+    /** @readonly @type {import('@playwright/test').Locator} */
+    this.doneButton = this.getByRole('link', { name: 'DONE' });
     /** @readonly @type {import('@playwright/test').Locator} */
     this.errorMessage = this.getByTestId('error-message');
-    /** @readonly @type {import('@playwright/test').Locator} */
-    this.forgotPasswordLink = this.getByRole('link', { name: /forgot password/i });
   }
 
   /**
-   * Perform login action
-   * Uses built-in Locator methods instead of page methods
-   * @param {string} username
-   * @param {string} password
-   * @returns {Promise<void>}
+   * Get singleton instance
+   * @param {import('@playwright/test').Page} page 
+   * @returns {LoginPage}
    */
-  async login(username, password) {
-    logger.info(`Logging in as: ${username}`);
-    await this.usernameInput.fill(username);
-    await this.passwordInput.fill(password);
-    await this.loginButton.click();
-    await this.waitForNavigation();
+  static getInstance(page) {
+    if (!LoginPage._instance || LoginPage._currentPage !== page) {
+      LoginPage._instance = new LoginPage(page);
+      LoginPage._currentPage = page;
+    }
+    return LoginPage._instance;
   }
 
   /**
-   * Fast login without waiting for navigation (for performance)
-   * @param {string} username
-   * @param {string} password
+   * Login with OTP (actual flow for your app)
+   * Uses PlaywrightWrapper + SmartLocator for self-healing
+   * @param {string} mobile - 10-digit mobile number
+   * @param {string} otp - 6-digit OTP
    * @returns {Promise<void>}
    */
-  async fastLogin(username, password) {
-    await this.usernameInput.fill(username);
-    await this.passwordInput.fill(password);
-    await this.loginButton.click();
+  async loginWithOTP(mobile, otp) {
+    logger.info(`[LoginPage] 🔐 Logging in with: ${mobile}`);
+    
+    // Fill mobile/email
+    await this.fill(this.emailOrMobileInput, mobile, 'Email/Mobile Input');
+    
+    // Click Send OTP
+    await this.click(this.sendOtpButton, 'Send OTP Button');
+    
+    // Wait for OTP input to appear
+    await this.waitForLocator(this.otpInput, 'visible', 10000);
+    
+    // Fill OTP
+    await this.fill(this.otpInput, otp, 'OTP Input');
+    
+    // Click Done
+    await this.click(this.doneButton, 'Done Button');
+    
+    // Wait for login to complete
+    await this.page.waitForURL(/\/(dashboard|home|overview|cart)/, { timeout: 15000 });
+    
+    logger.info('[LoginPage] ✅ Login successful');
   }
 
   /**
@@ -70,11 +100,16 @@ class LoginPage extends BasePage {
   }
 
   /**
-   * Navigate to forgot password page
-   * @returns {Promise<void>}
+   * Check if user is logged in
+   * @returns {Promise<boolean>}
    */
-  async navigateToForgotPassword() {
-    await this.forgotPasswordLink.click();
+  async isLoggedIn() {
+    // Check if login form is NOT visible
+    const loginFormVisible = await this.emailOrMobileInput
+      .isVisible({ timeout: 2000 })
+      .catch(() => false);
+    
+    return !loginFormVisible;
   }
 }
 

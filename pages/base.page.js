@@ -12,6 +12,8 @@ const { SharedTestContext } = require('../platform/core/shared-test-context');
  * - For advanced UI actions (popup, upload, download, toast, etc.) use utils/ui/ui-actions.js
  * - For network actions (mocking, response capture) use utils/network/network-actions.js
  * 
+ * NEW: Singleton pattern + PlaywrightWrapper integration (10xquality style)
+ * 
  * @abstract
  */
 class BasePage {
@@ -31,6 +33,41 @@ class BasePage {
     // Initialize SmartLocator Engine
     const { SmartLocator } = require('../platform/core/smart-locator');
     this.healer = new SmartLocator(page, this.constructor.name);
+
+    // Initialize PlaywrightWrapper for high-level actions
+    const { PlaywrightWrapper } = require('../utils/ui/playwright-wrapper');
+    this.wrapper = PlaywrightWrapper.getInstance(page);
+
+    // Initialize AssertWrapper for assertions
+    const { AssertWrapper } = require('../utils/ui/assert-wrapper');
+    this.assert = new AssertWrapper(page);
+  }
+
+  /**
+   * Singleton pattern for page objects
+   * Subclasses should implement their own getInstance method like:
+   * 
+   * ```js
+   * static getInstance(page) {
+   *   if (!LoginPage.instance || LoginPage.currentPage !== page) {
+   *     LoginPage.instance = new LoginPage(page);
+   *     LoginPage.currentPage = page;
+   *   }
+   *   return LoginPage.instance;
+   * }
+   * ```
+   * 
+   * @protected
+   * @param {typeof BasePage} PageClass 
+   * @param {import('@playwright/test').Page} page 
+   * @returns {BasePage}
+   */
+  static _createSingleton(PageClass, page) {
+    if (!PageClass._instance || PageClass._currentPage !== page) {
+      PageClass._instance = new PageClass(page);
+      PageClass._currentPage = page;
+    }
+    return PageClass._instance;
   }
 
   /**
@@ -205,6 +242,32 @@ class BasePage {
       // Enforce a strict, shorter timeout for the interaction so SmartLocator catches it
       await loc.click({ timeout: 3000 });
     });
+  }
+
+  /**
+   * Proactively clear common 1mg overlays (global)
+   */
+  async clearOverlays() {
+    const potentialOverlays = [
+      { name: 'Roadblock/Banner', selector: 'button:has(img[src*="cross_icon"])' },
+      { name: 'Location Popup', selector: '#location-close' },
+      { name: 'Care Plan Popup', selector: '.careplan-close' },
+      { name: 'Generic Close', selector: 'button[aria-label="Close"]' },
+      { name: 'Generic Cross', selector: '.popup-close' }
+    ];
+
+    for (const overlay of potentialOverlays) {
+      try {
+        const locator = this.page.locator(overlay.selector).first();
+        if (await locator.isVisible({ timeout: 1500 })) {
+          logger.info(`Closing ${overlay.name} overlay`);
+          await locator.click();
+          await this.page.waitForLoadState('domcontentloaded');
+        }
+      } catch (e) {
+        // Ignore errors during proactive cleanup
+      }
+    }
   }
 }
 

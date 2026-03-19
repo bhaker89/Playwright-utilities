@@ -147,6 +147,27 @@ const test = base.extend({
     const loginPage = new LoginPage(page);
     await use(loginPage);
   },
+
+  /**
+   * Bridge Fixture (NEW - 10xquality pattern)
+   * Provides single entry point to all pages, wrappers, and helpers
+   * Includes API client for integrated UI + API tests
+   * 
+   * @example
+   * test('example', async ({ bridge }) => {
+   *   await bridge.loginPage.navigate();
+   *   await bridge.assert.toBeVisible('.logo', 'Logo');
+   *   
+   *   // For hybrid tests:
+   *   const apiResponse = await bridge.apiClient.get('/user/profile');
+   *   bridge.context.set('userId', apiResponse.body.id);
+   * });
+   */
+  bridge: async ({ page, apiClient }, use) => {
+    const { Bridge } = require('../utils/ui/bridge');
+    const bridge = Bridge.getInstance(page, apiClient);
+    await use(bridge);
+  },
 });
 
 const expect = playwrightTest.expect;
