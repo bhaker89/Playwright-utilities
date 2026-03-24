@@ -1,0 +1,124 @@
+utils/ui/assert-wrapper.js
+  6acdced68d764c14 1-269
+tests/examples/ui-bridge-pattern.spec.js
+  6acdced68d764c14 1-115
+tests/integration/self-healing.spec.js
+  3a5bac160732de15 1-526
+platform/cli/ui-test-generator-cli.js
+  3d621994c0b8286f 3,9
+run-e2e-test.sh
+  67b7ed1311aebb44 1-47
+docs/UI_FRAMEWORK_MIGRATION_GUIDE.md
+  6acdced68d764c14 1-391
+utils/ui/playwright-wrapper.js
+  6acdced68d764c14 1-371
+docs/UI_TEST_GENERATOR_GUIDE.md
+  3d621994c0b8286f 407
+  3a5bac160732de15 1-406,408-446
+utils/ui/bridge.js
+  3d621994c0b8286f 1-4,7
+  6acdced68d764c14 5-6,8-146
+setup-self-healing.sh
+  3a5bac160732de15 1-163
+package.json
+  3a5bac160732de15 30,32-33
+  6513b37c513543f1 40-41,79
+  3d621994c0b8286f 31
+platform/generators/INDEX.md
+  3d621994c0b8286f 1-406
+platform/core/healing-reporter.js
+  3a5bac160732de15 1-405
+docs/1MG_VALIDATION_REPORT.md
+  7726c9b6377f1745 1-716
+pages/login.page.js
+  6acdced68d764c14 7,17,23,25,27,29,35-37,39,41-42,44-46,50-52,55-58,73-74,76-77
+tests/setup/auth.setup.js
+  6acdced68d764c14 1
+platform/core/smart-locator.js
+  3a5bac160732de15 77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "379efd42519acd8f893b05b688c2dabb67f08734",
+  "prompts": {
+    "3a5bac160732de15": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "395524",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 2433,
+      "total_deletions": 2,
+      "accepted_lines": 1543,
+      "overriden_lines": 0
+    },
+    "3d621994c0b8286f": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "395778",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 630,
+      "total_deletions": 31,
+      "accepted_lines": 415,
+      "overriden_lines": 0
+    },
+    "6513b37c513543f1": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "385851",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 3111,
+      "total_deletions": 3,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "67b7ed1311aebb44": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "386478",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 56,
+      "total_deletions": 1,
+      "accepted_lines": 47,
+      "overriden_lines": 0
+    },
+    "6acdced68d764c14": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "395752",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 1470,
+      "total_deletions": 37,
+      "accepted_lines": 1314,
+      "overriden_lines": 0
+    },
+    "7726c9b6377f1745": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "397135",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 716,
+      "total_deletions": 0,
+      "accepted_lines": 716,
+      "overriden_lines": 0
+    }
+  }
+}
