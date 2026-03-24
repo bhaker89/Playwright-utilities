@@ -1,0 +1,49 @@
+run-e2e-test.sh
+  67b7ed1311aebb44 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "f5fec4b6d1db98af0270f58b22482a45bd349f12",
+  "prompts": {
+    "4c02fc6cdf362d57": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "383315",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 243,
+      "total_deletions": 9,
+      "accepted_lines": 234,
+      "overriden_lines": 0
+    },
+    "6513b37c513543f1": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "385851",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 3111,
+      "total_deletions": 3,
+      "accepted_lines": 3099,
+      "overriden_lines": 3
+    },
+    "67b7ed1311aebb44": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "386478",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 56,
+      "total_deletions": 1,
+      "accepted_lines": 49,
+      "overriden_lines": 1
+    }
+  }
+}
