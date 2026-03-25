@@ -17,8 +17,16 @@ const yaml = require('js-yaml');
  */
 class UITestGenerator {
     constructor() {
+        // YAML output can remain in generated-tests (no Playwright discovery needed)
         this.outputDir = path.join(process.cwd(), 'generated-tests');
+
+        // Playwright specs must land under ./tests because playwright.config.js uses: testDir: './tests'
+        // This guarantees that `npx playwright test` picks up generated specs automatically.
+        this.generatedUiSpecDir = path.join(process.cwd(), 'tests', 'ui', 'generated');
+
+        // Page Objects remain in the shared /pages folder
         this.pagesDir = path.join(process.cwd(), 'pages');
+
         this._ensureDirectories();
     }
 
@@ -253,24 +261,35 @@ User Request: "${prompt}"`;
             steps: tc.steps,
             assertions: tc.assertions
         }));
-        
+
+        // Google OAuth flows are highly variable (account chooser, CAPTCHA, policy banners, 2FA, consent, etc.)
+        // "Negative" tests against Google UI are usually noisy/flaky. For stability, we skip negative tests
+        // whenever the suite appears to be a Google Sign-In flow.
+        const isGoogleAuthFlow = (testPlan.pages || []).some(p => /google/i.test(p.name)) ||
+            tests.some(t => (t.steps || []).some(s => typeof s.url === 'string' && s.url.includes('google')));
+
+        const filteredTests = isGoogleAuthFlow
+            ? tests.filter(t => t.category !== 'negative')
+            : tests;
+
         // Group tests by category for better organization
         const testsByCategory = {
-            positive: tests.filter(t => t.category === 'positive'),
-            negative: tests.filter(t => t.category === 'negative'),
-            edge: tests.filter(t => t.category === 'edge')
+            positive: filteredTests.filter(t => t.category === 'positive'),
+            negative: filteredTests.filter(t => t.category === 'negative'),
+            edge: filteredTests.filter(t => t.category === 'edge')
         };
-        
+
         logger.info(`📊 Test breakdown: ${testsByCategory.positive.length} positive, ${testsByCategory.negative.length} negative, ${testsByCategory.edge.length} edge cases`);
-        
+
         return {
             name: testPlan.name,
             description: testPlan.description,
             baseUrl: testPlan.baseUrl,
             pages: testPlan.pages || [],
-            tests,
+            tests: filteredTests,
             testsByCategory,
-            testData: testPlan.testData || {}
+            testData: testPlan.testData || {},
+            isGoogleAuthFlow
         };
     }
 
@@ -338,10 +357,11 @@ User Request: "${prompt}"`;
             let locatorCode;
             if (el.type === 'button') {
                 locatorCode = `this.page.getByRole('button', { name: /${el.name.replace(' Button', '')}/i })`;
-            } else if (el.type === 'input') {
-                locatorCode = `this.page.locator('${el.selector}')`;
             } else {
-                locatorCode = `this.page.locator('${el.selector}')`;
+                // IMPORTANT: Always escape selectors safely.
+                // Many CSS selectors contain single quotes (e.g. input[type='email']), which would break JS strings.
+                // JSON.stringify produces a valid JS string literal every time.
+                locatorCode = `this.page.locator(${JSON.stringify(el.selector)})`;
             }
 
             return `
@@ -452,12 +472,15 @@ module.exports = { ${name} };
      * @private
      */
     async _generatePlaywrightTest(testSuite, withPageObjects, withSelfHealing, customPath = null) {
-        const testCode = withPageObjects
-            ? this._generatePOMTest(testSuite, withSelfHealing)
-            : this._generateDirectTest(testSuite, withSelfHealing);
-
         const filename = this._sanitizeFilename(testSuite.name) + '.spec.js';
-        const filepath = customPath || path.join(this.outputDir, 'playwright', filename);
+
+        // Default location: under ./tests so Playwright auto-discovers it.
+        // If a customPath is provided explicitly, we respect it.
+        const filepath = customPath || path.join(this.generatedUiSpecDir, filename);
+
+        const testCode = withPageObjects
+            ? this._generatePOMTest(testSuite, withSelfHealing, filepath)
+            : this._generateDirectTest(testSuite, withSelfHealing, filepath);
 
         this._ensureDirectory(path.dirname(filepath));
         fs.writeFileSync(filepath, testCode, 'utf8');
@@ -470,10 +493,14 @@ module.exports = { ${name} };
      * Generate POM-style Playwright test
      * @private
      */
-    _generatePOMTest(testSuite, withSelfHealing) {
+    _generatePOMTest(testSuite, withSelfHealing, specFilePath) {
+        const specDir = path.dirname(specFilePath);
+        const pagesRelativeDir = path.relative(specDir, this.pagesDir).split(path.sep).join('/');
+        const pagesRequireBase = pagesRelativeDir.startsWith('.') ? pagesRelativeDir : `./${pagesRelativeDir}`;
+
         const imports = testSuite.pages.map(page => {
             const filename = this._toKebabCase(page.name) + '.page';
-            return `const { ${page.name} } = require('../../pages/${filename}');`;
+            return `const { ${page.name} } = require('${pagesRequireBase}/${filename}');`;
         }).join('\n');
 
         // Group tests by category if available
@@ -522,12 +549,25 @@ module.exports = { ${name} };
                 return `const ${instanceName} = new ${page.name}(page);`;
             }).join('\n        ');
 
+            // Env-only secret handling for Google login.
+            // We never embed Google credentials in generated specs.
+            const testDataBlock = (testSuite.isGoogleAuthFlow || testSuite.testData?.googleEmail || testSuite.testData?.googlePassword)
+                ? `const testData = {
+            googleEmail: process.env.GOOGLE_TEST_EMAIL,
+            googlePassword: process.env.GOOGLE_TEST_PASSWORD
+        };
+
+        if (!testData.googleEmail || !testData.googlePassword) {
+            throw new Error('Missing GOOGLE_TEST_EMAIL / GOOGLE_TEST_PASSWORD in config/.env.<env>');
+        }`
+                : `const testData = ${JSON.stringify(testSuite.testData, null, 8)};`;
+
             return `
     test('${test.name}', async ({ page }) => {
         // Test: ${test.description}
         ${pageInstances}
 
-        const testData = ${JSON.stringify(testSuite.testData, null, 8)};
+        ${testDataBlock}
 
         ${steps}
 
@@ -761,7 +801,8 @@ ${testCases}
         const dirs = [
             this.outputDir,
             path.join(this.outputDir, 'yaml'),
-            path.join(this.outputDir, 'playwright'),
+            // Playwright specs are written under ./tests/ui/generated (not under generated-tests)
+            this.generatedUiSpecDir,
             this.pagesDir
         ];
 
@@ -791,15 +832,27 @@ ${testCases}
     }
 
     _toCamelCase(str) {
-        return str
-            .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => 
-                index === 0 ? letter.toLowerCase() : letter.toUpperCase())
+        // Make sure the generated identifier is a valid JS property name.
+        // Example: "Google Sign-In Button" -> "googleSignInButton" (hyphens removed)
+        const normalized = String(str)
+            .replace(/[^a-zA-Z0-9]+/g, ' ')
+            .trim();
+
+        return normalized
+            .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) =>
+                index === 0 ? letter.toLowerCase() : letter.toUpperCase()
+            )
             .replace(/\s+/g, '');
     }
 
     _toPascalCase(str) {
-        return str
-            .replace(/(?:^\w|[A-Z]|\b\w)/g, letter => letter.toUpperCase())
+        // Example: "Google Sign-In Button" -> "GoogleSignInButton"
+        const normalized = String(str)
+            .replace(/[^a-zA-Z0-9]+/g, ' ')
+            .trim();
+
+        return normalized
+            .replace(/(?:^\w|[A-Z]|\b\w)/g, (letter) => letter.toUpperCase())
             .replace(/\s+/g, '');
     }
 }

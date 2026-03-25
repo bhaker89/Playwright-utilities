@@ -147,6 +147,31 @@ module.exports = defineConfig({
       },
     },
 
+
+    // Desktop Browsers - excludes API tests
+    {
+      name: 'chromium',
+      testIgnore: /.*\/api\/.*\.spec\.js/,
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1920, height: 1080 },
+        storageState: '.auth/user.json',
+      },
+    },
+
+    // NOAUTH: Use this for login-flow tests where you want a clean unauthenticated session.
+    // - Does NOT depend on the global OTP setup project
+    // - Does NOT inject storageState
+    {
+      name: 'chromium-noauth',
+      testIgnore: /.*\/api\/.*\.spec\.js/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1920, height: 1080 },
+      },
+    },
+
     /* Test against mobile viewports. */
     {
       name: 'Mobile Chrome',
