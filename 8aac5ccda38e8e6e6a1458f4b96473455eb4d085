@@ -1,0 +1,23 @@
+README.md
+  6230c0afdc5257ec 7-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "8aac5ccda38e8e6e6a1458f4b96473455eb4d085",
+  "prompts": {
+    "6230c0afdc5257ec": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "400430",
+        "model": "OPENROUTER_GPT_5_POINT_2"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 66,
+      "total_deletions": 23,
+      "accepted_lines": 43,
+      "overriden_lines": 0
+    }
+  }
+}
