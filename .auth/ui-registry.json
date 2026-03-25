@@ -50,5 +50,11 @@
       "selector": "text=Find medicines",
       "lastUpdated": "2026-03-16T10:32:21.445Z"
     }
+  },
+  "LoginPage": {
+    "Google Sign-In Button": {
+      "selector": "button:has-text('Sign in with Google')",
+      "lastUpdated": "2026-03-25T08:30:48.627Z"
+    }
   }
 }
