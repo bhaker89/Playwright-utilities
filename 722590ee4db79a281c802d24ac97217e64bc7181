@@ -1,19 +1,45 @@
-platform/generators/ui-test-code-generator.js
-  478451db08972ac9 20,22-27,29,264-274,277-279,281,283,289,291-292,361-364,476-483,496-500,503,552-558,560-564,570,804-805,835-841,849-855
-README.md
-  81a9d3be92837868 13-14,204-386
-config/.env.stag
-  478451db08972ac9 19-22
-pages/google-auth-page.page.js
-  478451db08972ac9 30,48
 pages/login-page.page.js
   478451db08972ac9 30,39
+pages/google-auth-page.page.js
+  478451db08972ac9 30,48
+platform/generators/ui-test-code-generator.js
+  478451db08972ac9 20,22-27,29,264-274,277-279,281,283,289,291-292,361-364,476-483,496-500,503,552-558,560-564,570,804-805,835-841,849-855
+config/.env.stag
+  478451db08972ac9 19-22
+README.md
+  81a9d3be92837868 161-343
 ---
 {
   "schema_version": "authorship/3.0.0",
   "git_ai_version": "1.1.5",
   "base_commit_sha": "722590ee4db79a281c802d24ac97217e64bc7181",
   "prompts": {
+    "24450e07a48f7b64": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "371058",
+        "model": "CLAUDE_4_POINT_5_SONNET"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 36,
+      "total_deletions": 42,
+      "accepted_lines": 19,
+      "overriden_lines": 0
+    },
+    "3a5bac160732de15": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "395524",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 2433,
+      "total_deletions": 2,
+      "accepted_lines": 1543,
+      "overriden_lines": 0
+    },
     "478451db08972ac9": {
       "agent_id": {
         "tool": "DeputyDev",
@@ -24,20 +50,20 @@ pages/login-page.page.js
       "messages": [],
       "total_additions": 149,
       "total_deletions": 65,
-      "accepted_lines": 82,
+      "accepted_lines": 142,
       "overriden_lines": 0
     },
-    "6230c0afdc5257ec": {
+    "5ed8c6fffda7e828": {
       "agent_id": {
         "tool": "DeputyDev",
-        "id": "400430",
-        "model": "OPENROUTER_GPT_5_POINT_2"
+        "id": "371650",
+        "model": "CLAUDE_4_POINT_5_SONNET"
       },
       "human_author": "varun bhaker <varun.bhaker@1mg.com>",
       "messages": [],
-      "total_additions": 66,
-      "total_deletions": 23,
-      "accepted_lines": 0,
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 493,
       "overriden_lines": 0
     },
     "81a9d3be92837868": {
