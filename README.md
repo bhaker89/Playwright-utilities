@@ -4,6 +4,49 @@
 
 ---
 
+## Copy/Paste Friendly Summary (Plain Text)
+
+If you need to share this in chat tools (Flock/Slack/Jira/email) where Markdown can break, use one of the options below.
+
+### Option A: "Code block" (best if Flock keeps monospaced blocks)
+
+```
+dWeb Playwright Automation Suite
+
+What you get
+- UI automation (Page Object Model) + cross-browser + mobile web
+- API automation (Playwright request + multi-service clients)
+- Integrated tests (UI + API in the same spec)
+- SmartLocator self-healing (registry -> fuzzy -> LLM rescue)
+- AI-assisted test generation (natural language / curl -> tests)
+
+Quick start
+1) Install
+   - npm install
+   - npm run install:browsers
+2) Configure env
+   - cp .env.example config/.env.stag
+   - Edit config/.env.stag (BASE_URL, API_BASE_URL, credentials, LLM keys)
+3) Run
+   - npm test
+   - npm run test:api
+   - npm run test:chrome
+   - npm run ui
+
+Useful
+- View trace: npx playwright show-trace test-results/*/trace.zip
+- Generate:   npm run generate:ui-test
+- Generate:   npm run generate:from-curl
+```
+
+### Option B: "No formatting" (works even if Flock strips code blocks)
+
+dWeb Playwright Automation Suite
+What you get: UI + API + Integrated tests + SmartLocator self-healing + AI generation
+Quick start: npm install | npm run install:browsers | cp .env.example config/.env.stag | npm test
+
+---
+
 ## 📖 Table of Contents
 
 - [Why Adopt This Across dWeb?](#-why-adopt-this-across-dweb)

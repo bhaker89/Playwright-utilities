@@ -1,0 +1,2320 @@
+openapi: 3.0.0
+info:
+  title: Get Task By Id API
+  description: Auto-generated OpenAPI spec for groot/get-task-by-id
+  version: 1.0.0
+  x-generated-at: '2026-03-25T10:07:30.056Z'
+  x-service: groot
+  x-api-name: get-task-by-id
+servers:
+  - url: http://staginternalapi.1mg.com
+    description: API Server
+paths:
+  /groot/v1/tasks/4796:
+    get:
+      summary: Get Task By Id
+      description: GET get-task-by-id operation
+      operationId: get_get_task_by_id
+      tags:
+        - get
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 4796
+                      external_order_id:
+                        type: string
+                        example: PICKUP_TEST_005
+                      rider_id:
+                        type: integer
+                        example: 716
+                      rider_identification:
+                        type: string
+                        example: DE716
+                      rider_name:
+                        type: string
+                        example: Sanity_One
+                      rider_phone_number:
+                        type: string
+                        example: '9061099401'
+                      amount:
+                        type: integer
+                        example: 0
+                      status:
+                        type: string
+                        example: cancelled
+                      type:
+                        type: string
+                        example: PICKUP
+                      delivery_checklist:
+                        type: object
+                        properties:
+                          otp:
+                            type: object
+                            properties:
+                              return_to_origin:
+                                type: string
+                                example: '5743'
+                            required:
+                              - return_to_origin
+                          proof_of_pickup:
+                            type: object
+                            properties:
+                              sku_count:
+                                type: integer
+                                example: 3
+                              signatures:
+                                type: array
+                                items:
+                                  type: object
+                              payment_image_proof:
+                                type: array
+                                items:
+                                  type: object
+                              delivery_image_proof:
+                                type: array
+                                items:
+                                  type: string
+                                  example: https://1mg-staging-inventory.s3.amazonaws.com/riders%2Fpod%2F6155-4796%2F1739346007_Delivery_confirmation_photo
+                            required:
+                              - sku_count
+                              - signatures
+                              - payment_image_proof
+                              - delivery_image_proof
+                          proof_of_delivery:
+                            type: object
+                            properties:
+                              otp:
+                                type: string
+                                example: '5743'
+                              sku_count:
+                                type: string
+                                nullable: true
+                              signatures:
+                                type: array
+                                items:
+                                  type: object
+                              payment_image_proof:
+                                type: array
+                                items:
+                                  type: object
+                              delivery_image_proof:
+                                type: array
+                                items:
+                                  type: object
+                            required:
+                              - otp
+                              - signatures
+                              - payment_image_proof
+                              - delivery_image_proof
+                          delivery_checklist:
+                            type: object
+                            properties:
+                              otp:
+                                type: boolean
+                                example: true
+                              sku_count:
+                                type: boolean
+                                example: true
+                              delivery_image_proof:
+                                type: boolean
+                                example: true
+                            required:
+                              - otp
+                              - sku_count
+                              - delivery_image_proof
+                        required:
+                          - otp
+                          - proof_of_pickup
+                          - proof_of_delivery
+                          - delivery_checklist
+                      metadata:
+                        type: object
+                        properties:
+                          SLA status:
+                            type: string
+                            example: On Time
+                          reached_at:
+                            type: string
+                            example: '2025-02-12T07:39:44Z'
+                          rnr_reason:
+                            type: string
+                            example: Wrong product/medicine has been delivered
+                          assigned_at:
+                            type: string
+                            example: '2025-03-11T06:59:12Z'
+                          picked_up_at:
+                            type: string
+                            example: '2025-02-12T07:40:22Z'
+                          on_the_way_at:
+                            type: string
+                            example: '2025-02-12T07:39:36Z'
+                          payout_status:
+                            type: string
+                            example: Processing Completed
+                          rider_earning:
+                            type: object
+                            properties:
+                              'null':
+                                type: integer
+                                example: 0
+                              base_pay:
+                                type: integer
+                                example: 0
+                              total_pay:
+                                type: integer
+                                example: 0
+                              distance_pay:
+                                type: integer
+                                example: 0
+                              variable_pay:
+                                type: integer
+                                example: 0
+                            required:
+                              - 'null'
+                              - base_pay
+                              - total_pay
+                              - distance_pay
+                              - variable_pay
+                          rescheduled_at:
+                            type: string
+                            example: '2025-03-11T06:59:12Z'
+                          assignment_type:
+                            type: string
+                            example: manual
+                          hub_drop_off_at:
+                            type: string
+                            example: '2025-02-12T08:16:50Z'
+                          pickup_location:
+                            type: object
+                            properties:
+                              latitude:
+                                type: string
+                                example: '37.4219983'
+                              longitude:
+                                type: string
+                                example: '-122.084'
+                            required:
+                              - latitude
+                              - longitude
+                          out_for_pickup_at:
+                            type: string
+                            example: '2025-02-12T07:37:39Z'
+                          delivered_location:
+                            type: object
+                            properties:
+                              latitude:
+                                type: string
+                                example: '37.4219983'
+                              longitude:
+                                type: string
+                                example: '-122.084'
+                            required:
+                              - latitude
+                              - longitude
+                        required:
+                          - SLA status
+                          - reached_at
+                          - rnr_reason
+                          - assigned_at
+                          - picked_up_at
+                          - on_the_way_at
+                          - payout_status
+                          - rider_earning
+                          - rescheduled_at
+                          - assignment_type
+                          - hub_drop_off_at
+                          - pickup_location
+                          - out_for_pickup_at
+                          - delivered_location
+                      pickup_address:
+                        type: object
+                        properties: {}
+                        required: []
+                      drop_address:
+                        type: object
+                        properties:
+                          city:
+                            type: string
+                            example: GURUGRAM
+                          state:
+                            type: string
+                            example: Haryana
+                          street:
+                            type: string
+                            example: okhla mg road
+                          country:
+                            type: string
+                            example: In
+                          latitude:
+                            type: string
+                            example: '28.39218875140413'
+                          zip_code:
+                            type: string
+                            example: '121008'
+                          longitude:
+                            type: string
+                            example: '76.96759058273341'
+                        required:
+                          - city
+                          - state
+                          - street
+                          - country
+                          - latitude
+                          - zip_code
+                          - longitude
+                      tags:
+                        type: object
+                        properties:
+                          order_type:
+                            type: array
+                            items:
+                              type: string
+                              example: return
+                        required:
+                          - order_type
+                      customer_details:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: Vasuda
+                          email:
+                            type: string
+                            example: ''
+                          did_number:
+                            type: string
+                            example: ''
+                          phone_number:
+                            type: string
+                            example: 90******12
+                        required:
+                          - name
+                          - email
+                          - did_number
+                          - phone_number
+                      expected_eta:
+                        type: string
+                        example: 12-02-2025 14:49:09
+                      actual_eta:
+                        type: string
+                        nullable: true
+                      current_eta:
+                        type: string
+                        example: 12-02-2025 14:49:09
+                      created_at:
+                        type: string
+                        example: 12-02-2025 12:49:09
+                      updated_at:
+                        type: string
+                        example: 12-02-2025 13:46:48
+                      notes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: text
+                            value:
+                              type: string
+                              example: fifteen_minute_delivery
+                          required:
+                            - type
+                            - value
+                      latest:
+                        type: boolean
+                        example: true
+                      fulfilled_by:
+                        type: string
+                        example: inhouse
+                      sla_status:
+                        type: string
+                        example: Late
+                      distance:
+                        type: integer
+                        example: 0
+                      batch_id:
+                        type: integer
+                        example: 1030
+                      order_id:
+                        type: string
+                        example: PICKUP_TEST_005
+                      tour_id:
+                        type: string
+                        nullable: true
+                      order:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 6155
+                          external_order_id:
+                            type: string
+                            example: PICKUP_TEST_005
+                          order_type:
+                            type: string
+                            example: pharmacy
+                          order_id:
+                            type: string
+                            example: PICKUP_TEST_005
+                          status:
+                            type: string
+                            example: pickup_completed
+                          catchment_code:
+                            type: string
+                            example: PTS_GGN
+                          amount_payable:
+                            type: integer
+                            example: 0
+                          line_items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 233112
+                                name:
+                                  type: string
+                                  example: dettol
+                                brand:
+                                  type: string
+                                  example: dettol
+                                price:
+                                  type: integer
+                                  example: 1
+                                quantity:
+                                  type: integer
+                                  example: 1
+                                image_urls:
+                                  type: array
+                                  items:
+                                    type: string
+                                    example: https://www.1mg.com/otc/dettol-antiseptic-disinfectant-liquid-otc399361
+                                pack_weight:
+                                  type: integer
+                                  example: 1
+                                discounted_price:
+                                  type: integer
+                                  example: 10
+                              required:
+                                - id
+                                - name
+                                - brand
+                                - price
+                                - quantity
+                                - image_urls
+                                - pack_weight
+                                - discounted_price
+                          slot:
+                            type: object
+                            properties:
+                              end:
+                                type: integer
+                                example: 1718863252
+                              start:
+                                type: integer
+                                example: 1718859652
+                            required:
+                              - end
+                              - start
+                          address:
+                            type: object
+                            properties:
+                              city:
+                                type: string
+                                example: GURUGRAM
+                              name:
+                                type: string
+                                example: Vasuda
+                              state:
+                                type: string
+                                example: Haryana
+                              country:
+                                type: string
+                                example: In
+                              pincode:
+                                type: string
+                                example: '121008'
+                              street1:
+                                type: string
+                                example: okhla
+                              street2:
+                                type: string
+                                example: mg road
+                              latitude:
+                                type: number
+                                example: 28.39218875140413
+                              locality:
+                                type: string
+                                example: sfdsd
+                              longitude:
+                                type: number
+                                example: 76.96759058273341
+                              contact_number:
+                                type: string
+                                example: 90******12
+                              geodata_latitude:
+                                type: number
+                                example: 28.39218875140413
+                              geodata_longitude:
+                                type: number
+                                example: 76.96759058273341
+                            required:
+                              - city
+                              - name
+                              - state
+                              - country
+                              - pincode
+                              - street1
+                              - street2
+                              - latitude
+                              - locality
+                              - longitude
+                              - contact_number
+                              - geodata_latitude
+                              - geodata_longitude
+                          metadata:
+                            type: object
+                            properties:
+                              notes:
+                                type: array
+                                items:
+                                  type: string
+                                  example: fifteen_minute_delivery
+                              skills:
+                                type: array
+                                items:
+                                  type: string
+                                  example: rapid
+                              category:
+                                type: string
+                                example: standard
+                              hub_code:
+                                type: string
+                                example: okhla
+                              order_eta:
+                                type: integer
+                                example: 1723030975
+                              order_mrp:
+                                type: number
+                                example: 99.2
+                              psp_order:
+                                type: boolean
+                                example: false
+                              team_code:
+                                type: string
+                                example: okhla
+                              rnr_reason:
+                                type: string
+                                example: Wrong product/medicine has been delivered
+                              cms_enabled:
+                                type: boolean
+                                example: true
+                              payment_mode:
+                                type: string
+                                example: prepaid
+                              sub_category:
+                                type: string
+                                example: fifteen_minute_delivery
+                              order_distance:
+                                type: integer
+                                example: 0
+                              order_allocation:
+                                type: string
+                                example: manual
+                              payment_page_url:
+                                type: string
+                                example: https://stag.1mg.com/external-payment/0OH2HQWnXnd9426DdU1khw%3D%3D
+                              otp_based_delivery:
+                                type: boolean
+                                example: true
+                              batching_performed_by:
+                                type: string
+                                example: manual
+                              dynamic_allocation_enabled:
+                                type: boolean
+                                example: false
+                            required:
+                              - notes
+                              - skills
+                              - category
+                              - hub_code
+                              - order_eta
+                              - order_mrp
+                              - psp_order
+                              - team_code
+                              - rnr_reason
+                              - cms_enabled
+                              - payment_mode
+                              - sub_category
+                              - order_distance
+                              - order_allocation
+                              - payment_page_url
+                              - otp_based_delivery
+                              - batching_performed_by
+                              - dynamic_allocation_enabled
+                          order_created_at:
+                            type: string
+                            example: 23-01-2024 05:50:43
+                          created_at:
+                            type: string
+                            example: 12-02-2025 12:47:59
+                          updated_at:
+                            type: string
+                            example: 12-02-2025 13:46:49
+                          type:
+                            type: string
+                            example: PICKUP
+                          entry_type:
+                            type: string
+                            example: API
+                          hub_id:
+                            type: string
+                            example: 661f7301af16fb92ab0628c2
+                          slot_start_time:
+                            type: string
+                            example: 12-02-2025 12:49:09
+                          slot_end_time:
+                            type: string
+                            example: 12-02-2025 14:49:09
+                          first_attempt_date:
+                            type: string
+                            nullable: true
+                          category:
+                            type: string
+                            example: standard
+                          fulfilled_by:
+                            type: string
+                            example: inhouse
+                          city:
+                            type: string
+                            example: gurugram
+                          pincode:
+                            type: integer
+                            example: 121008
+                          state_delay_time:
+                            type: string
+                            example: 12-02-2025 12:54:09
+                          tag:
+                            type: string
+                            nullable: true
+                          sub_category:
+                            type: string
+                            nullable: true
+                          batch_id:
+                            type: integer
+                            example: 1030
+                          display_address:
+                            type: string
+                            example: okhla, mg road, sfdsd
+                        required:
+                          - id
+                          - external_order_id
+                          - order_type
+                          - order_id
+                          - status
+                          - catchment_code
+                          - amount_payable
+                          - line_items
+                          - slot
+                          - address
+                          - metadata
+                          - order_created_at
+                          - created_at
+                          - updated_at
+                          - type
+                          - entry_type
+                          - hub_id
+                          - slot_start_time
+                          - slot_end_time
+                          - category
+                          - fulfilled_by
+                          - city
+                          - pincode
+                          - state_delay_time
+                          - batch_id
+                          - display_address
+                      rider_info:
+                        type: object
+                        properties:
+                          address_id:
+                            type: integer
+                            example: 931174
+                          email:
+                            type: string
+                            example: fsgsvshhd@gmail.com
+                          phone_number:
+                            type: string
+                            example: '9061099401'
+                          employee_id:
+                            type: string
+                            nullable: true
+                          city:
+                            type: string
+                            example: gurgaon
+                          profile_pic:
+                            type: string
+                            nullable: true
+                          name:
+                            type: string
+                            example: Sanity_One
+                          rider_address:
+                            type: string
+                            nullable: true
+                          id:
+                            type: integer
+                            example: 716
+                          type:
+                            type: string
+                            example: rider
+                          tags:
+                            type: string
+                            nullable: true
+                          fleet_type:
+                            type: string
+                            example: inhouse
+                          employer_id:
+                            type: integer
+                            example: 30
+                          user_id:
+                            type: integer
+                            example: 1444
+                          managed_by:
+                            type: string
+                            example: 1mg
+                          pay_structure:
+                            type: string
+                            example: mbg
+                          metadata:
+                            type: object
+                            properties:
+                              vendor_cash_collection_enabled:
+                                type: boolean
+                                example: true
+                            required:
+                              - vendor_cash_collection_enabled
+                          persona_id:
+                            type: integer
+                            example: 25
+                          payroll:
+                            type: string
+                            example: variable
+                          onboarding_date:
+                            type: string
+                            example: 26-12-2024
+                          status:
+                            type: string
+                            example: active
+                          onboarding_status:
+                            type: string
+                            example: verified
+                          employee_type:
+                            type: string
+                            example: non_contractual
+                          employer:
+                            type: object
+                            properties:
+                              address:
+                                type: object
+                                properties:
+                                  street1:
+                                    type: string
+                                    example: gurugram
+                                  street2:
+                                    type: string
+                                    example: ''
+                                  locality:
+                                    type: string
+                                    example: okhla
+                                  pincode:
+                                    type: string
+                                    example: '120001'
+                                  city:
+                                    type: string
+                                    example: gurgaon
+                                  state:
+                                    type: string
+                                    example: HARYANA
+                                  country:
+                                    type: string
+                                    example: IN
+                                  contact_number:
+                                    type: string
+                                    example: '1234567890'
+                                required:
+                                  - street1
+                                  - street2
+                                  - locality
+                                  - pincode
+                                  - city
+                                  - state
+                                  - country
+                                  - contact_number
+                              id:
+                                type: integer
+                                example: 30
+                              fleet_type:
+                                type: string
+                                example: inhouse
+                              email:
+                                type: string
+                                example: default_transporter@1mg.com
+                              phone_number:
+                                type: string
+                                example: '4567890876'
+                              code:
+                                type: string
+                                example: default_transporter
+                              status:
+                                type: string
+                                example: active
+                              name:
+                                type: string
+                                example: default_transporter
+                            required:
+                              - address
+                              - id
+                              - fleet_type
+                              - email
+                              - phone_number
+                              - code
+                              - status
+                              - name
+                          contract:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 660
+                              activated:
+                                type: boolean
+                                example: true
+                              tags:
+                                type: object
+                                properties: {}
+                                required: []
+                              partial_payment_count:
+                                type: integer
+                                example: 5
+                              rider_identification:
+                                type: string
+                                example: DE716
+                              hub_id:
+                                type: string
+                                example: 661f7301af16fb92ab0628c2
+                              team_id:
+                                type: string
+                                example: 65f0880e9a599964950a03b6
+                              total_payment_count:
+                                type: integer
+                                example: 6
+                              rider_id:
+                                type: integer
+                                example: 716
+                              outstanding_amount:
+                                type: integer
+                                example: 0
+                              last_cash_submitted_at:
+                                type: string
+                                example: 07-10-2025 09:22:15
+                              masked_phone_number:
+                                type: string
+                                example: '9061099401'
+                            required:
+                              - id
+                              - activated
+                              - tags
+                              - partial_payment_count
+                              - rider_identification
+                              - hub_id
+                              - team_id
+                              - total_payment_count
+                              - rider_id
+                              - outstanding_amount
+                              - last_cash_submitted_at
+                              - masked_phone_number
+                          documents:
+                            type: object
+                            properties:
+                              agreement:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 440
+                                  front_image:
+                                    type: string
+                                    nullable: true
+                                  type:
+                                    type: string
+                                    example: agreement
+                                  pdf_document:
+                                    type: string
+                                    example: https://1mg-staging-inventory.s3.amazonaws.com/profile_pictures/1735224576_dummy.pdf
+                                  back_image:
+                                    type: string
+                                    nullable: true
+                                  number:
+                                    type: string
+                                    nullable: true
+                                  metadata:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - id
+                                  - type
+                                  - pdf_document
+                              bank_details:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 426
+                                  front_image:
+                                    type: string
+                                    example: https://1mg-staging-inventory.s3.amazonaws.com/rider_documents%2F716%2F1735219800_Bankdetailproof.jpeg
+                                  type:
+                                    type: string
+                                    example: bank_details
+                                  pdf_document:
+                                    type: string
+                                    nullable: true
+                                  back_image:
+                                    type: string
+                                    nullable: true
+                                  number:
+                                    type: string
+                                    example: '656655555545'
+                                  metadata:
+                                    type: object
+                                    properties:
+                                      bank_name:
+                                        type: string
+                                        example: Hdfc
+                                      ifsc_code:
+                                        type: string
+                                        example: HDFC9293636
+                                      is_active:
+                                        type: boolean
+                                        example: true
+                                      bank_detail_proofs:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            url:
+                                              type: string
+                                              example: https://1mg-staging-inventory.s3.amazonaws.com/rider_documents%2F716%2F1735219800_Bankdetailproof.jpeg
+                                            description:
+                                              type: string
+                                              example: BankProof
+                                          required:
+                                            - url
+                                            - description
+                                      bank_account_number:
+                                        type: string
+                                        example: '656655555545'
+                                    required:
+                                      - bank_name
+                                      - ifsc_code
+                                      - is_active
+                                      - bank_detail_proofs
+                                      - bank_account_number
+                                required:
+                                  - id
+                                  - front_image
+                                  - type
+                                  - number
+                                  - metadata
+                              pan_card:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 427
+                                  front_image:
+                                    type: string
+                                    example: abc
+                                  type:
+                                    type: string
+                                    example: pan_card
+                                  pdf_document:
+                                    type: string
+                                    nullable: true
+                                  back_image:
+                                    type: string
+                                    nullable: true
+                                  number:
+                                    type: string
+                                    example: '1234511111'
+                                  metadata:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - id
+                                  - front_image
+                                  - type
+                                  - number
+                              aadhaar_card:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 428
+                                  front_image:
+                                    type: string
+                                    example: abc
+                                  type:
+                                    type: string
+                                    example: aadhaar_card
+                                  pdf_document:
+                                    type: string
+                                    nullable: true
+                                  back_image:
+                                    type: string
+                                    example: def
+                                  number:
+                                    type: string
+                                    example: '123451111111'
+                                  metadata:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - id
+                                  - front_image
+                                  - type
+                                  - back_image
+                                  - number
+                              driving_license:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 429
+                                  front_image:
+                                    type: string
+                                    example: abc
+                                  type:
+                                    type: string
+                                    example: driving_license
+                                  pdf_document:
+                                    type: string
+                                    nullable: true
+                                  back_image:
+                                    type: string
+                                    example: xyz
+                                  number:
+                                    type: string
+                                    example: dl12345
+                                  metadata:
+                                    type: object
+                                    properties:
+                                      expiry_date:
+                                        type: string
+                                        example: '2024-11-14'
+                                    required:
+                                      - expiry_date
+                                required:
+                                  - id
+                                  - front_image
+                                  - type
+                                  - back_image
+                                  - number
+                                  - metadata
+                            required:
+                              - agreement
+                              - bank_details
+                              - pan_card
+                              - aadhaar_card
+                              - driving_license
+                          persona:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 25
+                              tags:
+                                type: object
+                                properties: {}
+                                required: []
+                              fleet_type:
+                                type: string
+                                example: THIRD_PARTY
+                              code:
+                                type: string
+                                example: rapid-cold
+                              name:
+                                type: string
+                                example: rapid-cold
+                            required:
+                              - id
+                              - tags
+                              - fleet_type
+                              - code
+                              - name
+                          tl_verification:
+                            type: object
+                            properties:
+                              enable:
+                                type: boolean
+                                example: false
+                              state:
+                                type: string
+                                example: 'on'
+                            required:
+                              - enable
+                              - state
+                          co_verification:
+                            type: object
+                            properties:
+                              enable:
+                                type: boolean
+                                example: false
+                              state:
+                                type: string
+                                example: 'on'
+                            required:
+                              - enable
+                              - state
+                          rate_card:
+                            type: array
+                            items:
+                              type: object
+                          incentive_card:
+                            type: array
+                            items:
+                              type: object
+                          rider_credit_limit:
+                            type: integer
+                            example: 10000
+                        required:
+                          - address_id
+                          - email
+                          - phone_number
+                          - city
+                          - name
+                          - id
+                          - type
+                          - fleet_type
+                          - employer_id
+                          - user_id
+                          - managed_by
+                          - pay_structure
+                          - metadata
+                          - persona_id
+                          - payroll
+                          - onboarding_date
+                          - status
+                          - onboarding_status
+                          - employee_type
+                          - employer
+                          - contract
+                          - documents
+                          - persona
+                          - tl_verification
+                          - co_verification
+                          - rate_card
+                          - incentive_card
+                          - rider_credit_limit
+                    required:
+                      - id
+                      - external_order_id
+                      - rider_id
+                      - rider_identification
+                      - rider_name
+                      - rider_phone_number
+                      - amount
+                      - status
+                      - type
+                      - delivery_checklist
+                      - metadata
+                      - pickup_address
+                      - drop_address
+                      - tags
+                      - customer_details
+                      - expected_eta
+                      - current_eta
+                      - created_at
+                      - updated_at
+                      - notes
+                      - latest
+                      - fulfilled_by
+                      - sla_status
+                      - distance
+                      - batch_id
+                      - order_id
+                      - order
+                      - rider_info
+                  is_success:
+                    type: boolean
+                    example: true
+                  status_code:
+                    type: integer
+                    example: 200
+                required:
+                  - data
+                  - is_success
+                  - status_code
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    ResponseBody:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 4796
+            external_order_id:
+              type: string
+              example: PICKUP_TEST_005
+            rider_id:
+              type: integer
+              example: 716
+            rider_identification:
+              type: string
+              example: DE716
+            rider_name:
+              type: string
+              example: Sanity_One
+            rider_phone_number:
+              type: string
+              example: '9061099401'
+            amount:
+              type: integer
+              example: 0
+            status:
+              type: string
+              example: cancelled
+            type:
+              type: string
+              example: PICKUP
+            delivery_checklist:
+              type: object
+              properties:
+                otp:
+                  type: object
+                  properties:
+                    return_to_origin:
+                      type: string
+                      example: '5743'
+                  required:
+                    - return_to_origin
+                proof_of_pickup:
+                  type: object
+                  properties:
+                    sku_count:
+                      type: integer
+                      example: 3
+                    signatures:
+                      type: array
+                      items:
+                        type: object
+                    payment_image_proof:
+                      type: array
+                      items:
+                        type: object
+                    delivery_image_proof:
+                      type: array
+                      items:
+                        type: string
+                        example: https://1mg-staging-inventory.s3.amazonaws.com/riders%2Fpod%2F6155-4796%2F1739346007_Delivery_confirmation_photo
+                  required:
+                    - sku_count
+                    - signatures
+                    - payment_image_proof
+                    - delivery_image_proof
+                proof_of_delivery:
+                  type: object
+                  properties:
+                    otp:
+                      type: string
+                      example: '5743'
+                    sku_count:
+                      type: string
+                      nullable: true
+                    signatures:
+                      type: array
+                      items:
+                        type: object
+                    payment_image_proof:
+                      type: array
+                      items:
+                        type: object
+                    delivery_image_proof:
+                      type: array
+                      items:
+                        type: object
+                  required:
+                    - otp
+                    - signatures
+                    - payment_image_proof
+                    - delivery_image_proof
+                delivery_checklist:
+                  type: object
+                  properties:
+                    otp:
+                      type: boolean
+                      example: true
+                    sku_count:
+                      type: boolean
+                      example: true
+                    delivery_image_proof:
+                      type: boolean
+                      example: true
+                  required:
+                    - otp
+                    - sku_count
+                    - delivery_image_proof
+              required:
+                - otp
+                - proof_of_pickup
+                - proof_of_delivery
+                - delivery_checklist
+            metadata:
+              type: object
+              properties:
+                SLA status:
+                  type: string
+                  example: On Time
+                reached_at:
+                  type: string
+                  example: '2025-02-12T07:39:44Z'
+                rnr_reason:
+                  type: string
+                  example: Wrong product/medicine has been delivered
+                assigned_at:
+                  type: string
+                  example: '2025-03-11T06:59:12Z'
+                picked_up_at:
+                  type: string
+                  example: '2025-02-12T07:40:22Z'
+                on_the_way_at:
+                  type: string
+                  example: '2025-02-12T07:39:36Z'
+                payout_status:
+                  type: string
+                  example: Processing Completed
+                rider_earning:
+                  type: object
+                  properties:
+                    'null':
+                      type: integer
+                      example: 0
+                    base_pay:
+                      type: integer
+                      example: 0
+                    total_pay:
+                      type: integer
+                      example: 0
+                    distance_pay:
+                      type: integer
+                      example: 0
+                    variable_pay:
+                      type: integer
+                      example: 0
+                  required:
+                    - 'null'
+                    - base_pay
+                    - total_pay
+                    - distance_pay
+                    - variable_pay
+                rescheduled_at:
+                  type: string
+                  example: '2025-03-11T06:59:12Z'
+                assignment_type:
+                  type: string
+                  example: manual
+                hub_drop_off_at:
+                  type: string
+                  example: '2025-02-12T08:16:50Z'
+                pickup_location:
+                  type: object
+                  properties:
+                    latitude:
+                      type: string
+                      example: '37.4219983'
+                    longitude:
+                      type: string
+                      example: '-122.084'
+                  required:
+                    - latitude
+                    - longitude
+                out_for_pickup_at:
+                  type: string
+                  example: '2025-02-12T07:37:39Z'
+                delivered_location:
+                  type: object
+                  properties:
+                    latitude:
+                      type: string
+                      example: '37.4219983'
+                    longitude:
+                      type: string
+                      example: '-122.084'
+                  required:
+                    - latitude
+                    - longitude
+              required:
+                - SLA status
+                - reached_at
+                - rnr_reason
+                - assigned_at
+                - picked_up_at
+                - on_the_way_at
+                - payout_status
+                - rider_earning
+                - rescheduled_at
+                - assignment_type
+                - hub_drop_off_at
+                - pickup_location
+                - out_for_pickup_at
+                - delivered_location
+            pickup_address:
+              type: object
+              properties: {}
+              required: []
+            drop_address:
+              type: object
+              properties:
+                city:
+                  type: string
+                  example: GURUGRAM
+                state:
+                  type: string
+                  example: Haryana
+                street:
+                  type: string
+                  example: okhla mg road
+                country:
+                  type: string
+                  example: In
+                latitude:
+                  type: string
+                  example: '28.39218875140413'
+                zip_code:
+                  type: string
+                  example: '121008'
+                longitude:
+                  type: string
+                  example: '76.96759058273341'
+              required:
+                - city
+                - state
+                - street
+                - country
+                - latitude
+                - zip_code
+                - longitude
+            tags:
+              type: object
+              properties:
+                order_type:
+                  type: array
+                  items:
+                    type: string
+                    example: return
+              required:
+                - order_type
+            customer_details:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Vasuda
+                email:
+                  type: string
+                  example: ''
+                did_number:
+                  type: string
+                  example: ''
+                phone_number:
+                  type: string
+                  example: 90******12
+              required:
+                - name
+                - email
+                - did_number
+                - phone_number
+            expected_eta:
+              type: string
+              example: 12-02-2025 14:49:09
+            actual_eta:
+              type: string
+              nullable: true
+            current_eta:
+              type: string
+              example: 12-02-2025 14:49:09
+            created_at:
+              type: string
+              example: 12-02-2025 12:49:09
+            updated_at:
+              type: string
+              example: 12-02-2025 13:46:48
+            notes:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: text
+                  value:
+                    type: string
+                    example: fifteen_minute_delivery
+                required:
+                  - type
+                  - value
+            latest:
+              type: boolean
+              example: true
+            fulfilled_by:
+              type: string
+              example: inhouse
+            sla_status:
+              type: string
+              example: Late
+            distance:
+              type: integer
+              example: 0
+            batch_id:
+              type: integer
+              example: 1030
+            order_id:
+              type: string
+              example: PICKUP_TEST_005
+            tour_id:
+              type: string
+              nullable: true
+            order:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 6155
+                external_order_id:
+                  type: string
+                  example: PICKUP_TEST_005
+                order_type:
+                  type: string
+                  example: pharmacy
+                order_id:
+                  type: string
+                  example: PICKUP_TEST_005
+                status:
+                  type: string
+                  example: pickup_completed
+                catchment_code:
+                  type: string
+                  example: PTS_GGN
+                amount_payable:
+                  type: integer
+                  example: 0
+                line_items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 233112
+                      name:
+                        type: string
+                        example: dettol
+                      brand:
+                        type: string
+                        example: dettol
+                      price:
+                        type: integer
+                        example: 1
+                      quantity:
+                        type: integer
+                        example: 1
+                      image_urls:
+                        type: array
+                        items:
+                          type: string
+                          example: https://www.1mg.com/otc/dettol-antiseptic-disinfectant-liquid-otc399361
+                      pack_weight:
+                        type: integer
+                        example: 1
+                      discounted_price:
+                        type: integer
+                        example: 10
+                    required:
+                      - id
+                      - name
+                      - brand
+                      - price
+                      - quantity
+                      - image_urls
+                      - pack_weight
+                      - discounted_price
+                slot:
+                  type: object
+                  properties:
+                    end:
+                      type: integer
+                      example: 1718863252
+                    start:
+                      type: integer
+                      example: 1718859652
+                  required:
+                    - end
+                    - start
+                address:
+                  type: object
+                  properties:
+                    city:
+                      type: string
+                      example: GURUGRAM
+                    name:
+                      type: string
+                      example: Vasuda
+                    state:
+                      type: string
+                      example: Haryana
+                    country:
+                      type: string
+                      example: In
+                    pincode:
+                      type: string
+                      example: '121008'
+                    street1:
+                      type: string
+                      example: okhla
+                    street2:
+                      type: string
+                      example: mg road
+                    latitude:
+                      type: number
+                      example: 28.39218875140413
+                    locality:
+                      type: string
+                      example: sfdsd
+                    longitude:
+                      type: number
+                      example: 76.96759058273341
+                    contact_number:
+                      type: string
+                      example: 90******12
+                    geodata_latitude:
+                      type: number
+                      example: 28.39218875140413
+                    geodata_longitude:
+                      type: number
+                      example: 76.96759058273341
+                  required:
+                    - city
+                    - name
+                    - state
+                    - country
+                    - pincode
+                    - street1
+                    - street2
+                    - latitude
+                    - locality
+                    - longitude
+                    - contact_number
+                    - geodata_latitude
+                    - geodata_longitude
+                metadata:
+                  type: object
+                  properties:
+                    notes:
+                      type: array
+                      items:
+                        type: string
+                        example: fifteen_minute_delivery
+                    skills:
+                      type: array
+                      items:
+                        type: string
+                        example: rapid
+                    category:
+                      type: string
+                      example: standard
+                    hub_code:
+                      type: string
+                      example: okhla
+                    order_eta:
+                      type: integer
+                      example: 1723030975
+                    order_mrp:
+                      type: number
+                      example: 99.2
+                    psp_order:
+                      type: boolean
+                      example: false
+                    team_code:
+                      type: string
+                      example: okhla
+                    rnr_reason:
+                      type: string
+                      example: Wrong product/medicine has been delivered
+                    cms_enabled:
+                      type: boolean
+                      example: true
+                    payment_mode:
+                      type: string
+                      example: prepaid
+                    sub_category:
+                      type: string
+                      example: fifteen_minute_delivery
+                    order_distance:
+                      type: integer
+                      example: 0
+                    order_allocation:
+                      type: string
+                      example: manual
+                    payment_page_url:
+                      type: string
+                      example: https://stag.1mg.com/external-payment/0OH2HQWnXnd9426DdU1khw%3D%3D
+                    otp_based_delivery:
+                      type: boolean
+                      example: true
+                    batching_performed_by:
+                      type: string
+                      example: manual
+                    dynamic_allocation_enabled:
+                      type: boolean
+                      example: false
+                  required:
+                    - notes
+                    - skills
+                    - category
+                    - hub_code
+                    - order_eta
+                    - order_mrp
+                    - psp_order
+                    - team_code
+                    - rnr_reason
+                    - cms_enabled
+                    - payment_mode
+                    - sub_category
+                    - order_distance
+                    - order_allocation
+                    - payment_page_url
+                    - otp_based_delivery
+                    - batching_performed_by
+                    - dynamic_allocation_enabled
+                order_created_at:
+                  type: string
+                  example: 23-01-2024 05:50:43
+                created_at:
+                  type: string
+                  example: 12-02-2025 12:47:59
+                updated_at:
+                  type: string
+                  example: 12-02-2025 13:46:49
+                type:
+                  type: string
+                  example: PICKUP
+                entry_type:
+                  type: string
+                  example: API
+                hub_id:
+                  type: string
+                  example: 661f7301af16fb92ab0628c2
+                slot_start_time:
+                  type: string
+                  example: 12-02-2025 12:49:09
+                slot_end_time:
+                  type: string
+                  example: 12-02-2025 14:49:09
+                first_attempt_date:
+                  type: string
+                  nullable: true
+                category:
+                  type: string
+                  example: standard
+                fulfilled_by:
+                  type: string
+                  example: inhouse
+                city:
+                  type: string
+                  example: gurugram
+                pincode:
+                  type: integer
+                  example: 121008
+                state_delay_time:
+                  type: string
+                  example: 12-02-2025 12:54:09
+                tag:
+                  type: string
+                  nullable: true
+                sub_category:
+                  type: string
+                  nullable: true
+                batch_id:
+                  type: integer
+                  example: 1030
+                display_address:
+                  type: string
+                  example: okhla, mg road, sfdsd
+              required:
+                - id
+                - external_order_id
+                - order_type
+                - order_id
+                - status
+                - catchment_code
+                - amount_payable
+                - line_items
+                - slot
+                - address
+                - metadata
+                - order_created_at
+                - created_at
+                - updated_at
+                - type
+                - entry_type
+                - hub_id
+                - slot_start_time
+                - slot_end_time
+                - category
+                - fulfilled_by
+                - city
+                - pincode
+                - state_delay_time
+                - batch_id
+                - display_address
+            rider_info:
+              type: object
+              properties:
+                address_id:
+                  type: integer
+                  example: 931174
+                email:
+                  type: string
+                  example: fsgsvshhd@gmail.com
+                phone_number:
+                  type: string
+                  example: '9061099401'
+                employee_id:
+                  type: string
+                  nullable: true
+                city:
+                  type: string
+                  example: gurgaon
+                profile_pic:
+                  type: string
+                  nullable: true
+                name:
+                  type: string
+                  example: Sanity_One
+                rider_address:
+                  type: string
+                  nullable: true
+                id:
+                  type: integer
+                  example: 716
+                type:
+                  type: string
+                  example: rider
+                tags:
+                  type: string
+                  nullable: true
+                fleet_type:
+                  type: string
+                  example: inhouse
+                employer_id:
+                  type: integer
+                  example: 30
+                user_id:
+                  type: integer
+                  example: 1444
+                managed_by:
+                  type: string
+                  example: 1mg
+                pay_structure:
+                  type: string
+                  example: mbg
+                metadata:
+                  type: object
+                  properties:
+                    vendor_cash_collection_enabled:
+                      type: boolean
+                      example: true
+                  required:
+                    - vendor_cash_collection_enabled
+                persona_id:
+                  type: integer
+                  example: 25
+                payroll:
+                  type: string
+                  example: variable
+                onboarding_date:
+                  type: string
+                  example: 26-12-2024
+                status:
+                  type: string
+                  example: active
+                onboarding_status:
+                  type: string
+                  example: verified
+                employee_type:
+                  type: string
+                  example: non_contractual
+                employer:
+                  type: object
+                  properties:
+                    address:
+                      type: object
+                      properties:
+                        street1:
+                          type: string
+                          example: gurugram
+                        street2:
+                          type: string
+                          example: ''
+                        locality:
+                          type: string
+                          example: okhla
+                        pincode:
+                          type: string
+                          example: '120001'
+                        city:
+                          type: string
+                          example: gurgaon
+                        state:
+                          type: string
+                          example: HARYANA
+                        country:
+                          type: string
+                          example: IN
+                        contact_number:
+                          type: string
+                          example: '1234567890'
+                      required:
+                        - street1
+                        - street2
+                        - locality
+                        - pincode
+                        - city
+                        - state
+                        - country
+                        - contact_number
+                    id:
+                      type: integer
+                      example: 30
+                    fleet_type:
+                      type: string
+                      example: inhouse
+                    email:
+                      type: string
+                      example: default_transporter@1mg.com
+                    phone_number:
+                      type: string
+                      example: '4567890876'
+                    code:
+                      type: string
+                      example: default_transporter
+                    status:
+                      type: string
+                      example: active
+                    name:
+                      type: string
+                      example: default_transporter
+                  required:
+                    - address
+                    - id
+                    - fleet_type
+                    - email
+                    - phone_number
+                    - code
+                    - status
+                    - name
+                contract:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 660
+                    activated:
+                      type: boolean
+                      example: true
+                    tags:
+                      type: object
+                      properties: {}
+                      required: []
+                    partial_payment_count:
+                      type: integer
+                      example: 5
+                    rider_identification:
+                      type: string
+                      example: DE716
+                    hub_id:
+                      type: string
+                      example: 661f7301af16fb92ab0628c2
+                    team_id:
+                      type: string
+                      example: 65f0880e9a599964950a03b6
+                    total_payment_count:
+                      type: integer
+                      example: 6
+                    rider_id:
+                      type: integer
+                      example: 716
+                    outstanding_amount:
+                      type: integer
+                      example: 0
+                    last_cash_submitted_at:
+                      type: string
+                      example: 07-10-2025 09:22:15
+                    masked_phone_number:
+                      type: string
+                      example: '9061099401'
+                  required:
+                    - id
+                    - activated
+                    - tags
+                    - partial_payment_count
+                    - rider_identification
+                    - hub_id
+                    - team_id
+                    - total_payment_count
+                    - rider_id
+                    - outstanding_amount
+                    - last_cash_submitted_at
+                    - masked_phone_number
+                documents:
+                  type: object
+                  properties:
+                    agreement:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 440
+                        front_image:
+                          type: string
+                          nullable: true
+                        type:
+                          type: string
+                          example: agreement
+                        pdf_document:
+                          type: string
+                          example: https://1mg-staging-inventory.s3.amazonaws.com/profile_pictures/1735224576_dummy.pdf
+                        back_image:
+                          type: string
+                          nullable: true
+                        number:
+                          type: string
+                          nullable: true
+                        metadata:
+                          type: string
+                          nullable: true
+                      required:
+                        - id
+                        - type
+                        - pdf_document
+                    bank_details:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 426
+                        front_image:
+                          type: string
+                          example: https://1mg-staging-inventory.s3.amazonaws.com/rider_documents%2F716%2F1735219800_Bankdetailproof.jpeg
+                        type:
+                          type: string
+                          example: bank_details
+                        pdf_document:
+                          type: string
+                          nullable: true
+                        back_image:
+                          type: string
+                          nullable: true
+                        number:
+                          type: string
+                          example: '656655555545'
+                        metadata:
+                          type: object
+                          properties:
+                            bank_name:
+                              type: string
+                              example: Hdfc
+                            ifsc_code:
+                              type: string
+                              example: HDFC9293636
+                            is_active:
+                              type: boolean
+                              example: true
+                            bank_detail_proofs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  url:
+                                    type: string
+                                    example: https://1mg-staging-inventory.s3.amazonaws.com/rider_documents%2F716%2F1735219800_Bankdetailproof.jpeg
+                                  description:
+                                    type: string
+                                    example: BankProof
+                                required:
+                                  - url
+                                  - description
+                            bank_account_number:
+                              type: string
+                              example: '656655555545'
+                          required:
+                            - bank_name
+                            - ifsc_code
+                            - is_active
+                            - bank_detail_proofs
+                            - bank_account_number
+                      required:
+                        - id
+                        - front_image
+                        - type
+                        - number
+                        - metadata
+                    pan_card:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 427
+                        front_image:
+                          type: string
+                          example: abc
+                        type:
+                          type: string
+                          example: pan_card
+                        pdf_document:
+                          type: string
+                          nullable: true
+                        back_image:
+                          type: string
+                          nullable: true
+                        number:
+                          type: string
+                          example: '1234511111'
+                        metadata:
+                          type: string
+                          nullable: true
+                      required:
+                        - id
+                        - front_image
+                        - type
+                        - number
+                    aadhaar_card:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 428
+                        front_image:
+                          type: string
+                          example: abc
+                        type:
+                          type: string
+                          example: aadhaar_card
+                        pdf_document:
+                          type: string
+                          nullable: true
+                        back_image:
+                          type: string
+                          example: def
+                        number:
+                          type: string
+                          example: '123451111111'
+                        metadata:
+                          type: string
+                          nullable: true
+                      required:
+                        - id
+                        - front_image
+                        - type
+                        - back_image
+                        - number
+                    driving_license:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 429
+                        front_image:
+                          type: string
+                          example: abc
+                        type:
+                          type: string
+                          example: driving_license
+                        pdf_document:
+                          type: string
+                          nullable: true
+                        back_image:
+                          type: string
+                          example: xyz
+                        number:
+                          type: string
+                          example: dl12345
+                        metadata:
+                          type: object
+                          properties:
+                            expiry_date:
+                              type: string
+                              example: '2024-11-14'
+                          required:
+                            - expiry_date
+                      required:
+                        - id
+                        - front_image
+                        - type
+                        - back_image
+                        - number
+                        - metadata
+                  required:
+                    - agreement
+                    - bank_details
+                    - pan_card
+                    - aadhaar_card
+                    - driving_license
+                persona:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 25
+                    tags:
+                      type: object
+                      properties: {}
+                      required: []
+                    fleet_type:
+                      type: string
+                      example: THIRD_PARTY
+                    code:
+                      type: string
+                      example: rapid-cold
+                    name:
+                      type: string
+                      example: rapid-cold
+                  required:
+                    - id
+                    - tags
+                    - fleet_type
+                    - code
+                    - name
+                tl_verification:
+                  type: object
+                  properties:
+                    enable:
+                      type: boolean
+                      example: false
+                    state:
+                      type: string
+                      example: 'on'
+                  required:
+                    - enable
+                    - state
+                co_verification:
+                  type: object
+                  properties:
+                    enable:
+                      type: boolean
+                      example: false
+                    state:
+                      type: string
+                      example: 'on'
+                  required:
+                    - enable
+                    - state
+                rate_card:
+                  type: array
+                  items:
+                    type: object
+                incentive_card:
+                  type: array
+                  items:
+                    type: object
+                rider_credit_limit:
+                  type: integer
+                  example: 10000
+              required:
+                - address_id
+                - email
+                - phone_number
+                - city
+                - name
+                - id
+                - type
+                - fleet_type
+                - employer_id
+                - user_id
+                - managed_by
+                - pay_structure
+                - metadata
+                - persona_id
+                - payroll
+                - onboarding_date
+                - status
+                - onboarding_status
+                - employee_type
+                - employer
+                - contract
+                - documents
+                - persona
+                - tl_verification
+                - co_verification
+                - rate_card
+                - incentive_card
+                - rider_credit_limit
+          required:
+            - id
+            - external_order_id
+            - rider_id
+            - rider_identification
+            - rider_name
+            - rider_phone_number
+            - amount
+            - status
+            - type
+            - delivery_checklist
+            - metadata
+            - pickup_address
+            - drop_address
+            - tags
+            - customer_details
+            - expected_eta
+            - current_eta
+            - created_at
+            - updated_at
+            - notes
+            - latest
+            - fulfilled_by
+            - sla_status
+            - distance
+            - batch_id
+            - order_id
+            - order
+            - rider_info
+        is_success:
+          type: boolean
+          example: true
+        status_code:
+          type: integer
+          example: 200
+      required:
+        - data
+        - is_success
+        - status_code
