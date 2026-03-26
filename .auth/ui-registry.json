@@ -1,0 +1,22 @@
+{
+  "ReportPage": {
+    "Download Report": {
+      "selector": "text=\"Download Report\"",
+      "lastUpdated": "2026-03-26T05:32:32.406Z"
+    }
+  },
+  "MetricsPage": {
+    "Button 0": {
+      "selector": "text=\"Button 0\"",
+      "lastUpdated": "2026-03-26T05:32:53.309Z"
+    },
+    "Button 1": {
+      "selector": "text=\"Button 1\"",
+      "lastUpdated": "2026-03-26T05:33:08.404Z"
+    },
+    "Button 2": {
+      "selector": "text=\"Button 2\"",
+      "lastUpdated": "2026-03-26T05:33:23.461Z"
+    }
+  }
+}

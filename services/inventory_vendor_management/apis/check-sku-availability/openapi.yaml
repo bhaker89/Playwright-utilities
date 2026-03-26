@@ -1,0 +1,228 @@
+openapi: 3.0.0
+info:
+  title: Check Sku Availability API
+  description: Auto-generated OpenAPI spec for inventory_vendor_management/check-sku-availability
+  version: 1.0.0
+  x-generated-at: '2026-03-05T10:22:16.405Z'
+  x-service: inventory_vendor_management
+  x-api-name: check-sku-availability
+servers:
+  - url: https://staginternalapi.1mg.com
+    description: API Server
+paths:
+  /inventory_vendor_management/__onemg-internal__/v3/inventories/skus_availability:
+    post:
+      summary: Check Sku Availability
+      description: POST check-sku-availability operation
+      operationId: post_check_sku_availability
+      tags:
+        - check
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cart_id:
+                  type: string
+                  example: '3099555'
+                cart_type:
+                  type: string
+                  example: pharmacy
+                user_id:
+                  type: string
+                  example: 535b4416-5bb7-4de3-89da-06273f9ddb4c
+                addresses:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      city:
+                        type: string
+                        example: Gurgaon
+                      pincode:
+                        type: string
+                        example: '122001'
+                      state:
+                        type: string
+                        example: Haryana
+                      latitude:
+                        type: number
+                        example: 28.474679
+                      longitude:
+                        type: number
+                        example: 77.1048978
+                    required:
+                      - city
+                      - pincode
+                      - state
+                      - latitude
+                      - longitude
+                skus:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sku_id:
+                        type: string
+                        example: '174078'
+                      quantity:
+                        type: integer
+                        example: 3
+                      sub_category:
+                        type: string
+                        example: AYURVEDIC
+                      is_dangerous_sku:
+                        type: boolean
+                        example: false
+                      is_banned:
+                        type: boolean
+                        example: false
+                    required:
+                      - sku_id
+                      - quantity
+                      - sub_category
+                      - is_dangerous_sku
+                      - is_banned
+                is_loyal_user:
+                  type: boolean
+                  example: false
+                pincodes:
+                  type: array
+                  items:
+                    type: string
+                    example: '122001'
+                vendors_per_sku:
+                  type: integer
+                  example: 10
+              required:
+                - cart_id
+                - cart_type
+                - user_id
+                - addresses
+                - skus
+                - is_loyal_user
+                - pincodes
+                - vendors_per_sku
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Mock response (API not executed)
+                required:
+                  - success
+                  - message
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    RequestBody:
+      type: object
+      properties:
+        cart_id:
+          type: string
+          example: '3099555'
+        cart_type:
+          type: string
+          example: pharmacy
+        user_id:
+          type: string
+          example: 535b4416-5bb7-4de3-89da-06273f9ddb4c
+        addresses:
+          type: array
+          items:
+            type: object
+            properties:
+              city:
+                type: string
+                example: Gurgaon
+              pincode:
+                type: string
+                example: '122001'
+              state:
+                type: string
+                example: Haryana
+              latitude:
+                type: number
+                example: 28.474679
+              longitude:
+                type: number
+                example: 77.1048978
+            required:
+              - city
+              - pincode
+              - state
+              - latitude
+              - longitude
+        skus:
+          type: array
+          items:
+            type: object
+            properties:
+              sku_id:
+                type: string
+                example: '174078'
+              quantity:
+                type: integer
+                example: 3
+              sub_category:
+                type: string
+                example: AYURVEDIC
+              is_dangerous_sku:
+                type: boolean
+                example: false
+              is_banned:
+                type: boolean
+                example: false
+            required:
+              - sku_id
+              - quantity
+              - sub_category
+              - is_dangerous_sku
+              - is_banned
+        is_loyal_user:
+          type: boolean
+          example: false
+        pincodes:
+          type: array
+          items:
+            type: string
+            example: '122001'
+        vendors_per_sku:
+          type: integer
+          example: 10
+      required:
+        - cart_id
+        - cart_type
+        - user_id
+        - addresses
+        - skus
+        - is_loyal_user
+        - pincodes
+        - vendors_per_sku
+    ResponseBody:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Mock response (API not executed)
+      required:
+        - success
+        - message

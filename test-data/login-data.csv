@@ -1,0 +1,6 @@
+email,password,expected_status
+eve.holt@reqres.in,cityslicka,200
+invalid@test.com,wrongpass,400
+eve.holt@reqres.in,wrongpass,400
+,password123,400
+test@test.com,,400

@@ -1,0 +1,87 @@
+{
+  "description": "Configurable API endpoints - Replace with YOUR actual endpoints",
+  "baseURL": "https://jsonplaceholder.typicode.com",
+  "endpoints": {
+    "posts": {
+      "list": {
+        "method": "GET",
+        "path": "/posts",
+        "description": "Get all posts",
+        "expectedStatus": 200
+      },
+      "getById": {
+        "method": "GET",
+        "path": "/posts/{id}",
+        "description": "Get single post by ID",
+        "expectedStatus": 200
+      },
+      "create": {
+        "method": "POST",
+        "path": "/posts",
+        "description": "Create new post",
+        "expectedStatus": 201,
+        "payload": {
+          "title": "Test Post",
+          "body": "Test Body",
+          "userId": 1
+        }
+      },
+      "update": {
+        "method": "PUT",
+        "path": "/posts/{id}",
+        "description": "Update existing post",
+        "expectedStatus": 200
+      },
+      "delete": {
+        "method": "DELETE",
+        "path": "/posts/{id}",
+        "description": "Delete post",
+        "expectedStatus": 200
+      }
+    },
+    "users": {
+      "list": {
+        "method": "GET",
+        "path": "/users",
+        "description": "Get all users",
+        "expectedStatus": 200
+      }
+    }
+  },
+  "customEndpoints": {
+    "comment": "Add your actual API endpoints here",
+    "example": {
+      "yourAPI": {
+        "method": "GET",
+        "path": "/your/actual/endpoint",
+        "description": "Replace with your actual endpoint",
+        "expectedStatus": 200,
+        "headers": {
+          "Authorization": "Bearer YOUR_TOKEN",
+          "Content-Type": "application/json"
+        },
+        "queryParams": {
+          "param1": "value1",
+          "param2": "value2"
+        }
+      }
+    }
+  },
+  "instructions": {
+    "step1": "Replace 'baseURL' with your actual API base URL",
+    "step2": "Update endpoints with your actual API endpoints",
+    "step3": "Add authentication headers if needed",
+    "step4": "Update expected status codes based on your API",
+    "step5": "Run tests with: npm test -- tests/api/configurable-api.spec.ts"
+  },
+  "realWorldExamples": {
+    "weatherAPI": "https://api.openweathermap.org/data/2.5/weather?q=London&appid=YOUR_KEY",
+    "reqresAPI": "https://reqres.in/api/users",
+    "catsAPI": "https://api.thecatapi.com/v1/images/search",
+    "dogsAPI": "https://dog.ceo/api/breeds/image/random",
+    "jokesAPI": "https://official-joke-api.appspot.com/random_joke",
+    "github": "https://api.github.com/users/github",
+    "spacex": "https://api.spacexdata.com/v4/launches/latest"
+  },
+  "note": "I used JSONPlaceholder as a demo. Replace with YOUR actual API endpoints!"
+}

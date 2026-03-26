@@ -1,0 +1,5 @@
+Title,Preconditions,Steps,Expected
+Add to Cart Flow,User is logged in,"Navigate to Landing Page
+Search for 'Paracetamol'
+Click on the first search result
+Click Add to Cart button",Item should be added to the cart

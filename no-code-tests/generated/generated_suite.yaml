@@ -1,0 +1,20 @@
+name: Generated Suite
+tests:
+  - name: Login Test
+    type: ui
+    assertions:
+      - type: url
+        expected: /dashboard
+    steps:
+      - action: goto
+        url: /login
+      - action: fill
+        selector: '#username'
+        value: testuser
+      - action: fill
+        selector: '#password'
+        value: password123
+      - action: click
+        selector: '#login-btn'
+      - action: assert_visible
+        selector: .dashboard

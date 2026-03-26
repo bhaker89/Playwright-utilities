@@ -1,0 +1,8 @@
+{
+  "AddToCartButton": [
+    "getByTestId('add-to-cart')",
+    "getByRole('button', { name: 'Add to Cart' })",
+    "css=.add-to-cart-btn",
+    "xpath=//button[contains(text(), 'Add')]"
+  ]
+}
