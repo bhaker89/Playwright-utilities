@@ -1,0 +1,257 @@
+openapi: 3.0.0
+info:
+  title: SKU Availability API
+  description: >
+    Checks availability of pharmacy SKUs for a given cart, user, and delivery address.
+    Used to determine which vendors can fulfil the requested SKUs and their availability status.
+  version: 1.0.0
+  x-service: inventory_vendor_management
+  x-api-name: check-sku-availability
+servers:
+  - url: https://staginternalapi.1mg.com
+    description: Staging - Internal API Server
+paths:
+  /inventory_vendor_management/__onemg-internal__/v3/inventories/skus_availability:
+    post:
+      summary: Check SKU Availability
+      description: >
+        Checks stock and vendor availability for a list of SKUs against a cart
+        and user address. Returns per-vendor availability details for each SKU.
+      operationId: checkSkuAvailability
+      tags:
+        - Inventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuAvailabilityRequest'
+            example:
+              cart_id: "3099555"
+              cart_type: pharmacy
+              user_id: "535b4416-5bb7-4de3-89da-06273f9ddb4c"
+              addresses:
+                - city: Gurgaon
+                  pincode: "122001"
+                  state: Haryana
+                  latitude: 28.474679
+                  longitude: 77.1048978
+              skus:
+                - sku_id: "174078"
+                  quantity: 3
+                  sub_category: AYURVEDIC
+                  storage_temperature: null
+                  is_dangerous_sku: false
+                  is_banned: false
+              is_loyal_user: false
+              pincodes:
+                - "122001"
+              vendors_per_sku: 10
+      responses:
+        '200':
+          description: SKU availability returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkuAvailabilityResponse'
+              example:
+                status: success
+                data:
+                  skus:
+                    - sku_id: "174078"
+                      is_available: true
+                      vendors:
+                        - vendor_id: "V001"
+                          name: "PharmaCo Gurgaon"
+                          available_quantity: 50
+                          pincode: "122001"
+                          is_serviceable: true
+                          mrp: 250.00
+                          selling_price: 225.00
+        '400':
+          description: Bad Request — missing or invalid fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: "cart_id is required"
+        '401':
+          description: Unauthorized — missing auth credentials
+        '403':
+          description: Forbidden — invalid internal token or IP restriction
+        '422':
+          description: Unprocessable Entity — field validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    SkuAvailabilityRequest:
+      type: object
+      required:
+        - cart_id
+        - cart_type
+        - user_id
+        - addresses
+        - skus
+        - is_loyal_user
+        - pincodes
+        - vendors_per_sku
+      properties:
+        cart_id:
+          type: string
+          description: Unique cart identifier
+          example: "3099555"
+        cart_type:
+          type: string
+          enum: [pharmacy, general, grocery]
+          description: Type of cart
+          example: pharmacy
+        user_id:
+          type: string
+          format: uuid
+          description: UUID of the user
+          example: "535b4416-5bb7-4de3-89da-06273f9ddb4c"
+        addresses:
+          type: array
+          minItems: 1
+          description: Delivery address(es) for availability check
+          items:
+            $ref: '#/components/schemas/Address'
+        skus:
+          type: array
+          minItems: 1
+          description: List of SKUs to check availability for
+          items:
+            $ref: '#/components/schemas/Sku'
+        is_loyal_user:
+          type: boolean
+          description: Whether the user is a loyalty programme member
+          example: false
+        pincodes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+          description: Delivery pincodes
+          example: ["122001"]
+        vendors_per_sku:
+          type: integer
+          minimum: 1
+          maximum: 50
+          description: Maximum number of vendors to return per SKU
+          example: 10
+
+    Address:
+      type: object
+      required: [city, pincode, state, latitude, longitude]
+      properties:
+        city:
+          type: string
+          example: Gurgaon
+        pincode:
+          type: string
+          pattern: '^\d{6}$'
+          example: "122001"
+        state:
+          type: string
+          example: Haryana
+        latitude:
+          type: number
+          format: float
+          example: 28.474679
+        longitude:
+          type: number
+          format: float
+          example: 77.1048978
+
+    Sku:
+      type: object
+      required: [sku_id, quantity, sub_category, is_dangerous_sku, is_banned]
+      properties:
+        sku_id:
+          type: string
+          example: "174078"
+        quantity:
+          type: integer
+          minimum: 1
+          example: 3
+        sub_category:
+          type: string
+          enum: [AYURVEDIC, ALLOPATHIC, SURGICAL, OTC, NUTRACEUTICAL]
+          example: AYURVEDIC
+        storage_temperature:
+          type: string
+          nullable: true
+          example: null
+        is_dangerous_sku:
+          type: boolean
+          example: false
+        is_banned:
+          type: boolean
+          example: false
+
+    SkuAvailabilityResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success, error]
+          example: success
+        data:
+          type: object
+          properties:
+            skus:
+              type: array
+              items:
+                type: object
+                properties:
+                  sku_id:
+                    type: string
+                    example: "174078"
+                  is_available:
+                    type: boolean
+                    example: true
+                  vendors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        vendor_id:
+                          type: string
+                          example: "V001"
+                        name:
+                          type: string
+                          example: "PharmaCo Gurgaon"
+                        available_quantity:
+                          type: integer
+                          example: 50
+                        pincode:
+                          type: string
+                          example: "122001"
+                        is_serviceable:
+                          type: boolean
+                          example: true
+                        mrp:
+                          type: number
+                          format: float
+                          example: 250.00
+                        selling_price:
+                          type: number
+                          format: float
+                          example: 225.00

@@ -1,0 +1,91 @@
+name: Advanced API Testing Examples
+description: Demonstrates various assertion types and advanced features
+
+curl: |
+  curl 'https://reqres.in/api/users/2' \
+    -H 'Accept: application/json'
+
+test_cases:
+  - name: Test all assertion types
+    description: Comprehensive example showing different assertion capabilities
+    assertions:
+      # Status code assertion
+      - type: status_code
+        expected: 200
+
+      # JSON path with exact value matching
+      - type: json_path
+        path: $.data.id
+        expected: 2
+
+      # JSON path existence check
+      - type: json_path
+        path: $.data.email
+        exists: true
+
+      # JSON path with contains
+      - type: json_path
+        path: $.data.email
+        contains: "@reqres.in"
+
+      # Response time assertion
+      - type: response_time
+        max_ms: 3000
+
+      # Header assertion
+      - type: header
+        header_name: Content-Type
+        contains: application/json
+
+      # Contains text in response
+      - type: contains
+        contains: "first_name"
+
+      # Regex pattern matching
+      - type: regex
+        pattern: "^\\{\"data\".*\\}$"
+
+  - name: Schema validation example
+    description: Validate response against JSON schema
+    assertions:
+      - type: status_code
+        expected: 200
+      - type: schema
+        schema:
+          type: object
+          required: ["data", "support"]
+          properties:
+            data:
+              type: object
+              required: ["id", "email", "first_name", "last_name"]
+              properties:
+                id:
+                  type: number
+                email:
+                  type: string
+                  format: email
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                avatar:
+                  type: string
+            support:
+              type: object
+              required: ["url", "text"]
+
+  - name: Extract and use variables
+    description: Extract data for use in subsequent tests
+    assertions:
+      - type: status_code
+        expected: 200
+    extract_variables:
+      - name: user_email
+        source: json_path
+        path: $.data.email
+      - name: user_name
+        source: json_path
+        path: $.data.first_name
+      - name: content_type
+        source: header
+        header_name: Content-Type

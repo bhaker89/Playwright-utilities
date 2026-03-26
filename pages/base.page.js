@@ -30,9 +30,16 @@ class BasePage {
     /** @protected @type {SharedTestContext} */
     this.context = SharedTestContext.getInstance();
 
-    // Initialize SmartLocator Engine
-    const { SmartLocator } = require('../platform/core/smart-locator');
-    this.healer = new SmartLocator(page, this.constructor.name);
+    // Initialize Locator Intelligence Engine (LIE) via Factory (10xquality Refinement)
+    this.lie = null;
+    if (process.env.ENABLE_LIE === 'true') {
+        try {
+            const LocatorFactory = require('../framework/locator-intelligence/locator-factory');
+            this.lie = new LocatorFactory(page);
+        } catch (err) {
+            console.error(`[BasePage] ❌ Failed to initialize LIE: ${err.message}`, err);
+        }
+    }
 
     // Initialize PlaywrightWrapper for high-level actions
     const { PlaywrightWrapper } = require('../utils/ui/playwright-wrapper');
@@ -224,11 +231,13 @@ class BasePage {
    */
   async fill(locator, value, fieldName) {
     logger.info(`Filling ${fieldName || 'field'} with value: ${value}`);
-    await this.healer.executeWithHealing(fieldName || 'field', locator, async (loc) => {
-      // Enforce a strict, shorter timeout for the interaction so SmartLocator catches it 
-      // before the global test timeout occurs.
-      await loc.fill(value, { timeout: 3000 });
-    });
+    if (this.lie) {
+      await this.lie.create(fieldName || 'field', async (loc) => {
+        await loc.fill(value, { timeout: 3000 });
+      }, locator);
+    } else {
+      await locator.fill(value, { timeout: 3000 });
+    }
   }
 
   /**
@@ -238,10 +247,13 @@ class BasePage {
    */
   async click(locator, elementName) {
     logger.info(`Clicking element: ${elementName || 'element'}`);
-    await this.healer.executeWithHealing(elementName || 'element', locator, async (loc) => {
-      // Enforce a strict, shorter timeout for the interaction so SmartLocator catches it
-      await loc.click({ timeout: 3000 });
-    });
+    if (this.lie) {
+      await this.lie.create(elementName || 'element', async (loc) => {
+        await loc.click({ timeout: 3000 });
+      }, locator);
+    } else {
+      await locator.click({ timeout: 3000 });
+    }
   }
 
   /**

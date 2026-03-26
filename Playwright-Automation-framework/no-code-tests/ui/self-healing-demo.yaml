@@ -1,0 +1,22 @@
+name: AI Self-Healing Verification
+description: Tests the UI engine's ability to heal broken selectors
+config:
+  headless: true
+tests:
+  - name: Heal Login Button
+    type: ui
+    steps:
+      - action: navigate
+        url: https://www.google.com
+      - action: fill
+        selector: "input[name='non-existent-search']"
+        value: "Playwright Automation"
+      - action: press
+        selector: "[name='q']"
+        value: "Enter"
+      - action: wait
+        value: 2000
+    assertions:
+      - type: ui_text
+        selector: "body"
+        expected: "Google"

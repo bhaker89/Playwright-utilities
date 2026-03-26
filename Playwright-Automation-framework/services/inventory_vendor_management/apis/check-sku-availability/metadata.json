@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-03-05T10:22:16.413Z",
+  "request": {
+    "method": "POST",
+    "url": "https://staginternalapi.1mg.com/inventory_vendor_management/__onemg-internal__/v3/inventories/skus_availability",
+    "hasHeaders": true,
+    "hasBody": true
+  },
+  "response": {
+    "status": 200,
+    "time": 0,
+    "contentType": "application/json"
+  }
+}

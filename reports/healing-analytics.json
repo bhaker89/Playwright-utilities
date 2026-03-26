@@ -1,10 +1,10 @@
 {
-  "reportGeneratedAt": "2026-03-25T10:13:35.594Z",
-  "testDuration": 64323,
+  "reportGeneratedAt": "2026-03-26T05:13:29.350Z",
+  "testDuration": 1981,
   "summary": {
-    "totalTests": 1,
+    "totalTests": 2,
     "passedTests": 0,
-    "failedTests": 0,
+    "failedTests": 2,
     "testsWithHealing": 0,
     "totalHealingAttempts": 0,
     "successfulHeals": 0,
