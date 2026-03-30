@@ -30,6 +30,7 @@ class LocatorMemoryStore {
     async _init() {
         if (!this.db) return;
         const run = promisify(this.db.run.bind(this.db));
+        await run('PRAGMA journal_mode=WAL');
         await run(`
             CREATE TABLE IF NOT EXISTS locators (
                 locator_key TEXT,

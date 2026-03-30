@@ -1,7 +1,9 @@
 const winston = require('winston');
 const path = require('path');
 
-const logDir = path.join(process.cwd(), 'logs');
+const { resolveFromRoot } = require('../../platform/core/workspace-root');
+
+const logDir = resolveFromRoot('logs');
 
 /**
  * Custom logger configuration using Winston

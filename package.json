@@ -1,8 +1,11 @@
 {
-  "name": "playwright-automation-framework",
+  "name": "playwright-automation-core",
   "version": "1.0.0",
   "description": "Enterprise-ready Playwright automation framework with JavaScript for end-to-end testing",
   "main": "index.js",
+  "bin": {
+    "playwright-automation-core": "./platform/cli/index.js"
+  },
   "scripts": {
     "test": "playwright test",
     "test:api": "playwright test tests/api",
@@ -74,6 +77,7 @@
     "joi": "^17.11.0",
     "js-yaml": "^4.1.0",
     "jsonpath-plus": "^8.0.0",
+    "minimist": "^1.2.8",
     "mongodb": "^6.3.0",
     "ollama": "^0.4.9",
     "openai": "^4.20.0",

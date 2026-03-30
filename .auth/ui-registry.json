@@ -8,15 +8,81 @@
   "MetricsPage": {
     "Button 0": {
       "selector": "text=\"Button 0\"",
-      "lastUpdated": "2026-03-26T05:32:53.309Z"
+      "lastUpdated": "2026-03-27T07:53:23.184Z"
     },
     "Button 1": {
       "selector": "text=\"Button 1\"",
-      "lastUpdated": "2026-03-26T05:33:08.404Z"
+      "lastUpdated": "2026-03-27T07:53:39.027Z"
     },
     "Button 2": {
       "selector": "text=\"Button 2\"",
-      "lastUpdated": "2026-03-26T05:33:23.461Z"
+      "lastUpdated": "2026-03-27T07:53:54.761Z"
+    }
+  },
+  "LoginPage": {
+    "Email Field": {
+      "selector": "input[type=\"email\"]",
+      "lastUpdated": "2026-03-27T06:47:53.844Z"
+    }
+  },
+  "CheckoutPage": {
+    "Payment Button": {
+      "selector": "button.payment-submit",
+      "lastUpdated": "2026-03-27T06:47:53.856Z"
+    }
+  },
+  "PerfPage": {
+    "Fast Button": {
+      "selector": "button.fast-btn",
+      "lastUpdated": "2026-03-27T06:42:18.606Z"
+    }
+  },
+  "TestPage": {
+    "Search Button": {
+      "selector": "button[aria-label=\"Search\"]",
+      "lastUpdated": "2026-03-27T07:52:48.990Z"
+    },
+    "Healed Button": {
+      "selector": "text=\"Healed Button\"",
+      "lastUpdated": "2026-03-27T07:55:10.869Z"
+    }
+  },
+  "FormPage": {
+    "Save": {
+      "selector": "text=\"Save\"",
+      "lastUpdated": "2026-03-27T06:48:11.898Z"
+    }
+  },
+  "BasePage": {
+    "DynamicButton": {
+      "0": "[",
+      "1": "d",
+      "2": "a",
+      "3": "t",
+      "4": "a",
+      "5": "-",
+      "6": "t",
+      "7": "e",
+      "8": "s",
+      "9": "t",
+      "10": "i",
+      "11": "d",
+      "12": "=",
+      "13": "\"",
+      "14": "r",
+      "15": "e",
+      "16": "a",
+      "17": "l",
+      "18": "-",
+      "19": "t",
+      "20": "a",
+      "21": "r",
+      "22": "g",
+      "23": "e",
+      "24": "t",
+      "25": "\"",
+      "26": "]",
+      "lastUpdated": "2026-03-27T09:12:35.397Z"
     }
   }
 }

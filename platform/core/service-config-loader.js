@@ -2,6 +2,8 @@ const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('js-yaml');
 
+const { resolveFromRoot } = require('./workspace-root');
+
 /**
  * Service Configuration Loader
  * Loads service configurations from services.yaml and applies environment-specific overrides
@@ -22,7 +24,7 @@ class ServiceConfigLoader {
   async loadConfig(configPath = null) {
     if (this.configLoaded) return;
 
-    const defaultPath = path.join(__dirname, '../../config/services.yaml');
+    const defaultPath = resolveFromRoot('config', 'services.yaml');
     const filePath = configPath || defaultPath;
 
     try {

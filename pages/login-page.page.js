@@ -45,7 +45,8 @@ class LoginPage extends BasePage {
      */
     get googleSignInButton() {
         // Google Sign-In Button: button[aria-label='Google Sign-In']
-        return this.page.getByRole('button', { name: /Google Sign-In/i });
+        // Page snapshot shows: button "Sign in with Google"
+        return this.page.getByRole('button', { name: /sign in with google/i });
     }
 
     /**

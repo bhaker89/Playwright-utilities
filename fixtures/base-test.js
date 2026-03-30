@@ -133,9 +133,9 @@ const test = base.extend({
   /**
    * UI Engine Fixture (Legacy No-Code support)
    */
-  ui: async ({ page }, use) => {
+  ui: async ({ page }, use, testInfo) => {
     const { UIEngine } = require('../platform/engines/ui-engine');
-    const uiEngine = new UIEngine(page);
+    const uiEngine = new UIEngine(page, testInfo.titlePath?.[0] || testInfo.title);
     await use(uiEngine);
   },
 

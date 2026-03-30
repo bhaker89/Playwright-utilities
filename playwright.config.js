@@ -37,9 +37,7 @@ module.exports = defineConfig({
       detail: true,
       suiteTitle: true
     }],
-    ['./platform/core/healing-reporter.js', { 
-      outputFile: 'reports/healing-analytics.json' 
-    }]
+    // Legacy 3-stage healing reporter removed. LIE has its own telemetry store.
   ],
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

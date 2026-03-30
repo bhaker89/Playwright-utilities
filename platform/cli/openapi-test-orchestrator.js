@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const minimist = require('minimist');
 const { execSync } = require('child_process');
 const { LLMClient } = require('../generators/llm-client');
 const { ContextGatherer } = require('../generators/context-gatherer');
@@ -574,3 +575,112 @@ Now generate the complete test file:
 }
 
 module.exports = { OpenApiTestOrchestrator };
+
+// -----------------------------------------------------------------------------
+// automation-core CLI entrypoint
+// -----------------------------------------------------------------------------
+// NOTE:
+// package.json bin currently points to this file. To support multiple commands
+// without breaking existing installs, we route based on argv._[0].
+if (require.main === module) {
+  (async () => {
+    const argv = minimist(process.argv.slice(2));
+    const cmd = Array.isArray(argv._) && argv._.length > 0 ? String(argv._[0]) : null;
+
+    // -------------------------------------------------------------------------
+    // Phase 2: prompt -> intent spec
+    // -------------------------------------------------------------------------
+    if (cmd === 'generate-intent-spec') {
+      const prompt = argv.prompt || argv.p || null;
+      const service = argv.service || argv.svc || null;
+      const out = argv.out || null;
+      const llmProvider = argv['llm-provider'] || argv.llmProvider || 'groq';
+
+      if (!prompt) throw new Error('Missing required argument: --prompt <text>');
+      if (!service) throw new Error('Missing required argument: --service <name>');
+
+      const { generateIntentSpecFromPrompt } = require('../generators/prompt-to-intent-spec-generator');
+      const result = await generateIntentSpecFromPrompt(prompt, service, out, { llmProvider });
+
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify({ success: true, ...result }, null, 2));
+      return;
+    }
+
+    // -------------------------------------------------------------------------
+    // Phase 2: intent spec -> locator registry
+    // -------------------------------------------------------------------------
+    if (cmd === 'ground-spec') {
+      const specPath = argv.spec || argv.s || null;
+      const service = argv.service || argv.svc || null;
+      const baseUrl = argv['base-url'] || argv.baseUrl || null;
+      const storageStatePath = argv['storage-state'] || argv.storageState || null;
+      const headed = Boolean(argv.headed);
+
+      if (!specPath) {
+        throw new Error('Missing required argument: --spec <path>');
+      }
+
+      const { groundSpec } = require('../core/ground-spec');
+      const result = await groundSpec({
+        specPath,
+        service,
+        baseUrl,
+        storageStatePath,
+        headless: !headed,
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify({ success: true, ...result }, null, 2));
+      return;
+    }
+
+    // -------------------------------------------------------------------------
+    // Phase 2: run intent spec using locator registry + self-healing
+    // -------------------------------------------------------------------------
+    if (cmd === 'run-intent') {
+      const specPath = argv.spec || argv.s || null;
+      const service = argv.service || argv.svc || null;
+      const baseUrl = argv['base-url'] || argv.baseUrl || null;
+      const storageStatePath = argv['storage-state'] || argv.storageState || null;
+      const headed = Boolean(argv.headed);
+
+      if (!specPath) {
+        throw new Error('Missing required argument: --spec <path>');
+      }
+
+      const { runIntentSpec } = require('../core/intent-runner');
+      const result = await runIntentSpec({
+        specPath,
+        service,
+        baseUrl,
+        storageStatePath,
+        headless: !headed,
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify({ success: true, ...result }, null, 2));
+      return;
+    }
+
+    // Default behavior (existing): run YAML spec through Orchestrator
+    const specPath = argv.spec || argv.s || null;
+    const service = argv.service || argv.svc || null;
+
+    if (!specPath) {
+      throw new Error('Missing required argument: --spec <path>');
+    }
+
+    const { Orchestrator } = require('../core/orchestrator');
+    const orchestrator = new Orchestrator();
+
+    await orchestrator.run({
+      specPath,
+      service,
+    });
+  })().catch(err => {
+    // eslint-disable-next-line no-console
+    console.error(err);
+    process.exit(1);
+  });
+}

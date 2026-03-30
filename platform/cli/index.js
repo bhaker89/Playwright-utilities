@@ -19,6 +19,11 @@ class CLI {
   parseArgs() {
     return yargs(process.argv.slice(2))
       .usage('Usage: $0 <command> [options]')
+      .option('workspace-root', {
+        alias: 'w',
+        describe: 'Workspace root (child repo root). Defaults to current directory.',
+        type: 'string',
+      })
       .command(
         'run <testFile>',
         'Run a test suite from YAML/JSON file',
@@ -173,6 +178,35 @@ class CLI {
           await this.generateFromOpenApiCommand(argv);
         }
       )
+      .command(
+        'generate-spec',
+        'Generate a no-code YAML spec from a natural language prompt (TestSuiteLoader schema)',
+        (yargs) => {
+          return yargs
+            .option('prompt', {
+              describe: 'Natural language prompt (e.g. "login with valid credentials")',
+              type: 'string',
+              demandOption: true
+            })
+            .option('out', {
+              describe: 'Optional output YAML path. If omitted, writes to specs/<prompt-slug>.yaml',
+              type: 'string'
+            })
+            .option('service', {
+              describe: 'Service name (e.g., psp)',
+              type: 'string',
+              demandOption: true
+            })
+            .option('llm-provider', {
+              describe: 'LLM provider to use',
+              choices: ['openai', 'claude', 'groq'],
+              default: 'groq'
+            });
+        },
+        async (argv) => {
+          await this.generateSpecCommand(argv);
+        }
+      )
       .example('$0 generate ui "Login and verify dashboard"', 'Generate UI test')
       .example('$0 generate-from-curl --curl "curl -X POST..." --service payment-service --api process-payment', 'Generate from cURL')
       .example('$0 generate-from-openapi --spec services/order/openapi.yaml --service order-service --api create-order --llm-provider groq', 'Generate tests from OpenAPI spec using Groq')
@@ -220,6 +254,10 @@ class CLI {
    * Validate test suite command
    */
   async validateCommand(argv) {
+    if (argv.workspaceRoot) {
+      process.env.AUTOMATION_ROOT = path.resolve(argv.workspaceRoot);
+    }
+
     const testFilePath = path.resolve(argv.testFile);
 
     // Check if file exists
@@ -252,6 +290,10 @@ class CLI {
    * Import command handler
    */
   async importCommand(argv) {
+    if (argv.workspaceRoot) {
+      process.env.AUTOMATION_ROOT = path.resolve(argv.workspaceRoot);
+    }
+
     const sourcePath = argv.file ? path.resolve(argv.file) : null;
 
     if (sourcePath && !fs.existsSync(sourcePath)) {
@@ -304,7 +346,7 @@ class CLI {
   async _saveImportedSuite(suite, outputDirArg) {
     const outputDir = outputDirArg
       ? path.resolve(outputDirArg)
-      : path.resolve(process.cwd(), 'no-code-tests/api');
+      : path.resolve(process.env.AUTOMATION_ROOT || process.cwd(), 'no-code-tests/api');
 
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
@@ -317,13 +359,17 @@ class CLI {
     fs.writeFileSync(outputPath, yaml.dump(suite, { indent: 2, lineWidth: -1 }));
     console.log(`\n✓ Successfully converted to: ${outputPath}`);
     console.log(`  Tests generated: ${suite.tests.length}`);
-    console.log(`  Run with: node platform/cli/index.js run ${path.relative(process.cwd(), outputPath)}`);
+    console.log(`  Run with: node platform/cli/index.js run ${path.relative(process.env.AUTOMATION_ROOT || process.cwd(), outputPath)}`);
   }
 
   /**
    * Generate from cURL command handler (NEW FLOW)
    */
   async generateFromCurlCommand(argv) {
+    if (argv.workspaceRoot) {
+      process.env.AUTOMATION_ROOT = path.resolve(argv.workspaceRoot);
+    }
+
     console.log('🚀 API Test Generator - Complete Flow');
     console.log('='.repeat(80));
 
@@ -364,6 +410,10 @@ class CLI {
    * Generate tests from OpenAPI spec command handler
    */
   async generateFromOpenApiCommand(argv) {
+    if (argv.workspaceRoot) {
+      process.env.AUTOMATION_ROOT = path.resolve(argv.workspaceRoot);
+    }
+
     console.log('🤖 OpenAPI → Playwright Test Generator (Powered by Groq)');
     console.log('='.repeat(80));
 
@@ -418,9 +468,45 @@ class CLI {
   }
 
   /**
+   * Generate no-code YAML spec from prompt
+   */
+  async generateSpecCommand(argv) {
+    if (argv.workspaceRoot) {
+      process.env.AUTOMATION_ROOT = path.resolve(argv.workspaceRoot);
+    }
+
+    console.log(`\n\ud83e\udde0 Generating YAML spec from prompt: "${argv.prompt}"`);
+
+    try {
+      const { generateSpecFromPrompt } = require('../generators/prompt-to-spec-generator');
+
+      const result = await generateSpecFromPrompt(
+        argv.prompt,
+        argv.service,
+        argv.out || null,
+        { llmProvider: argv.llmProvider }
+      );
+
+      console.log(`\n\u2705 Spec generated: ${result.outputPath}`);
+      console.log(`\n\ud83c\udfaf Run it with:`);
+      const specPathForRunCommand = argv.out || path.relative(process.env.AUTOMATION_ROOT || process.cwd(), result.outputPath);
+      console.log(`  npx automation-core --spec ${specPathForRunCommand} --service ${argv.service}`);
+      process.exit(0);
+    } catch (error) {
+      console.error('\n\u274c Spec generation failed:');
+      console.error(error.message);
+      process.exit(1);
+    }
+  }
+
+  /**
    * Generate test command handler
    */
   async generateCommand(argv) {
+    if (argv.workspaceRoot) {
+      process.env.AUTOMATION_ROOT = path.resolve(argv.workspaceRoot);
+    }
+
     console.log(`🧠 AI Generating ${argv.type} test for: "${argv.prompt}"...`);
 
     try {
@@ -432,7 +518,7 @@ class CLI {
         process.exit(1);
       }
 
-      const outputDir = path.resolve(process.cwd(), 'no-code-tests/generated');
+      const outputDir = path.resolve(process.env.AUTOMATION_ROOT || process.cwd(), 'no-code-tests/generated');
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
       }
@@ -445,7 +531,7 @@ class CLI {
 
       console.log(`\n✨ Generated test saved to: ${outputPath}`);
       console.log('You can run it with:');
-      console.log(`node platform/cli/index.js run ${path.relative(process.cwd(), outputPath)}`);
+      console.log(`node platform/cli/index.js run ${path.relative(process.env.AUTOMATION_ROOT || process.cwd(), outputPath)}`);
 
       process.exit(0);
     } catch (error) {

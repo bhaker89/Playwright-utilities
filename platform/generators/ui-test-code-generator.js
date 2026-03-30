@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 
+const { resolveFromRoot } = require('../core/workspace-root');
+
 /**
  * UITestGenerator
  * Generates executable UI test suites from natural language descriptions
@@ -18,14 +20,14 @@ const yaml = require('js-yaml');
 class UITestGenerator {
     constructor() {
         // YAML output can remain in generated-tests (no Playwright discovery needed)
-        this.outputDir = path.join(process.cwd(), 'generated-tests');
+        this.outputDir = resolveFromRoot('generated-tests');
 
         // Playwright specs must land under ./tests because playwright.config.js uses: testDir: './tests'
         // This guarantees that `npx playwright test` picks up generated specs automatically.
-        this.generatedUiSpecDir = path.join(process.cwd(), 'tests', 'ui', 'generated');
+        this.generatedUiSpecDir = resolveFromRoot('tests', 'ui', 'generated');
 
         // Page Objects remain in the shared /pages folder
-        this.pagesDir = path.join(process.cwd(), 'pages');
+        this.pagesDir = resolveFromRoot('pages');
 
         this._ensureDirectories();
     }

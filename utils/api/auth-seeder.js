@@ -2,6 +2,8 @@ const { logger } = require('../base/logger');
 const fs = require('fs');
 const path = require('path');
 
+const { resolveFromRoot } = require('../../platform/core/workspace-root');
+
 /**
  * AuthSeeder
  * High-speed API-based session seeding.
@@ -16,7 +18,7 @@ class AuthSeeder {
     constructor(request, baseURL) {
         this.request = request;
         this.baseURL = baseURL || 'https://stag.1mg.com';
-        this.authFile = path.join(process.cwd(), '.auth', 'user.json');
+        this.authFile = resolveFromRoot('.auth', 'user.json');
     }
 
     /**
