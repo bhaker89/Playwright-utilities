@@ -1,0 +1,30 @@
+ENVIRONMENT:
+- env: stag
+- base_url: https://stag.1mg.com
+
+SERVICE:
+- service_name: 1mg-web
+- flow_name: dev_smoke_quick_order
+
+AUTH:
+- required: no
+- method: none
+- prereq_ui_state: If a login modal appears, ignore it for this smoke.
+
+START STATE:
+- start_url: /
+- known popups: login modal may appear
+
+HAPPY PATH STEPS:
+1) Go to home page
+2) Click "Quick order" entry point
+3) Wait for quick order page to load
+
+ASSERTIONS:
+- url_contains: /done-in-one
+- visible_text_contains: Quick order
+
+CONSTRAINTS:
+- avoid_otp: true
+- avoid_payment: true
+- do_not_log_secrets: true

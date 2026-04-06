@@ -1,13 +1,18 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
-const { chromium } = require('@playwright/test');
+const { chromium, request } = require('@playwright/test');
 
 const { ServiceConfigLoader } = require('./service-config-loader');
 const registryLoader = require('./locator-registry-loader');
 const { UIEngine } = require('../engines/ui-engine');
 const { AssertionEngine } = require('../engines/assertion-engine');
 const { resolveRegistryEntryToSelectorStrings } = require('./locator-registry-resolver');
+
+// Load .env.${TEST_ENV} so TEST_MOBILE/TEST_OTP etc. are present in process.env
+require('../../config/environment.config');
+
+const { AuthSeeder } = require('../../utils/api/auth-seeder');
 
 function slugify(value) {
   return String(value || '')
@@ -75,6 +80,65 @@ function resolveTargetSelectorOrThrow({ registry, targetKey }) {
   return resolved.primarySelector;
 }
 
+function resolveUiAuthConfig({ serviceConfig }) {
+  // Keep UI auth separate from API auth headers (`auth.type`) to avoid
+  // changing ServiceConfigLoader.getAuthHeaders() behavior.
+  const uiAuth = serviceConfig?.ui_auth || null;
+  if (!uiAuth) return null;
+
+  const mode = uiAuth.mode || null; // expected: 'otp' | 'google' (future)
+  const storageStatePath = uiAuth.storage_state || null;
+
+  if (!mode && !storageStatePath) return null;
+
+  return {
+    mode,
+    storageStatePath,
+  };
+}
+
+async function ensureStorageStateSeededIfNeeded({ uiAuthConfig, baseUrl }) {
+  if (!uiAuthConfig) return;
+
+  const { mode, storageStatePath } = uiAuthConfig;
+  if (!storageStatePath) return;
+
+  const resolvedPath = path.resolve(storageStatePath);
+  if (fs.existsSync(resolvedPath)) return;
+
+  if (mode === 'otp') {
+    const mobile = process.env.TEST_MOBILE;
+    const otp = process.env.TEST_OTP;
+
+    if (!mobile || !otp) {
+      throw new Error(
+        `UI auth seeding requested (mode=otp) but TEST_MOBILE/TEST_OTP are missing. ` +
+        `Set TEST_ENV appropriately (e.g. TEST_ENV=stag) so config/.env.<env> is loaded, ` +
+        `or export TEST_MOBILE/TEST_OTP in the environment.`
+      );
+    }
+
+    const apiContext = await request.newContext({ baseURL: baseUrl });
+    try {
+      const seeder = new AuthSeeder(apiContext, baseUrl, { authFile: resolvedPath });
+      await seeder.seedSession(mobile, otp);
+    } finally {
+      await apiContext.dispose();
+    }
+
+    return;
+  }
+
+  if (mode === 'google') {
+    throw new Error(
+      `UI auth seeding requested (mode=google) but GoogleAuthSeeder is not implemented yet. ` +
+      `For now, pre-seed storageState at '${storageStatePath}' and re-run.`
+    );
+  }
+
+  throw new Error(`Unsupported ui_auth.mode '${mode}'. Supported: otp, google`);
+}
+
 function toUiEngineSteps({ intentSpec, registry, baseUrl }) {
   const steps = Array.isArray(intentSpec?.steps) ? intentSpec.steps : [];
 
@@ -136,6 +200,15 @@ function toAssertionEngineAssertions({ intentSpec, registry }) {
       };
     }
 
+    // URL assertions are not tied to a selector. We still require a target key so
+    // grounding keeps a stable registry entry, but we intentionally ignore selector.
+    if (assertion.type === 'url_contains') {
+      return {
+        type: 'ui_url_contains',
+        expected: assertion.expected,
+      };
+    }
+
     // Allow direct pass-through for existing AssertionEngine types.
     if (String(assertion.type || '').startsWith('ui_')) {
       return {
@@ -159,8 +232,13 @@ async function runIntentSpec(options) {
     specPath,
     service: cliService = null,
     baseUrl: explicitBaseUrl = null,
-    storageStatePath = '.auth/user.json',
+
+    // If provided, overrides service config.
+    storageStatePath: cliStorageStatePath = undefined,
+
     headless = true,
+    smoke = false,
+    strict = false,
   } = options || {};
 
   if (!specPath) {
@@ -181,6 +259,18 @@ async function runIntentSpec(options) {
 
   const feature = inferFeatureFromIntent(intentSpec);
 
+  // Load service config once so we can pick ui_auth settings.
+  const serviceConfigLoader = new ServiceConfigLoader();
+  await serviceConfigLoader.loadConfig();
+  const serviceConfig = serviceConfigLoader.getService(serviceName);
+  const uiAuthConfig = resolveUiAuthConfig({ serviceConfig });
+
+  // Prefer storageState from service config unless explicitly overridden by caller.
+  const effectiveStorageStatePath =
+    cliStorageStatePath !== undefined
+      ? cliStorageStatePath
+      : (uiAuthConfig?.storageStatePath || '.auth/user.json');
+
   const baseUrl = await resolveBaseUrl({ serviceName, explicitBaseUrl });
   if (!baseUrl) {
     throw new Error(
@@ -188,6 +278,8 @@ async function runIntentSpec(options) {
       `Set services.yaml base_url for the service, or provide --base-url, or set BASE_URL env var.`
     );
   }
+
+  await ensureStorageStateSeededIfNeeded({ uiAuthConfig, baseUrl });
 
   const registry = registryLoader.loadServiceRegistry(serviceName, feature);
   if (!registry) {
@@ -201,7 +293,7 @@ async function runIntentSpec(options) {
 
   try {
     const contextOptions = {};
-    const resolvedStorageStatePath = storageStatePath ? path.resolve(storageStatePath) : null;
+    const resolvedStorageStatePath = effectiveStorageStatePath ? path.resolve(effectiveStorageStatePath) : null;
     if (resolvedStorageStatePath && fs.existsSync(resolvedStorageStatePath)) {
       contextOptions.storageState = resolvedStorageStatePath;
     }
@@ -212,7 +304,35 @@ async function runIntentSpec(options) {
     const uiEngine = new UIEngine(page, intentSpec?.testSuite?.name || feature);
 
     const uiSteps = toUiEngineSteps({ intentSpec, registry, baseUrl });
-    await uiEngine.executeSteps(uiSteps);
+
+    // -----------------------------------------------------------------------
+    // Optional smoke run mode
+    // -----------------------------------------------------------------------
+    // Purpose: Fast, deterministic validation of early steps before we rely on
+    // healing. This is intended to catch bad grounding quickly (e.g., input
+    // targets resolving to buttons) and produce actionable errors.
+    const stepsToRun = smoke ? uiSteps.slice(0, 6) : uiSteps;
+
+    for (const step of stepsToRun) {
+      if (!strict || (step.action === 'goto' || step.action === 'navigate')) {
+        await uiEngine.executeStep(step);
+        continue;
+      }
+
+      // Strict checks for common mis-grounding scenarios.
+      if ((step.action === 'fill' || step.action === 'type') && step.selector) {
+        const loc = page.locator(step.selector).first();
+        const tag = await loc.evaluate(el => el.tagName.toLowerCase()).catch(() => null);
+        if (tag && !['input', 'textarea'].includes(tag)) {
+          throw new Error(
+            `Smoke/strict validation failed: action='${step.action}' expected an input/textarea but resolved to <${tag}> for target '${step.element || step.selector}'. ` +
+            `This usually means grounding picked a wrong selector (e.g., primary-button).`
+          );
+        }
+      }
+
+      await uiEngine.executeStep(step);
+    }
 
     const assertionEngine = new AssertionEngine();
     const assertions = toAssertionEngineAssertions({ intentSpec, registry });

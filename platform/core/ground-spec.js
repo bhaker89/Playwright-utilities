@@ -72,6 +72,14 @@ function buildTargetRequests(spec) {
       if (!requestsByKey.has(syntheticKey)) {
         requestsByKey.set(syntheticKey, { targetKey: syntheticKey, selector: legacySelector });
       }
+
+      if (failedClicks.length > 0) {
+        throw new Error(
+          `Auto pre-steps failed: unable to click target(s): ${failedClicks.join(', ')}. ` +
+          'Add an early click step in the intent spec that opens the correct modal/panel/menu, ' +
+          'or provide --pre-steps as an escape hatch for this flow.'
+        );
+      }
     }
   }
 
@@ -218,6 +226,9 @@ async function groundSpec(options) {
     baseUrl: explicitBaseUrl = null,
     storageStatePath = '.auth/user.json',
     headless = true,
+    preSteps = null,
+    autoPreSteps = true,
+    autoPreStepsMax = 6,
   } = options || {};
 
   if (!specPath) {
@@ -281,13 +292,174 @@ async function groundSpec(options) {
     // Visit each route in order (multi-page support)
     for (const route of routesToVisit) {
       const fullUrl = buildFullUrl(baseUrl, route);
-      await page.goto(fullUrl);
-      await page.waitForLoadState('domcontentloaded');
-      await page.waitForLoadState('networkidle');
+
+      // domcontentloaded is reliable for initial render; networkidle is not reliable for SPAs
+      // with long-polling/analytics and can cause grounding to hang.
+      await page.goto(fullUrl, { waitUntil: 'domcontentloaded' });
+
+      // Best-effort: don't fail grounding if the app never reaches networkidle.
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 8000 });
+      } catch (_) {
+        // Intentionally ignore.
+      }
+
       await page.locator('body').waitFor({ state: 'visible', timeout: 15000 });
     }
 
     const extractor = new CandidateExtractor({ page });
+
+    async function clickBestEffortTarget(targetKey) {
+      const candidates = await extractor.extractCandidatesForTarget(targetKey);
+
+      // For auto-presteps, strongly prefer role-based button/link candidates.
+      // These are more likely to represent actual UI triggers (like "Login").
+      const preferredOrder = ['role', 'text', 'testid', 'label', 'css', 'xpath'];
+      candidates.sort((a, b) => {
+        const aRank = preferredOrder.indexOf(a.type);
+        const bRank = preferredOrder.indexOf(b.type);
+        if (aRank !== bRank) return aRank - bRank;
+        // within type, prefer stronger semantic match and uniqueness
+        return ((b.nameMatch || 0) - (a.nameMatch || 0)) || ((b.uniqueness || 0) - (a.uniqueness || 0));
+      });
+
+      for (const c of candidates.slice(0, 12)) {
+        try {
+          let locator;
+          if (c.type === 'testid') locator = page.getByTestId(c.value);
+          else if (c.type === 'role') locator = page.getByRole(c.value.role, c.value.options);
+          else if (c.type === 'label') locator = page.getByLabel(c.value, { exact: false });
+          else if (c.type === 'text') locator = page.getByText(c.value, { exact: false });
+          else if (c.type === 'css') locator = page.locator(c.value);
+          else if (c.type === 'xpath') locator = page.locator(`xpath=${c.value}`);
+          else locator = page.locator(String(c.value || ''));
+
+          const count = await locator.count().catch(() => 0);
+          if (count <= 0) continue;
+
+          await locator.first().click({ timeout: 15000 });
+
+          // Small post-click stabilization to allow modal/panel to render.
+          await page.waitForTimeout(400);
+
+          return true;
+        } catch (_) {
+          // Try next candidate.
+        }
+      }
+
+      return false;
+    }
+
+    async function applyAutoPreStepsFromSpec() {
+      // Option A enforcement: grounding must be stateful.
+      if (!autoPreSteps) {
+        throw new Error(
+          'Option A enforced: ground-spec requires autoPreSteps=true. ' +
+          'This prevents grounding hidden elements against the wrong DOM state.'
+        );
+      }
+
+      const steps = Array.isArray(spec?.steps) ? spec.steps : [];
+      if (steps.length === 0) return;
+
+      const failedClicks = [];
+
+      // Execute a safe prefix of intent steps to reach the right UI state for grounding.
+      // Limitations:
+      // - We can only auto-execute goto/click/wait.
+      // - We stop before any data-entry actions (fill/type/press/select/etc) to avoid side effects.
+      let executed = 0;
+
+      for (const step of steps) {
+        if (!step || typeof step !== 'object') continue;
+        if (executed >= autoPreStepsMax) break;
+
+        const action = step.action;
+
+        if (action === 'goto' && step.url) {
+          // Already navigated by routesToVisit, but if the spec has a more specific URL, respect it.
+          const fullUrl = buildFullUrl(baseUrl, step.url);
+          await page.goto(fullUrl, { waitUntil: 'domcontentloaded' });
+          executed++;
+          continue;
+        }
+
+        if (action === 'click' && step.target) {
+          const clicked = await clickBestEffortTarget(step.target);
+          if (clicked) {
+            executed++;
+          } else {
+            failedClicks.push(step.target);
+          }
+          continue;
+        }
+
+        if (action === 'wait') {
+          // wait can be time-based or target-based. Prefer deterministic target-based waits.
+          if (step.target) {
+            // Best-effort: wait for any candidate for this target to become visible.
+            const candidates = await extractor.extractCandidatesForTarget(step.target);
+            const best = candidates[0];
+            if (best) {
+              try {
+                let locator;
+                if (best.type === 'testid') locator = page.getByTestId(best.value);
+                else if (best.type === 'role') locator = page.getByRole(best.value.role, best.value.options);
+                else if (best.type === 'label') locator = page.getByLabel(best.value, { exact: false });
+                else if (best.type === 'text') locator = page.getByText(best.value, { exact: false });
+                else if (best.type === 'css') locator = page.locator(best.value);
+                else if (best.type === 'xpath') locator = page.locator(`xpath=${best.value}`);
+                else locator = page.locator(String(best.value || ''));
+
+                await locator.first().waitFor({ state: 'visible', timeout: 15000 });
+                executed++;
+              } catch (_) {
+                // ignore
+              }
+            }
+          } else if (typeof step.value === 'number') {
+            await page.waitForTimeout(step.value);
+            executed++;
+          }
+          continue;
+        }
+
+        // Stop before data-entry or other potentially destructive actions.
+        if (['fill', 'type', 'press', 'check', 'uncheck', 'select'].includes(action)) {
+          break;
+        }
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Auto pre-steps (Option A) + Optional manual pre-steps (escape hatch)
+    // -----------------------------------------------------------------------
+    // Auto-presteps: execute a safe prefix of intent steps to expose hidden UI states.
+    await applyAutoPreStepsFromSpec();
+
+    // Manual pre-steps are still supported as an escape hatch.
+    if (Array.isArray(preSteps) && preSteps.length > 0) {
+      for (const step of preSteps) {
+        if (!step || typeof step !== 'object') continue;
+
+        if (step.action === 'goto' && step.url) {
+          const fullUrl = buildFullUrl(baseUrl, step.url);
+          await page.goto(fullUrl, { waitUntil: 'domcontentloaded' });
+          continue;
+        }
+
+        if (step.action === 'click' && step.selector) {
+          await page.locator(step.selector).first().click({ timeout: 15000 });
+          continue;
+        }
+
+        if ((step.action === 'waitFor' || step.action === 'wait_for') && step.selector) {
+          await page.locator(step.selector).first().waitFor({ state: step.state || 'visible', timeout: 15000 });
+          continue;
+        }
+      }
+    }
 
     for (const req of targetRequests) {
       const targetKey = req.targetKey;

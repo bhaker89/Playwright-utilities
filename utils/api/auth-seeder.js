@@ -14,11 +14,14 @@ class AuthSeeder {
     /**
      * @param {import('@playwright/test').APIRequestContext} request
      * @param {string} baseURL
+     * @param {{ authFile?: string } | null} [options]
      */
-    constructor(request, baseURL) {
+    constructor(request, baseURL, options = null) {
         this.request = request;
         this.baseURL = baseURL || 'https://stag.1mg.com';
-        this.authFile = resolveFromRoot('.auth', 'user.json');
+
+        // Default path keeps backwards compatibility.
+        this.authFile = options?.authFile || resolveFromRoot('.auth', 'user.json');
     }
 
     /**

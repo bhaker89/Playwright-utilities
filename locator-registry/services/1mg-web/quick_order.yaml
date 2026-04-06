@@ -1,0 +1,325 @@
+mobile_number_input:
+  primary:
+    type: css
+    value: input[placeholder="Enter\ Phone\ Number"]
+  fallback:
+    - type: testid
+      value: primary-button
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Health Resource Center
+          exact: false
+    - type: label
+      value: Enter your city
+  score: 0.8743
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 0.791
+  source: lie
+  lastValidated: '2026-03-31'
+# NOTE: keys below are for other flows; quick-order smoke does not require auth.
+password_input:
+  primary:
+    type: testid
+    value: primary-button
+  fallback:
+    - type: css
+      value: input[name="city"]
+    - type: css
+      value: input[placeholder="Enter\ your\ city"]
+    - type: css
+      value: input[name="phone"]
+    - type: css
+      value: input[placeholder="Enter\ Phone\ Number"]
+    - type: css
+      value: input[name="_csrf"]
+  score: 0.85
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 1
+  source: lie
+  lastValidated: '2026-03-31'
+open_login_link:
+  primary:
+    type: role
+    value:
+      role: link
+      options:
+        name: Login
+        exact: false
+  fallback:
+    - type: text
+      value: Login
+  score: 0.9
+  entropy: 0
+  uniqueness: 0.8
+  stability: 0.9
+  confidence: 0.9
+  source: manual
+  lastValidated: '2026-03-31'
+submit_login_button:
+  primary:
+    type: css
+    value: button[data-testid="primary-button"]
+  fallback:
+    - type: testid
+      value: primary-button
+  score: 0.9
+  entropy: 0
+  uniqueness: 0.7
+  stability: 0.9
+  confidence: 0.9
+  source: manual
+  lastValidated: '2026-03-31'
+quick_order_button:
+  primary:
+    type: css
+    value: a[href*="/done-in-one/prescription-order"]
+  fallback:
+    - type: text
+      value: Quick order
+  score: 0.9
+  entropy: 0
+  uniqueness: 0.9
+  stability: 0.9
+  confidence: 0.9
+  source: manual
+  lastValidated: '2026-04-06'
+select_files_button:
+  primary:
+    type: testid
+    value: primary-button
+  fallback:
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Health Resource Center
+          exact: false
+    - type: label
+      value: Enter your city
+    - type: label
+      value: Search for Medicines and Health Products
+  score: 0.9667
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 1
+  source: lie
+  lastValidated: '2026-03-31'
+first_file_option:
+  primary:
+    type: testid
+    value: primary-button
+  fallback:
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Health Resource Center
+          exact: false
+    - type: label
+      value: Enter your city
+    - type: label
+      value: Search for Medicines and Health Products
+  score: 0.85
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 1
+  source: lie
+  lastValidated: '2026-03-31'
+done_button:
+  primary:
+    type: testid
+    value: primary-button
+  fallback:
+    - type: css
+      value: '[data-testid="primary-button"]'
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Health Resource Center
+          exact: false
+    - type: label
+      value: Enter your city
+  score: 1
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 1
+  source: lie
+  lastValidated: '2026-03-31'
+continue_button:
+  primary:
+    type: testid
+    value: primary-button
+  fallback:
+    - type: css
+      value: '[data-testid="primary-button"]'
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Health Resource Center
+          exact: false
+    - type: label
+      value: Enter your city
+  score: 1
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 1
+  source: lie
+  lastValidated: '2026-03-31'
+place_medicine_request_button:
+  primary:
+    type: testid
+    value: primary-button
+  fallback:
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Health Resource Center
+          exact: false
+    - type: label
+      value: Enter your city
+    - type: label
+      value: Search for Medicines and Health Products
+  score: 0.9375
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 1
+  source: lie
+  lastValidated: '2026-03-31'
+dashboard_header:
+  primary:
+    type: testid
+    value: primary-button
+  fallback:
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Health Resource Center
+          exact: false
+    - type: label
+      value: Enter your city
+    - type: label
+      value: Search for Medicines and Health Products
+  score: 0.85
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 1
+  source: lie
+  lastValidated: '2026-03-31'
+quick_order_page:
+  primary:
+    type: text
+    value: Upload prescription
+  fallback:
+    - type: text
+      value: Upload prescriptions
+    - type: text
+      value: Drag files from your computer
+    - type: text
+      value: Select files
+  score: 0.85
+  entropy: 0
+  uniqueness: 0.8
+  stability: 0.8
+  confidence: 0.85
+  source: manual
+  lastValidated: '2026-04-06'

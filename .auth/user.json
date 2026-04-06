@@ -1,231 +1,51 @@
 {
   "cookies": [
     {
-      "name": "VISITOR-ID",
-      "value": "cef89780-071f-4d9c-ac4a-1079e0d6a259_dYcEsKvyNN_4921_1773733227599",
-      "domain": ".stag.1mg.com",
+      "name": "_csrf",
+      "value": "57573d7ccc93bcf2f32c574e7558a70134b3a446b5b4985a85ee8dc848e51b0acd55a097fbb860170780ccff475ae792bf02ab28e5fcf1c4cc96dfeb2af36150%7Cebe505a8dd5e8ef116ca873e10ac9241d42e3f2467b4e99bf3c453cdf100592b",
+      "domain": "stag.1mg.com",
       "path": "/",
-      "expires": 1808293306.716177,
+      "expires": 1778049753.611026,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "jarvis-id",
+      "value": "d5136a28-4ef4-47a4-b041-8791d1234a5a",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1810017753.627282,
       "httpOnly": false,
-      "secure": false,
+      "secure": true,
       "sameSite": "Lax"
     },
     {
       "name": "city",
-      "value": "Gurgaon",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": 1776325306.719791,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "abVisitorId",
-      "value": "801906",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": 1808293309.465294,
-      "httpOnly": true,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "abExperimentShow",
-      "value": "true",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": 1808293309.46534,
-      "httpOnly": true,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "amoSessionId",
-      "value": "7b2c6849-2278-4ba9-8ea4-16f8c27aaaa0",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": 1773735106.719917,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "_csrf",
-      "value": "c0lvHwsqBxHkZjb1pdLeCIFw",
+      "value": "New Delhi",
       "domain": "stag.1mg.com",
       "path": "/",
       "expires": -1,
-      "httpOnly": true,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "isLocaleRedirect",
-      "value": "false",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "isLocaleUIChange",
-      "value": "false",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "rl_user_id",
-      "value": "RudderEncrypt%3AU2FsdGVkX19bCAdASxpfQJ3h20c%2Flc2gKlTkMAkFx0g%3D",
-      "domain": ".1mg.com",
-      "path": "/",
-      "expires": 1805269307,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "rl_anonymous_id",
-      "value": "RudderEncrypt%3AU2FsdGVkX19vLSDVb1jrqS6E%2BGZYzdtdGBsLMbx8KOfKw3StxiGeTMmjgoPBu6qGZI%2FWNvo0FIQSd99v5Kc0qg%3D%3D",
-      "domain": ".1mg.com",
-      "path": "/",
-      "expires": 1805269307,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "rl_group_id",
-      "value": "RudderEncrypt%3AU2FsdGVkX1%2B95wq3ku4PS%2FOfU0SeaZzJF5fqkrS1%2B2M%3D",
-      "domain": ".1mg.com",
-      "path": "/",
-      "expires": 1805269307,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "rl_trait",
-      "value": "RudderEncrypt%3AU2FsdGVkX1%2BjhhRZrHcDCkQSVQWx5HK%2BkURjYN61KuQ%3D",
-      "domain": ".1mg.com",
-      "path": "/",
-      "expires": 1805269307,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "rl_group_trait",
-      "value": "RudderEncrypt%3AU2FsdGVkX1%2BVG60Vres575txxeDNLAmWNGjktxkMy8c%3D",
-      "domain": ".1mg.com",
-      "path": "/",
-      "expires": 1805269307,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "rl_page_init_referrer",
-      "value": "RudderEncrypt%3AU2FsdGVkX19UzN0bO8uOs1QpA5j1Jrtn1JfEzCHU43c%3D",
-      "domain": ".1mg.com",
-      "path": "/",
-      "expires": 1805269307,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "rl_page_init_referring_domain",
-      "value": "RudderEncrypt%3AU2FsdGVkX1%2FHvFoVK%2Fdi9ZnDIy3w%2FuQmyCzBLznf%2FSk%3D",
-      "domain": ".1mg.com",
-      "path": "/",
-      "expires": 1805269307,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "geolocation",
-      "value": "false",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": 1776325309.465263,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "synapse-init",
-      "value": "false",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "synapse-platform",
-      "value": "web",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "session",
-      "value": "9F5ryuYEoJCDPQRBqRHkJQ.6DCLIi59rLJ8tNLsk0VEsfnyo1Ba2gGFBG4HbmKxaSuLzc5QKclOO60_xD7Vv9cGoemCgyW2ZUPhdItJEpSBkS_p6eLsKG9QoXk3rUSJ2_1r4gVN4u31hRBxImjc-TPNe3lnZCFwX4wBJCLucp4PIA.1773733308154.144000000.bpIo9FdmBL5Rzbp-aC0GMG-h4StYHoQJlggIu47M2Cg",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": 1773877309.060022,
-      "httpOnly": true,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "is_cp_member",
-      "value": "false",
-      "domain": "stag.1mg.com",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "_gcl_au",
-      "value": "1.1.685030031.1773733308",
-      "domain": ".1mg.com",
-      "path": "/",
-      "expires": 1781509308,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
       "name": "_ga",
-      "value": "GA1.3.1682104878.1773733309",
+      "value": "GA1.3.1451508540.1775457753",
       "domain": ".stag.1mg.com",
       "path": "/",
-      "expires": 1808293309.471706,
+      "expires": 1810017753.32203,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
       "name": "_gid",
-      "value": "GA1.3.251953160.1773733309",
+      "value": "GA1.3.1773203388.1775457753",
       "domain": ".stag.1mg.com",
       "path": "/",
-      "expires": 1773819709,
+      "expires": 1775544153,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
@@ -235,207 +55,117 @@
       "value": "1",
       "domain": ".stag.1mg.com",
       "path": "/",
-      "expires": 1773733368,
+      "expires": 1775457813,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
-      "name": "_gid",
-      "value": "GA1.2.251953160.1773733309",
+      "name": "isLoyalUser",
+      "value": "true",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1775601753.318243,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.1451508540.1775457753",
       "domain": ".1mg.com",
       "path": "/",
-      "expires": 1773819710,
+      "expires": 1810017753.785496,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
-      "name": "_dc_gtm_UA-63340984-13",
-      "value": "1",
-      "domain": ".1mg.com",
+      "name": "abVisitorId",
+      "value": "906155",
+      "domain": "stag.1mg.com",
       "path": "/",
-      "expires": 1773733368,
+      "expires": 1810017753.471191,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "abExperimentShow",
+      "value": "false",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1810017753.471223,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "amoSessionId",
+      "value": "d496c9dc-5115-46f9-bb31-2d41139969fa",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1775459553.398227,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "session",
+      "value": "TZ_fXHWj_Qrk3jNnuzxwug.0STEAX-Eem1b29JCTkVgQQ.1775457753523.144000000.nzleZbSLA0aN7DVGGyZD9pZ5tsykfiYMTnfM90DQNqs",
+      "domain": "stag.1mg.com",
+      "path": "/",
+      "expires": 1775601754.471401,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "VISITOR-ID",
+      "value": "deddb972-222b-4bb5-baa6-7c25b523b9f5_hhLRA4QfnM_1531_1775457647433",
+      "domain": ".stag.1mg.com",
+      "path": "/",
+      "expires": 1810017753.610966,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
       "name": "_ga_FYKWPM3VWQ",
-      "value": "GS2.1.s1773733308$o1$g0$t1773733308$j60$l0$h0",
+      "value": "GS2.1.s1775457753$o1$g1$t1775457753$j60$l0$h0",
       "domain": ".1mg.com",
       "path": "/",
-      "expires": 1808293308.92676,
+      "expires": 1810017753.812904,
       "httpOnly": false,
       "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "MgidSensorNVis",
-      "value": "1",
-      "domain": ".stag.1mg.com",
-      "path": "/",
-      "expires": 1781509308,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "MgidSensorHref",
-      "value": "https://stag.1mg.com/?login=true&followup=/login#",
-      "domain": ".stag.1mg.com",
-      "path": "/",
-      "expires": 1781509308,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "nv_userdevice",
-      "value": "1827190238z6eax",
-      "domain": ".notifyvisitors.com",
-      "path": "/",
-      "expires": 1808293309.410289,
-      "httpOnly": true,
-      "secure": true,
-      "sameSite": "None"
-    },
-    {
-      "name": "_nv_sess",
-      "value": "91160005.1773733309.vuAuNCcpJgHVP3ce8W8qNmUgvO9fzGW8DEhWXZt6b9EVz1ey1D",
-      "domain": ".stag.1mg.com",
-      "path": "/",
-      "expires": 1773735109,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "_nv_uid",
-      "value": "91160005.1773733309.90a7b78a-7218-470d-ba62-20182af8a45d.1773733309.1773733309.1.0",
-      "domain": ".stag.1mg.com",
-      "path": "/",
-      "expires": 1808293309.41361,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "_nv_utm",
-      "value": "91160005.1773733309.1.1.dXRtc3JjPShkaXJlY3QpfHV0bWNjbj0oZGlyZWN0KXx1dG1jbWQ9KG5vbmUpfHV0bWN0cj0obm90IHNldCl8dXRtY2N0PShub3Qgc2V0KXxnY2xpZD18dXRtYWRncD18bV91dG1zcmM9fG1fdXRtY2NuPXxtX3V0bWNtZD18bHA9aHR0cHM6Ly9zdGFnLjFtZy5jb20v",
-      "domain": ".stag.1mg.com",
-      "path": "/",
-      "expires": 1773735109,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "_nv_sess_uid",
-      "value": "91160005.1773733309.dXRtc3JjPShkaXJlY3QpfHV0bWNjbj0oZGlyZWN0KXx1dG1jbWQ9KG5vbmUpfHV0bWN0cj0obm90IHNldCl8dXRtY2N0PShub3Qgc2V0KXxnY2xpZD18dXRtYWRncD18dXJsPWh0dHBzOi8vc3RhZy4xbWcuY29tLw==",
-      "domain": ".stag.1mg.com",
-      "path": "/",
-      "expires": 1781617309,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "_nv_did",
-      "value": "91160005.1773733309.1827190238z6eax",
-      "domain": ".stag.1mg.com",
-      "path": "/",
-      "expires": 1808293309.414073,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "_nv_hit",
-      "value": "91160005.1773733309.cHZpZXc9MQ==",
-      "domain": ".stag.1mg.com",
-      "path": "/",
-      "expires": 1789501309,
-      "httpOnly": false,
-      "secure": true,
       "sameSite": "Lax"
     },
     {
       "name": "__rtbh.lid",
-      "value": "%7B%22eventType%22%3A%22lid%22%2C%22id%22%3A%22mjTBoDodR5CVqKVsZLCB%22%2C%22expiryDate%22%3A%222027-03-17T07%3A41%3A49.440Z%22%7D",
+      "value": "%7B%22eventType%22%3A%22lid%22%2C%22id%22%3A%22L3jOcOaYHO3wtwkyFgbB%22%2C%22expiryDate%22%3A%222027-04-06T06%3A42%3A33.843Z%22%7D",
       "domain": "stag.1mg.com",
       "path": "/",
-      "expires": 1805269309,
+      "expires": 1806993753,
       "httpOnly": false,
       "secure": true,
       "sameSite": "None"
     },
     {
-      "name": "rl_session",
-      "value": "RudderEncrypt%3AU2FsdGVkX19gOTlTpbxRs%2Bw09j0RpYqOP%2Bq0RJqTgCNOuzt66BrgrNDq50rSPgrFnXGIgiZ1Q6DjzkHfch%2FxTjjBvVPN%2FqEHn5478veL3FNPyPz%2F2Jexd3w%2Fc%2BSn64Yvhmlduwk7Cy2tiDK7GPcO8w%3D%3D",
-      "domain": ".1mg.com",
+      "name": "g",
+      "value": "uXhVrAHfWNQiVat23Wvo_1775457754700",
+      "domain": ".creativecdn.com",
       "path": "/",
-      "expires": 1805269309,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "muidn",
-      "value": "q2hNuVCaJGF0",
-      "domain": ".mgid.com",
-      "path": "/",
-      "expires": 1805269309.859271,
+      "expires": 1806993754.662565,
       "httpOnly": false,
       "secure": true,
       "sameSite": "None"
     },
     {
-      "name": "uid",
-      "value": "fd96a168-b658-44f6-81a8-eea4ee9489c8",
-      "domain": ".criteo.com",
+      "name": "c",
+      "value": "uXhVrAHfWNQiVat23Wvo_UXVDxjkzyjivJA3pPnzU_1775457754700",
+      "domain": ".creativecdn.com",
       "path": "/",
-      "expires": 1807429309.971984,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "None"
-    },
-    {
-      "name": "_ga",
-      "value": "GA1.2.1682104878.1773733309",
-      "domain": ".1mg.com",
-      "path": "/",
-      "expires": 1808293310.007612,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "blueID",
-      "value": "f41a6383-2839-44a1-a228-cbc61c8da34b",
-      "domain": ".stag.1mg.com",
-      "path": "/",
-      "expires": 1805269310,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "test_cookie",
-      "value": "CheckForPermission",
-      "domain": ".doubleclick.net",
-      "path": "/",
-      "expires": 1773734210.217805,
-      "httpOnly": true,
-      "secure": true,
-      "sameSite": "None"
-    },
-    {
-      "name": "cto_bundle",
-      "value": "qZ8YbV8lMkZKcSUyQk1ERkt1R2U1cTFEWTM4M1hpcDdHZ2tBREZoWDdmY1FQS0hXcUNXZVZidGtFSjglMkIybGtYZFZHN1JDJTJGWWc1MFZZOHRlOTNSSXRNMUJock50d1NJN0dDT2dPTGglMkZ4ZDQlMkZnRE1vRlQwWEVYNWZDNGM0aSUyQmxRZ2E1UzZyemJP",
-      "domain": ".criteo.com",
-      "path": "/",
-      "expires": 1807429311.222511,
+      "expires": 1806993754.66263,
       "httpOnly": false,
       "secure": true,
       "sameSite": "None",
@@ -443,14 +173,16 @@
       "_crHasCrossSiteAncestor": true
     },
     {
-      "name": "cto_bundle",
-      "value": "zuUPfl8lMkZDbjFad0hWNGRNVkZrQmcwMjBGb1NtJTJGQk01ZG9lbiUyRks0TXMydW5OQUZockFVclN2TVlEQ29LM2Z6TFVjQzVzOVpxJTJGa0lPN09lbUJxbEw2TVR5WjdidWlWVjVNM0QwMTJMc3FGczdWaXlRRTBLa2o5TTU2d1hoNXBjcmhoM1BMbGZVN3A5MFRuTGM3T2RXNXhFYnBpZE9xeVBjak81JTJCSXU1JTJGTkxlYUtsVHh1UWo4QzNoNk12Yk01UjdaWWRpOXE",
-      "domain": ".1mg.com",
+      "name": "ts",
+      "value": "1775457754",
+      "domain": ".creativecdn.com",
       "path": "/",
-      "expires": 1807897310,
+      "expires": 1806993754.664527,
       "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
+      "secure": true,
+      "sameSite": "None",
+      "partitionKey": "https://1mg.com",
+      "_crHasCrossSiteAncestor": true
     }
   ],
   "origins": [
@@ -458,48 +190,48 @@
       "origin": "https://stag.1mg.com",
       "localStorage": [
         {
+          "name": "tdl-sso-version",
+          "value": "4.1.17"
+        },
+        {
+          "name": "anonymousId",
+          "value": "438c85ed-95e0-4bb7-ba13-5eb240a34a72"
+        },
+        {
           "name": "1mg_dev_2fba32ef_stag.1mg.com_singular_session_id",
-          "value": "7d07c3f4-786b-4146-a67c-5ac712f81e17"
+          "value": "13fa0ba3-74be-4113-b339-83bbd9a6056f"
         },
         {
           "name": "__rtbh.lid",
-          "value": "{\"eventType\":\"lid\",\"id\":\"mjTBoDodR5CVqKVsZLCB\",\"expiryDate\":\"2027-03-17T07:41:49.440Z\"}"
+          "value": "{\"eventType\":\"lid\",\"id\":\"L3jOcOaYHO3wtwkyFgbB\",\"expiryDate\":\"2027-04-06T06:42:33.843Z\"}"
         },
         {
           "name": "global_singular_id",
-          "value": "b531cee6-f44a-447f-99f8-e77b446487c2"
+          "value": "e34e4ab2-4377-4577-9cbf-76b2624cbc16"
         },
         {
           "name": "1mg_dev_2fba32ef_stag.1mg.com_last_event_timestamp",
-          "value": "1773733309"
+          "value": "1775457754"
         },
         {
-          "name": "cto_bundle",
-          "value": "zuUPfl8lMkZDbjFad0hWNGRNVkZrQmcwMjBGb1NtJTJGQk01ZG9lbiUyRks0TXMydW5OQUZockFVclN2TVlEQ29LM2Z6TFVjQzVzOVpxJTJGa0lPN09lbUJxbEw2TVR5WjdidWlWVjVNM0QwMTJMc3FGczdWaXlRRTBLa2o5TTU2d1hoNXBjcmhoM1BMbGZVN3A5MFRuTGM3T2RXNXhFYnBpZE9xeVBjak81JTJCSXU1JTJGTkxlYUtsVHh1UWo4QzNoNk12Yk01UjdaWWRpOXE"
+          "name": "tdl-sso-redirect-tcp-flag",
+          "value": "{\"isRedirectedFromTCP\":false,\"setAt\":1775457753627}"
         },
         {
           "name": "1mg_dev_2fba32ef_stag.1mg.com_touchpoint_timestamp",
-          "value": "1773733309"
-        },
-        {
-          "name": "blueID",
-          "value": "f41a6383-2839-44a1-a228-cbc61c8da34b"
-        },
-        {
-          "name": "rudder.514abed5-5545-4fea-a2ab-ec6d4e3f7655.queue",
-          "value": "[]"
+          "value": "1775457753"
         },
         {
           "name": "1mg_dev_2fba32ef_stag.1mg.com_web_url",
-          "value": "https://stag.1mg.com/?login=true&followup=/login#"
-        },
-        {
-          "name": "_gcl_ls",
-          "value": "{\"schema\":\"gcl\",\"version\":1,\"gcl_ctr\":{\"value\":{\"value\":0,\"timeouts\":0,\"errors\":0,\"creationTimeMs\":1773733308485},\"expires\":1781509308485}}"
+          "value": "https://stag.1mg.com/?login=true&followup=/login"
         },
         {
           "name": "1mg_dev_2fba32ef_stag.1mg.com_first_page_visit_url",
-          "value": "https://stag.1mg.com/?login=true&followup=/login#"
+          "value": "https://stag.1mg.com/?login=true&followup=/login"
+        },
+        {
+          "name": "tdl-sso-analytics-v2",
+          "value": "{\"_id\":\"64edb42787ba43169a745fe2\",\"urls\":[\"reqbin\",\"transaction\",\"checkout\",\"orderConfirmation\",\"order-confirmation\",\"potential-order\",\"order\"],\"bufferArrayLength\":0,\"bufferIntervalInSeconds\":5,\"bufferSizeInKb\":0,\"dataPublishEndpoint\":\"https://ppapi.tatadigital.com/analytics-engine/events/v1\",\"sessionIdExpiresInS\":86400,\"redirectedFromTCPFlagExpiresInS\":86400,\"redisTtlInSeconds\":2592000,\"createdAt\":\"2023-05-11T08:21:54.108Z\",\"updatedAt\":\"2023-05-11T08:21:54.108Z\",\"__v\":0,\"customerHashValidityInS\":86400,\"eventToSendConfig\":[],\"recordAnalytics\":true,\"syncTrackingUrls\":[\"/v1/track\",\"/pharmacy_api/prescription-order\",\"/tracking_details?city\",\"/pharmacy_api/cart/summary\",\"/doctor_api/v5/conversations/\",\"/pharmacy_api/cart\",\"/pwa-api/cart/add\",\"/pwa-api/api/v4/carts/skus\",\"/pharmacy_api/v2/cart\",\"/labs_api/cart/replace\",\"/labs_api/cart/item\",\"/pwa-api/labs/cart/replace\",\"/v1/page\",\"labs_api/cart/validate\",\"/pwa-api/api/v4/orders\",\"/pharmacy_api/order\",\"/pwa-api/api/v4/carts/summary\",\"pharmacy_api/buy-now\",\"/pwa-api/api/v5/carts/skus\",\"/pwa-api/api/v4/carts/payment/offer/apply\"],\"cartAndWishListConfig\":{\"pwa-api/api/v4/carts/skus\":{\"type\":\"cart\",\"products\":[\"data\",\"brief\",\"items\"],\"keysToCapture\":{\"productId\":[\"sku_id\"],\"quantity\":[\"quantity\"],\"productName\":[\"sku_name\"],\"price\":[]}},\"pwa-api/api/v5/carts/skus\":{\"type\":\"cart\",\"products\":[\"data\",\"widgets\",\"1\",\"data\",\"grouped_items\",\"0\",\"items\"],\"keysToCapture\":{\"productId\":[\"cta\",\"details\",\"sku_id\"],\"quantity\":[\"cta\",\"details\",\"quantity\"],\"productName\":[\"header\"],\"price\":[\"analytics_data\",\"mrp\"]}}},\"recordGtmEvents\":true,\"dataLayerArgumentEventsToRecord\":[\"Remove Sku\"],\"dataLayerObjectEventsToRecord\":[\"Add To Cart\",\"Add To Cart \",\"Otc_upsell_widget_add\",\"Add To Cart Spotlight Products\",\"Add to cart widget\",\"Add to cart\",\"Remove SKU\",\"Remove Sku\",\"gtm.historyChange-v2\",\"gtm.load\",\"Delete test\",\"Add to Cart-Widget\",\"Remove Test\",\"Delete test widget\",\"newGAEvent\",\"Checkout\"],\"modifyHistoryOwnMethods\":true,\"recordWebVitals\":false,\"brand\":\"ONEMG\",\"keyToCheckLoginState\":[],\"browserEventsToRecord\":[\"click\"],\"listenToPastDataLayerEvents\":true,\"recordJsDispatchedClicks\":false,\"clientId\":\"ONEMG-WEB-APP\"}"
         },
         {
           "name": "1mg_dev_2fba32ef_stag.1mg.com_singular_first_page_visit_occurred",
@@ -510,28 +242,24 @@
           "value": "true"
         },
         {
+          "name": "tdl-sso-user-id",
+          "value": "438c85ed-95e0-4bb7-ba13-5eb240a34a72"
+        },
+        {
+          "name": "tdl-sso-session-id",
+          "value": "{\"sessionId\":\"3cf96cae-e2bc-407e-84c9-7f2318147915\",\"setAt\":1775457752675}"
+        },
+        {
           "name": "1mg_dev_2fba32ef_stag.1mg.com_did_visit_site",
           "value": "true"
         },
         {
-          "name": "rudder.514abed5-5545-4fea-a2ab-ec6d4e3f7655.inProgress",
-          "value": "{}"
-        },
-        {
-          "name": "rudder.514abed5-5545-4fea-a2ab-ec6d4e3f7655.reclaimStart",
-          "value": "null"
-        },
-        {
           "name": "1mg_dev_2fba32ef_stag.1mg.com_singular_instance_id",
-          "value": "3eb1c29c-1ecc-4dca-b903-d42b175bc475"
+          "value": "67f34021-05c1-4dd8-b2a3-269a10d2d02d"
         },
         {
-          "name": "rudder.514abed5-5545-4fea-a2ab-ec6d4e3f7655.ack",
-          "value": "1773733309667"
-        },
-        {
-          "name": "rudder.514abed5-5545-4fea-a2ab-ec6d4e3f7655.reclaimEnd",
-          "value": "null"
+          "name": "tneu.deviceInfo",
+          "value": "{\"platform\":\"web\",\"deviceVersion\":\"0\"}"
         }
       ]
     }

@@ -56,6 +56,9 @@ class AssertionEngine {
       case 'ui_text':
         return await this.assertUiText(page, assertion);
 
+      case 'ui_url_contains':
+        return await this.assertUiUrlContains(page, assertion);
+
       case 'status_code':
         return this.assertStatusCode(response, assertion);
 
@@ -350,6 +353,28 @@ class AssertionEngine {
       message: passed
         ? `Element "${assertion.selector}" contains expected text`
         : `Element "${assertion.selector}" expected to contain "${assertion.expected}", but got "${actual}"`,
+    };
+  }
+
+  /**
+   * Assert current URL contains expected substring
+   * @private
+   */
+  async assertUiUrlContains(page, assertion) {
+    if (!page) throw new Error('UI assertion requires a page object');
+
+    const currentUrl = page.url();
+    const expected = String(assertion.expected || '');
+    const passed = expected ? currentUrl.includes(expected) : false;
+
+    return {
+      type: 'ui_url_contains',
+      passed,
+      expected,
+      actual: currentUrl,
+      message: passed
+        ? `URL contains expected text: "${expected}"`
+        : `URL expected to contain "${expected}", but was "${currentUrl}"`,
     };
   }
 

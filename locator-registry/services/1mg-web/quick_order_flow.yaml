@@ -1,0 +1,132 @@
+quick_order_button:
+  primary:
+    type: testid
+    value: primary-button
+  fallback:
+    - type: text
+      value: Quick order
+    - type: testid
+      value: inputField_login
+    - type: text
+      value: Get a Call to Order Medicines
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+  score: 0.9667
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 1
+  source: lie
+  lastValidated: '2026-04-01'
+quick_order_page_loader:
+  primary:
+    type: text
+    value: Quick order
+  fallback:
+    - type: testid
+      value: primary-button
+    - type: testid
+      value: inputField_login
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Health Resource Center
+          exact: false
+  score: 0.874
+  entropy: 0
+  uniqueness: 1
+  stability: 0.8
+  confidence: 0.839
+  source: lie
+  lastValidated: '2026-04-01'
+page_url:
+  primary:
+    type: testid
+    value: primary-button
+  fallback:
+    - type: testid
+      value: inputField_login
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Health Resource Center
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Need Help? Get in touch
+          exact: false
+  score: 0.85
+  entropy: 0
+  uniqueness: 1
+  stability: 1
+  confidence: 1
+  source: lie
+  lastValidated: '2026-04-01'
+quick_order_header:
+  primary:
+    type: text
+    value: Quick order
+  fallback:
+    - type: testid
+      value: primary-button
+    - type: testid
+      value: inputField_login
+    - type: text
+      value: Get a Call to Order Medicines
+    - type: role
+      value:
+        role: link
+        options:
+          name: Login
+          exact: false
+    - type: role
+      value:
+        role: link
+        options:
+          name: Signup
+          exact: false
+  score: 0.9323
+  entropy: 0
+  uniqueness: 1
+  stability: 0.8
+  confidence: 0.839
+  source: lie
+  lastValidated: '2026-04-01'
