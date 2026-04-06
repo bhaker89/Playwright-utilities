@@ -1,12 +1,38 @@
 {
-  "name": "odin-automation-suite",
+  "name": "playwright-automation-core",
   "version": "1.0.0",
   "description": "Enterprise-ready Playwright automation framework with JavaScript for end-to-end testing",
   "main": "index.js",
+  "bin": {
+    "playwright-automation-core": "./platform/cli/index.js"
+  },
+  "files": [
+    "index.js",
+    "pages",
+    "components",
+    "services",
+    "framework",
+    "platform",
+    "utils",
+    "config"
+  ],
   "scripts": {
-    "test": "playwright test",
+    "test": "npm run test:smoke:local",
+    "test:smoke": "playwright test tests/smoke",
+    "test:smoke:local": "npm run test:smoke",
+    "test:smoke:ci": "CI=1 npm run test:smoke",
+    "test:smoke:debug": "playwright test tests/smoke --debug --headed --workers=1",
     "test:api": "playwright test tests/api",
+    "test:api:local": "npm run test:api",
+    "test:api:ci": "CI=1 npm run test:api",
+    "test:api:debug": "playwright test tests/api --debug --workers=1",
     "test:ui": "playwright test tests/ui",
+    "test:ui:local": "npm run test:ui",
+    "test:ui:ci": "CI=1 npm run test:ui",
+    "test:ui:debug": "playwright test tests/ui --debug --headed --workers=1",
+    "test:all": "playwright test tests",
+    "bootstrap": "bash scripts/bootstrap.sh",
+    "doctor": "node scripts/doctor.js",
     "test:mobile": "playwright test tests/mobile",
     "test:visual": "playwright test tests/visual",
     "test:integrated": "playwright test tests/integrated",
@@ -55,6 +81,9 @@
   ],
   "author": "",
   "license": "ISC",
+  "peerDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "allure-commandline": "^2.25.0",
@@ -74,6 +103,7 @@
     "joi": "^17.11.0",
     "js-yaml": "^4.1.0",
     "jsonpath-plus": "^8.0.0",
+    "minimist": "^1.2.8",
     "mongodb": "^6.3.0",
     "ollama": "^0.4.9",
     "openai": "^4.20.0",

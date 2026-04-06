@@ -1,0 +1,58 @@
+metadata:
+  service: 1mg-web
+intent:
+  primary_action: login
+  feature: quick_order
+  domain: medicine_request
+testSuite:
+  name: login_and_place_medicine_request
+  description: login to 1mg and place medicine request
+steps:
+  - action: goto
+    target: null
+    value: null
+    url: https://stag.1mg.com/
+
+  # Login form is not visible by default; open it first.
+  - action: click
+    target: open_login_link
+
+  - action: type
+    target: mobile_number_input
+    value: '9599612806'
+  - action: type
+    target: password_input
+    value: '123456'
+  - action: click
+    target: submit_login_button
+
+  - action: click
+    target: quick_order_button
+  - action: click
+    target: select_files_button
+  - action: click
+    target: first_file_option
+  - action: click
+    target: done_button
+  - action: click
+    target: continue_button
+  - action: click
+    target: place_medicine_request_button
+assertions:
+  - type: visible
+    target: dashboard_header
+    expected: true
+  - type: text
+    target: place_medicine_request_button
+    expected: Place medicine request
+
+  # (Optional) if you have a stable target for post-login state, assert it here.
+  # - type: visible
+  #   target: user_profile_icon
+  #   expected: true
+  - type: visible
+    target: done_button
+    expected: true
+  - type: url_contains
+    target: null
+    expected: done-in-one/rx-order-processing

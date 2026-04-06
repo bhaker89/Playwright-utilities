@@ -6,11 +6,12 @@ const WaitEngine = require('./wait-strategy-engine');
 const BoundaryDetector = require('./component-boundary-detector');
 const HealingEngine = require('./healing-engine');
 const telemetry = require('./locator-telemetry-engine');
+const ExecutionLayer = require('./execution-context-detector');
 const { logger } = require('../../utils/base/logger');
 
 /**
- * Locator Orchestrator (Core Brain)
- * Directs the entire LIE pipeline.
+ * Locator Orchestrator (Odin Engine)
+ * The central brain for smart locator resolution, ranking, and healing.
  */
 class LocatorOrchestrator {
     /**
@@ -28,116 +29,185 @@ class LocatorOrchestrator {
 
     /**
      * Smart Locator Execution Pipeline
+     * @param {string} locatorKey 
+     * @param {Function} actionFn 
+     * @param {import('@playwright/test').Locator} originalLocator 
      */
     async smartLocator(locatorKey, actionFn, originalLocator = null) {
-        const startTime = Date.now();
-        let currentLocator = originalLocator;
-        let currentStrategy = originalLocator ? 'original' : 'unknown';
-
-        const isLieEnabled = process.env.ENABLE_LIE !== 'false';
-        
-        if (!isLieEnabled && originalLocator) {
-            return await actionFn(originalLocator);
+        if (process.env.ENABLE_LIE !== 'true') {
+            return originalLocator ? await actionFn(originalLocator) : null;
         }
 
+        const startTime = Date.now();
+        const context = await ExecutionLayer.detect(this.page);
+        
         try {
-            // 1. Primary Strategy Discovery: Memory vs Map (Seed Truth)
-            if (!originalLocator || currentStrategy === 'unknown') {
-                let candidates = await memoryStore.getCandidates(locatorKey);
-                
-                // If memory is empty, consult the versioned Map Registry (Seed Truth)
-                if (candidates.length === 0) {
-                    const mapRegistry = require('./locator-map-registry');
-                    const seeds = await mapRegistry.getAlternatives(locatorKey);
-                    if (seeds.length > 0) {
-                        logger.info(`[Orchestrator] 🗺️ Seeding from Map Registry for ${locatorKey}`);
-                        candidates = seeds.map(s => ({ ...s, success_rate: 1.0, stability_score: 1.0 }));
+            // 1. Adaptive Wait Strategy (Proactive)
+            await this.waitEngine.apply('PROACTIVE');
+
+            // 2. Resolve & Rank Candidates
+            const candidates = await this._getRankedCandidates(locatorKey, context);
+            
+            // 3. Execution Loop
+            for (const candidate of candidates) {
+                const candidateStart = Date.now();
+                try {
+                    const locator = this._resolveLocator(candidate);
+                    const result = await actionFn(locator);
+                    
+                    // Success: Learn & Telemetry
+                    const duration = Date.now() - startTime;
+                    await memoryStore.updateStats(locatorKey, candidate.strategy, true, duration);
+                    
+                    // Visual feedback for alternative resolution
+                    if (candidate.strategy !== 'original') {
+                        await this._highlight(locator, locatorKey);
                     }
+                    telemetry.collect({
+                        locatorKey,
+                        strategy: candidate.strategy,
+                        status: 'SUCCESS',
+                        duration,
+                        context
+                    }).catch(() => {});
+
+                    return result;
+                } catch (err) {
+                    const candidateDuration = Date.now() - candidateStart;
+                    const failureType = classifier.classify(err);
+                    
+                    logger.warn(`[Orchestrator] Candidate ${candidate.strategy || 'unknown'} (${candidate.value || 'none'}) failed: ${failureType} in ${candidateDuration}ms. Error: ${err.message}`);
+
+                    // Telemetry for failed candidate
+                    telemetry.collect({
+                        locatorKey,
+                        strategy: candidate.strategy,
+                        status: 'FAILURE',
+                        failureType,
+                        duration: candidateDuration,
+                        context
+                    }).catch(() => {});
+
+                    // Adaptive recovery within loop: if blocked by overlay/hydration, wait before next candidate
+                    if (['OVERLAY_BLOCKED', 'HYDRATION_PENDING', 'REACT_REPLACEMENT'].includes(failureType)) {
+                        logger.info(`[Orchestrator] Applying corrective wait for ${failureType} before next candidate`);
+                        await this.waitEngine.apply(failureType).catch(() => {});
+                    }
+
+                    continue;
                 }
-
-                const ranked = ranker.rank(candidates, await this.volatility.detect());
-                if (ranked.length > 0) {
-                    currentLocator = this._resolveLocator(ranked[0]);
-                    currentStrategy = ranked[0].strategy;
-                }
             }
 
-            // Fallback to original if still nothing
-            if (!currentLocator && originalLocator) {
-                currentLocator = originalLocator;
-                currentStrategy = 'original';
+            // 4. Default to original if provided and no candidates worked
+            if (originalLocator) {
+                return await this._executeWithTelemetry(locatorKey, 'original', originalLocator, actionFn, context);
             }
 
-            if (!currentLocator) {
-                throw new Error(`[Orchestrator] No locator candidate found for: ${locatorKey}`);
-            }
-
-            // 2. Simple execution attempt
-            return await this._executeWithTelemetry(locatorKey, currentStrategy, currentLocator, actionFn);
+            throw new Error(`TIMEOUT: All candidates failed for ${locatorKey}`);
 
         } catch (error) {
+            const duration = Date.now() - startTime;
             const failureType = classifier.classify(error);
+            
             logger.warn(`[Orchestrator] Failure detected: ${failureType} on ${locatorKey}`);
-
-            // 3. Detect Mutation Burst upon failure to capture transient state
-            this.volatility.detectMutationBurst(500).then(burst => {
-                if (burst) logger.warn(`[Orchestrator] 🧊 High DOM mutation burst detected during failure for ${locatorKey}`);
+            
+            // Telemetry Capture
+            telemetry.collect({
+                locatorKey,
+                status: 'FAILURE',
+                failureType,
+                duration,
+                context
             }).catch(() => {});
 
-            // 4. Adaptive Wait
-            await this.waitEngine.apply(failureType);
-
-            // 5. Healing Pipeline
-            const rescueResult = await this.healing.attemptRescue(locatorKey, currentLocator || { toString: () => locatorKey });
+            // ONLY HEAL if it's a locator-related failure
+            const isHealable = ['LAZY_RENDER_PENDING', 'NOT_VISIBLE', 'DETACHED_NODE', 'OVERLAY_BLOCKED', 'SHADOW_ROOT_MISSING', 'REACT_REPLACEMENT'].includes(failureType);
             
-            if (rescueResult) {
-                const healedLocator = rescueResult.locator;
-                // Discover boundary for future stability
-                const boundary = await this.boundary.discoverBoundary(healedLocator);
-                const optimizedLocator = await this.boundary.getScopedLocator(healedLocator, boundary);
-                
-                // Final attempt
-                const result = await actionFn(optimizedLocator);
-                
-                // Track success via Telemetry
-                const duration = Date.now() - startTime;
-                await telemetry.collect({
-                    locatorKey,
-                    strategy: rescueResult.strategy,
-                    status: 'SUCCESS',
-                    duration,
-                    failureType: 'HEALED'
-                });
-                return result;
+            if (isHealable) {
+                // DOM Volatility Check (Mutation Burst)
+                const isVolatile = await this.volatility.detect();
+                if (isVolatile) {
+                    logger.warn(`[Orchestrator] High DOM volatility detected during failure of ${locatorKey}`);
+                    await this.waitEngine.apply('TRANSITION_ACTIVE');
+                }
+
+                // Healing Pipeline
+                const rescueResult = await this.healing.attemptRescue(locatorKey, originalLocator);
+                if (rescueResult) {
+                    // Success: Learn & Telemetry for healed locator
+                    const result = await actionFn(rescueResult.locator);
+                    await memoryStore.updateStats(locatorKey, rescueResult.strategy, true, Date.now() - startTime);
+                    return result;
+                }
             }
 
-            throw error; // If healing fails
+            throw error; // Rethrow if not healable or healing failed
         }
     }
 
-    async _executeWithTelemetry(locatorKey, strategy, locator, actionFn) {
+    async _getRankedCandidates(locatorKey, context) {
+        let candidates = await memoryStore.getCandidates(locatorKey);
+
+        // Defensive cleanup: telemetry can write malformed rows (e.g., strategy undefined/null).
+        // Those rows cannot be resolved into a usable Playwright locator.
+        candidates = (candidates || []).filter(c => {
+            if (!c) return false;
+            if (!c.strategy || typeof c.strategy !== 'string') return false;
+
+            // 'original' is an execution path, not a resolvable alternative candidate.
+            // (We already have the original locator passed into smartLocator.)
+            if (c.strategy === 'original') return false;
+
+            // If we don't have a selector payload, there's nothing to resolve.
+            // For memory rows, dom_signature is the best available payload.
+            if (!c.dom_signature) return false;
+
+            return true;
+        });
+        
+        // Seed Truth Fallback
+        if (candidates.length === 0) {
+            const mapRegistry = require('./locator-map-registry');
+            const seeds = await mapRegistry.getAlternatives(locatorKey);
+            if (seeds.length > 0) {
+                logger.info(`[Orchestrator] 🗺️ Seeding from Map Registry for ${locatorKey}`);
+                candidates = seeds.map(s => ({ ...s, success_rate: 1.0, confidence: 1.0 }));
+            }
+        }
+
+        if (candidates.length === 0) {
+            logger.info(`[Orchestrator] No candidates found for ${locatorKey}; falling back to original locator if provided.`);
+            return [];
+        }
+
+        return ranker.rank(candidates, context);
+    }
+
+    async _executeWithTelemetry(locatorKey, strategy, locator, actionFn, context) {
         const start = Date.now();
         try {
             const result = await actionFn(locator);
             const duration = Date.now() - start;
             
-            // Record telemetry (now async and buffered)
             telemetry.collect({
                 locatorKey,
                 strategy,
                 status: 'SUCCESS',
-                duration
+                duration,
+                context
             }).catch(() => {});
             
             return result;
         } catch (e) {
             const duration = Date.now() - start;
+            const failureType = classifier.classify(e);
             telemetry.collect({
                 locatorKey,
                 strategy,
                 status: 'FAILURE',
+                failureType,
                 duration,
-                error: e.message
+                context
             }).catch(() => {});
             throw e;
         }
@@ -159,6 +229,23 @@ class LocatorOrchestrator {
             case 'css': return this.page.locator(value);
             case 'xpath': return this.page.locator(`xpath=${value}`);
             default: return this.page.locator(value);
+        }
+    }
+
+    async _highlight(locator, locatorKey) {
+        if (!locator) return;
+        try {
+            await locator.evaluate((el, key) => {
+                if (el) {
+                    el.setAttribute('data-smart-loc-healed', 'true');
+                    el.style.outline = '3px solid #ff00ff'; // Magenta
+                    el.style.outlineOffset = '2px';
+                    el.title = `Resolved via LIE: ${key}`;
+                }
+            }, locatorKey).catch(() => {});
+            logger.info(`[Orchestrator] Applied highlighting to: ${locatorKey}`);
+        } catch (e) {
+            // Silently ignore
         }
     }
 }

@@ -20,11 +20,6 @@ logs/
 .env
 .env.local
 .env.*.local
-.env.*
-config/.env*
-
-# Locator Intelligence Engine artifacts
-framework/locator-intelligence/locator-memory.db
 
 # IDE
 .vscode/

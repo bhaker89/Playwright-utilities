@@ -7,6 +7,7 @@ const { RequestModifier } = require('../engines/request-modifier');
 const { DataProvider } = require('../engines/data-provider');
 const { UIEngine } = require('../engines/ui-engine');
 const { ServiceConfigLoader } = require('./service-config-loader');
+const registryLoader = require('./locator-registry-loader');
 const path = require('path');
 
 /**
@@ -26,9 +27,11 @@ class TestRunner {
   /**
    * Execute test suite from file
    * @param {string} testFilePath - Path to test suite YAML/JSON file
+   * @param {Object} [options]
+   * @param {string|null} [options.service] - Optional service override (e.g. from CLI)
    * @returns {Promise<void>}
    */
-  async runTestSuite(testFilePath) {
+  async runTestSuite(testFilePath, options = {}) {
     console.log(`\n${'='.repeat(80)}`);
     console.log(`Loading test suite: ${testFilePath}`);
     console.log('='.repeat(80));
@@ -38,6 +41,13 @@ class TestRunner {
 
     // Load test suite
     const testSuite = await this.loader.load(testFilePath);
+
+    // Service override keeps backward compatibility: existing suites continue to work,
+    // while automation-core can inject service via CLI/spec metadata.
+    if (options.service) {
+      testSuite.config = testSuite.config || {};
+      testSuite.config.service = testSuite.config.service || options.service;
+    }
 
     console.log(`Suite: ${testSuite.name}`);
     console.log(`Description: ${testSuite.description || 'N/A'}`);
@@ -63,7 +73,7 @@ class TestRunner {
 
     // Execute each test
     for (const testCase of testSuite.tests) {
-      await this.runTestCase(testCase, baseUrl, testFilePath, testSuite.config);
+      await this.runTestCase(testCase, baseUrl, testFilePath, testSuite.config, options);
     }
 
     console.log('\n' + '='.repeat(80));
@@ -75,12 +85,12 @@ class TestRunner {
    * Execute a single test case
    * @private
    */
-  async runTestCase(testCase, baseUrl, testFilePath, suiteConfig) {
+  async runTestCase(testCase, baseUrl, testFilePath, suiteConfig, options) {
     // Check if test is data-driven
     if (testCase.data_driven) {
-      await this.runDataDrivenTest(testCase, baseUrl, testFilePath, suiteConfig);
+      await this.runDataDrivenTest(testCase, baseUrl, testFilePath, suiteConfig, options);
     } else {
-      await this.runSingleTest(testCase, baseUrl, null, null, suiteConfig);
+      await this.runSingleTest(testCase, baseUrl, null, null, suiteConfig, testFilePath, options);
     }
   }
 
@@ -88,7 +98,15 @@ class TestRunner {
    * Execute single test (non-data-driven)
    * @private
    */
-  async runSingleTest(testCase, baseUrl, dataRow = null, rowIndex = null, suiteConfig = null) {
+  async runSingleTest(
+    testCase,
+    baseUrl,
+    dataRow = null,
+    rowIndex = null,
+    suiteConfig = null,
+    testFilePath = null,
+    options = {}
+  ) {
     const testName = rowIndex !== null
       ? `${testCase.name} [Row ${rowIndex + 1}]`
       : testCase.name;
@@ -99,7 +117,7 @@ class TestRunner {
     }
 
     // Determine which service to use (test-level overrides suite-level)
-    const serviceName = testCase.service || suiteConfig?.service;
+    const serviceName = testCase.service || suiteConfig?.service || options.service;
 
     // If using service configuration, get the service config
     let serviceRequestConfig = null;
@@ -113,7 +131,7 @@ class TestRunner {
 
     // Branch between API and UI
     if (testCase.type === 'ui') {
-      await this.runUITest(testCase, suiteConfig);
+      await this.runUITest(testCase, suiteConfig, testFilePath, serviceName);
       return;
     }
 
@@ -172,19 +190,19 @@ class TestRunner {
 
       // Build final URL and options
       const url = this.requestModifier.buildUrl(request_config);
-      const options = this.requestModifier.preparePlaywrightOptions(request_config);
+      const requestOptions = this.requestModifier.preparePlaywrightOptions(request_config);
 
-      console.log(`Method: ${options.method}`);
+      console.log(`Method: ${requestOptions.method}`);
       console.log(`URL: ${url}`);
-      console.log(`Headers: ${JSON.stringify(options.headers, null, 2)}`);
-      if (options.data) {
-        console.log(`Body: ${JSON.stringify(options.data, null, 2)}`);
+      console.log(`Headers: ${JSON.stringify(requestOptions.headers, null, 2)}`);
+      if (requestOptions.data) {
+        console.log(`Body: ${JSON.stringify(requestOptions.data, null, 2)}`);
       }
 
       // Execute request
       const startTime = Date.now();
       console.log('Sending request...');
-      const response = await apiContext.fetch(url, options);
+      const response = await apiContext.fetch(url, requestOptions);
       const responseTime = Date.now() - startTime;
 
       console.log(`Response Status: ${response.status()}`);
@@ -231,7 +249,7 @@ class TestRunner {
    * Execute data-driven test
    * @private
    */
-  async runDataDrivenTest(testCase, baseUrl, testFilePath, suiteConfig) {
+  async runDataDrivenTest(testCase, baseUrl, testFilePath, suiteConfig, options) {
     console.log(`\n--- Loading test data for: ${testCase.name} ---`);
 
     // Resolve data file path relative to test file
@@ -246,7 +264,7 @@ class TestRunner {
 
     // Run test for each data row
     for (let i = 0; i < testData.length; i++) {
-      await this.runSingleTest(testCase, baseUrl, testData[i], i, suiteConfig);
+      await this.runSingleTest(testCase, baseUrl, testData[i], i, suiteConfig, testFilePath, options);
     }
   }
 
@@ -254,15 +272,41 @@ class TestRunner {
    * Execute UI test using UIEngine
    * @private
    */
-  async runUITest(testCase, suiteConfig) {
+  async runUITest(testCase, suiteConfig, testFilePath, serviceName) {
     console.log(`\n--- Starting UI Test: ${testCase.name} ---`);
     const browser = await chromium.launch({ headless: suiteConfig?.headless !== false });
     const page = await browser.newPage();
-    const uiEngine = new UIEngine(page);
+    const uiEngine = new UIEngine(page, testCase.name);
 
     try {
       if (testCase.steps) {
-        await uiEngine.executeSteps(testCase.steps);
+        const featureName = testFilePath
+          ? path.basename(testFilePath).replace(/\.(yaml|yml|json)$/i, '')
+          : null;
+
+        // Preprocess steps: allow YAML to use a logical target key that maps to a locator
+        // via locator-registry YAML, without modifying UIEngine/SmartLocator persistence.
+        const stepsWithResolvedSelectors = testCase.steps.map(step => {
+          if (!step || step.selector) return step;
+
+          const target = step.target || step.element;
+          if (!target || !featureName) return step;
+
+          let locator = registryLoader.loadServiceRegistry(serviceName, featureName)?.[target];
+          if (!locator) {
+            locator = registryLoader.loadGlobalRegistry(featureName)?.[target];
+          }
+
+          // If registry lookup failed, keep the step unchanged (backward compatible).
+          if (!locator) return step;
+
+          return {
+            ...step,
+            selector: locator,
+          };
+        });
+
+        await uiEngine.executeSteps(stepsWithResolvedSelectors);
       }
 
       // Execute UI assertions
@@ -295,8 +339,15 @@ class TestRunner {
   /**
    * Execute test suite with Playwright config
    */
-  async execute(testFilePath) {
-    await this.runTestSuite(testFilePath);
+  async execute(config) {
+    // Backward compatible: execute('/path/to/spec.yaml')
+    if (typeof config === 'string') {
+      await this.runTestSuite(config);
+      return;
+    }
+
+    const { specPath, service } = config || {};
+    await this.runTestSuite(specPath, { service });
   }
 }
 

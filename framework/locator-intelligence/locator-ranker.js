@@ -1,3 +1,5 @@
+const SelectorStabilityEvaluator = require('./selector-stability-evaluator');
+
 /**
  * Context-Aware Locator Ranker
  * Implements the enterprise-level scoring formula for locator selection.
@@ -15,28 +17,23 @@ class LocatorRanker {
     }
 
     /**
-     * score = 0.30 successRate + 0.15 semanticStrength + 0.15 domStability + 
-     *         0.15 componentConfidence + 0.10 speed + 0.10 visibility + 0.05 entropyPenalty
+     * Framework 2 Scoring Formula:
+     * score = (successRate * 0.4) + (confidence * 0.3) + (visibility * 0.2) - (entropy * 0.3)
      */
     static calculateScore(candidate, context) {
-        const {
-            successRate = candidate.success_rate || 0.5,
-            semanticStrength = this._getSemanticStrength(candidate.strategy),
-            domStability = context.domStability || 0.8,
-            componentConfidence = context.componentConfidence || 0.8,
-            speed = this._normalizeSpeed(candidate.avg_exec_time),
-            visibility = 1.0, // Assuming found candidates are visible for ranking
-            entropyPenalty = this._getEntropyPenalty(candidate.strategy)
-        } = {};
+        const successRate = candidate.success_rate || 0.5;
+        const confidence = candidate.confidence || 0.8; // Metadata confidence
+        const visibility = context.visibility !== undefined ? context.visibility : 1.0;
+        
+        // Correct Entropy scoring input: Prefer actual selector payload over strategy name
+        const entropyInput = ['css', 'xpath'].includes(candidate.strategy) ? (candidate.value || candidate.dom_signature || '') : '';
+        const entropy = SelectorStabilityEvaluator.evaluate(entropyInput || candidate.strategy || '');
 
         const total = 
-            (0.30 * successRate) +
-            (0.15 * semanticStrength) +
-            (0.15 * domStability) +
-            (0.15 * componentConfidence) +
-            (0.10 * speed) +
-            (0.10 * visibility) -
-            (0.05 * entropyPenalty);
+            (0.4 * successRate) +
+            (0.3 * confidence) +
+            (0.2 * visibility) -
+            (0.3 * entropy);
 
         return Math.max(0, Math.min(1, total));
     }

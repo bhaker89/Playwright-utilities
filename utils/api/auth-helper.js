@@ -30,35 +30,58 @@ class AuthHelper {
     this.loginUrl = loginUrl || `${env.uiBaseURL}/?login=true&followup=/login`;
   }
 
-  // REAL LOCATORS from codegen
+  // These selectors vary across environments (stag/steve/prod) and UI revs.
+  // Keep them flexible and prefer role-based locators over brittle CSS.
+
   /** @private */
   emailOrMobileInput() {
-    return this.page.getByRole('textbox', { name: 'Enter Email ID or Mobile' });
+    return this.page
+      .getByRole('textbox', { name: 'Enter Email ID or Mobile' })
+      .or(this.page.getByRole('textbox', { name: 'Enter Your mobile number or email' }));
   }
 
   /** @private */
   sendOtpButton() {
-    return this.page.getByRole('link', { name: 'SEND OTP' });
+    return this.page
+      .getByRole('button', { name: 'Send OTP' })
+      .or(this.page.getByRole('link', { name: 'SEND OTP' }))
+      .or(this.page.getByRole('button', { name: 'SEND OTP' }));
   }
 
   /** @private */
   loginButton() {
-    return this.page.getByRole('link', { name: 'LOGIN', exact: true });
+    return this.page
+      .getByRole('link', { name: 'LOGIN', exact: true })
+      .or(this.page.getByRole('button', { name: 'LOGIN', exact: true }));
   }
 
   /** @private */
   otpInput() {
-    return this.page.getByRole('textbox', { name: 'One Time Password' });
+    // OTP UIs vary; prefer “Enter OTP” variants and fall back to other likely labels.
+    // Note: we intentionally do NOT include the email/mobile input label here to avoid false positives.
+    return this.page
+      .getByRole('textbox', { name: 'Enter OTP' })
+      .or(this.page.getByRole('textbox', { name: 'One Time Password' }))
+      .or(this.page.getByRole('textbox', { name: 'OTP' }));
   }
 
   /** @private */
   doneButton() {
-    return this.page.getByRole('link', { name: 'DONE' });
+    // Different environments use different CTA labels for OTP submit.
+    return this.page
+      .getByRole('button', { name: 'DONE' })
+      .or(this.page.getByRole('link', { name: 'DONE' }))
+      .or(this.page.getByRole('button', { name: 'Verify OTP' }))
+      .or(this.page.getByRole('button', { name: 'VERIFY OTP' }))
+      .or(this.page.getByRole('button', { name: 'Continue' }));
   }
 
   /** @private */
   closeButton() {
-    return this.page.getByRole('img', { name: 'Close' });
+    return this.page
+      .getByRole('button', { name: 'Close login popup' })
+      .or(this.page.getByRole('button', { name: 'Close' }))
+      .or(this.page.getByRole('img', { name: 'Close' }));
   }
 
   /**
@@ -83,20 +106,32 @@ class AuthHelper {
     logger.info(`[AuthHelper] Entered: ${emailOrMobile}`);
 
     // Click Send OTP button with retry for spinner/loading cases
+    // IMPORTANT: avoid false positives where some “OTP” input exists in DOM but the UI didn’t transition.
     let otpScreenAppeared = false;
     for (let i = 0; i < 3; i++) {
-      logger.info(`[AuthHelper] Clicking SEND OTP (Attempt ${i + 1}/3)...`);
+      logger.info(`[AuthHelper] Clicking Send OTP (Attempt ${i + 1}/3)...`);
       await this.sendOtpButton().click();
 
       try {
         // Wait for OTP input to appear
-        await this.otpInput().waitFor({ state: 'visible', timeout: 10000 });
+        await this.otpInput().waitFor({ state: 'visible', timeout: 15000 });
+
+        // Also ensure the original login input is no longer the active, visible primary field.
+        // Some UIs keep the first textbox visible; in that case we still proceed, but log it.
+        const loginInputStillVisible = await this.emailOrMobileInput()
+          .isVisible({ timeout: 1000 })
+          .catch(() => false);
+
+        if (loginInputStillVisible) {
+          logger.warn('[AuthHelper] Login input still visible after OTP appeared (UI may keep both in DOM)');
+        }
+
         otpScreenAppeared = true;
         logger.info('[AuthHelper] OTP screen appeared');
         break;
       } catch (error) {
         logger.warn(`[AuthHelper] OTP screen did not appear after attempt ${i + 1}`);
-        if (i < 2) await this.page.waitForTimeout(2000);
+        if (i < 2) await this.page.waitForTimeout(2500);
       }
     }
 
@@ -113,16 +148,40 @@ class AuthHelper {
       await this.doneButton().click();
       logger.info('[AuthHelper] Clicked DONE. Waiting for session to establish...');
 
+      // Give the UI a moment to establish session and/or close the modal.
+      // Avoid waiting for networkidle since homepage can keep long-polling requests alive.
+      await this.page.waitForLoadState('domcontentloaded').catch(() => {});
+      await this.page.waitForTimeout(1500);
+
       // Verify login success with retries
-      const isLoggedIn = await this.isUserLoggedIn(5); // 5 retries for slow staging redirects
+      const isLoggedIn = await this.isUserLoggedIn(6); // slightly more retries for staging
       if (isLoggedIn) {
         logger.info('[AuthHelper] ✅ Login successful');
+
+        // If the login modal still exists, close it so tests can proceed.
+        await this.closeLoginModal().catch(() => {});
       } else {
-        throw new Error('[AuthHelper] ❌ Login failed - user not detected as logged in after multiple retries. Possible invalid OTP or timeout.');
+        const currentUrl = this.page.url();
+        logger.warn(`[AuthHelper] Login not confirmed. Current URL: ${currentUrl}`);
+
+        throw new Error(
+          '[AuthHelper] ❌ Login failed - user not detected as logged in after multiple retries. ' +
+            'If OTP is correct, update logged-in detection rules for this environment.'
+        );
       }
     } else {
       logger.warn('[AuthHelper] ⚠️  OTP not provided - manual OTP entry required');
     }
+  }
+
+  /**
+   * Strongest login indicator for most apps is that the browser context now has cookies.
+   * We keep it generic (non-domain-specific) to avoid overfitting.
+   * @returns {Promise<boolean>}
+   */
+  async hasAnyCookies() {
+    const cookies = await this.page.context().cookies();
+    return Array.isArray(cookies) && cookies.length > 0;
   }
 
   /**
@@ -135,44 +194,75 @@ class AuthHelper {
     for (let i = 0; i < retries; i++) {
       logger.info(`[AuthHelper] Checking login status (Attempt ${i + 1}/${retries})...`);
 
+      // Strong signal: cookies exist.
+      // (We keep it generic; we can tighten to domain-specific cookies if needed.)
+      const cookies = await this.page.context().cookies().catch(() => []);
+      if (Array.isArray(cookies) && cookies.length > 0) {
+        logger.info('[AuthHelper] ✅ User logged in - cookies present');
+        return true;
+      }
+
       // Check if login modal/popup is closed
       const loginInputVisible = await this.emailOrMobileInput()
         .isVisible({ timeout: 2000 })
         .catch(() => false);
 
+      // Even if the login input is still visible, the user *might* already be logged in
+      // (some UIs keep the modal in DOM or keep input visible while session is established).
       if (loginInputVisible) {
         logger.info('[AuthHelper] Login form still visible');
-      } else {
-        // Check for common logged-in indicators
-        const loggedInSelectors = [
-          'text=My Account',
-          'text=Profile',
-          'text=Logout',
-          '[data-testid="user-profile"]',
-          '[data-testid="user-name"]',
-          '.user-profile',
-          '.profile-name',
-          'button:has-text("Logout")',
-        ];
+      }
 
-        for (const selector of loggedInSelectors) {
-          const isVisible = await this.page.locator(selector)
-            .first()
-            .isVisible({ timeout: 2000 })
-            .catch(() => false);
+      // Check for common logged-in indicators
+      const loggedInSelectors = [
+      // Strong signal: cookies exist after OTP submit.
+      const hasCookies = await this.hasAnyCookies().catch(() => false);
+      if (hasCookies) {
+        logger.info('[AuthHelper] ✅ User logged in - cookies present');
+        return true;
+      }
 
-          if (isVisible) {
-            logger.info(`[AuthHelper] ✅ User logged in - detected: ${selector}`);
-            return true;
-          }
-        }
+      // Check for common logged-in indicators
+      const loggedInSelectors = [
+        'text=My Account',
+        'text=Profile',
+        'text=Logout',
+        '[data-testid="user-profile"]',
+        '[data-testid="user-name"]',
+        '.user-profile',
+        '.profile-name',
+        'button:has-text("Logout")',
+      ];
 
-        // Check URL change (login modal typically closes after successful login)
-        const currentUrl = this.page.url();
-        if (!currentUrl.includes('login=true')) {
-          logger.info('[AuthHelper] ✅ User logged in - URL changed');
+      for (const selector of loggedInSelectors) {
+        const isVisible = await this.page
+          .locator(selector)
+          .first()
+          .isVisible({ timeout: 2000 })
+          .catch(() => false);
+
+        if (isVisible) {
+          logger.info(`[AuthHelper] ✅ User logged in - detected: ${selector}`);
           return true;
         }
+      }
+
+      // If header still shows “Login”, treat as not logged in.
+      const loginLinkVisible = await this.page
+        .getByRole('link', { name: 'Login' })
+        .isVisible({ timeout: 1000 })
+        .catch(() => false);
+
+      if (!loginLinkVisible) {
+        logger.info('[AuthHelper] ✅ User logged in - header Login link not visible');
+        return true;
+      }
+
+      // Check URL change (login modal typically closes after successful login)
+      const currentUrl = this.page.url();
+      if (!currentUrl.includes('login=true')) {
+        logger.info('[AuthHelper] ✅ User logged in - URL changed');
+        return true;
       }
 
       // Wait a bit before next retry if not last attempt

@@ -3,9 +3,11 @@ const { ApiHelperGenerator } = require('../generators/api-helper-generator');
 const { ApiExecutor } = require('../engines/api-executor');
 const { OpenApiGenerator } = require('../generators/openapi-generator');
 const { TestCodeGenerator } = require('../generators/test-code-generator');
+const { TestRunner } = require('./test-runner');
 const { logger } = require('../../utils/base/logger');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
+const yaml = require('js-yaml');
 
 /**
  * ============================================================================
@@ -39,7 +41,43 @@ class Orchestrator {
     this.apiExecutor = new ApiExecutor();
     this.openApiGenerator = new OpenApiGenerator();
     this.testCodeGenerator = new TestCodeGenerator();
+
+    // Used by automation-core CLI to execute YAML specs without changing existing flows.
+    this.testRunner = new TestRunner();
   }
+
+  /**
+   * Execute a YAML spec file (service-aware).
+   *
+   * Backward compatible behavior:
+   * - If called with a string, treat it as specPath and run with no explicit service.
+   * - If called with { specPath, service }, resolve service priority:
+   *   CLI service > spec.metadata.service > null.
+   */
+  async run(config) {
+    if (typeof config === 'string') {
+      return this.testRunner.execute(config);
+    }
+
+    const { specPath, service: cliService } = config || {};
+
+    if (!specPath) {
+      throw new Error('Missing required argument: specPath');
+    }
+
+    const spec = yaml.load(fs.readFileSync(specPath, 'utf8'));
+
+    const resolvedService =
+      cliService ||
+      spec?.metadata?.service ||
+      null;
+
+    return this.testRunner.execute({
+      specPath,
+      service: resolvedService,
+    });
+  }
+=======
 
   /**
    * Main orchestration method

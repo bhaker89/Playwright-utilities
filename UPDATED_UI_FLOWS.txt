@@ -1,0 +1,200 @@
+# Playwright-Automation — Updated End-to-End UI Execution Flows (WIP)
+
+This file is the starting point for documenting the *current, working* end-to-end UI execution flows in this repository.
+
+Goals this doc supports:
+1) Identify/remove legacy & obsolete code
+2) Find missing features via real execution
+3) Provide a complete, updated flow document (this file will later be converted to .md)
+
+---
+
+## 0) Preconditions (local machine)
+
+- Node.js available
+- Repo dependencies installed
+- Playwright browsers installed
+- A valid environment file exists: `config/.env.local`
+- If UI tests require authenticated state, ensure `.auth/user.json` can be created by the setup project / global setup
+
+---
+
+## 1) Bootstrap + sanity checks
+
+### Bootstrap
+- Command:
+  - `npm run bootstrap`
+
+What it does:
+- Creates `config/.env.local` (copied from `config/.env.example`) if missing
+- Runs `npm install`
+- Runs `npx playwright install`
+
+### Doctor
+- Command:
+  - `npm run doctor`
+
+What it checks:
+- `config/.env.local` exists
+- `npx playwright --version` is runnable
+
+---
+
+## 2) Environment selection
+
+Playwright config loads env in this order:
+1) `config/.env.local`
+2) `config/.env.<TEST_ENV>` (overrides local defaults if present)
+
+Examples:
+- `TEST_ENV=stag npm run test:smoke`
+- `TEST_ENV=prod npm run test:ui`
+
+Note:
+- Service-level config also exists at `config/services.yaml` (used by intent-runner / platform tooling).
+
+---
+
+## 3) End-to-end UI execution (recommended paths)
+
+### Path A — Fast signal (UI smoke)
+Purpose:
+- Validate that critical UI flows still run end-to-end.
+
+Commands:
+- Headless:
+  - `npm run test:smoke -- tests/smoke/ui.smoke.spec.js --project=chromium`
+- Debug/Headed (single worker):
+  - `npx playwright test tests/smoke/ui.smoke.spec.js --debug --headed --workers=1 --project=chromium`
+
+Artifacts:
+- HTML report: `npm run report`
+- Raw results: `test-results/`
+
+### Path B — Full UI suite
+Commands:
+- `npm run test:ui`
+- Or choose browser:
+  - `npx playwright test tests/ui --project=chromium`
+  - `npx playwright test tests/ui --project=firefox`
+
+### Path C — Login / unauthenticated flows
+Use the `chromium-noauth` project when you explicitly want a clean session (no injected `storageState`).
+
+Commands:
+- `npx playwright test tests/ui --project=chromium-noauth --headed --workers=1`
+
+---
+
+## 4) How we will identify legacy/obsolete code (execution-driven)
+
+### What we observed on real execution (06-Apr-2026)
+
+Attempted command:
+- `npx playwright test tests/smoke/ui.smoke.spec.js --project=chromium --workers=1 --reporter=line`
+
+Result: execution reached the setup project, but was blocked by 2 issues in sequence.
+
+#### Blocker #1 — Legacy drift in global setup
+- `global-setup.js` imported a non-existent module:
+  - `Error: Cannot find module './utils/base/cleanup-helper'`
+- Fix applied: **Option B** (remove legacy dependency; keep cleanup best-effort and self-contained).
+
+Why this matters for legacy/obsolete identification:
+- This is a direct example of **stale imports** that prevent any “execution-driven” discovery.
+- Rule: global setup must never depend on optional helpers; it should be best-effort only.
+
+#### Blocker #2 — Missing shared logger module
+- Many modules imported: `../utils/base/logger` but the file did not exist.
+- Fix applied: created `utils/base/logger.js` exporting a shared `logger`.
+
+#### Blocker #3 — Auth setup selectors out of sync with staging UI
+After setup started, auth failed during UI login:
+- Error: `TimeoutError: locator.waitFor: Timeout 10000ms exceeded`
+- Waiting for: `getByRole('textbox', { name: 'Enter Email ID or Mobile' })`
+
+Evidence (from Playwright error-context snapshot):
+- The login popup input on this environment is:
+  - `textbox "Enter Your mobile number or email"`
+- The button is:
+  - `button "Send OTP"`
+
+Fix direction:
+- Make `AuthHelper` selectors environment-tolerant (support both labels and button/link variants).
+
+### After fix: execution-driven legacy/obsolete process
+
+Commands (run in this order):
+1) Smoke (fast signal):
+   - `npx playwright test tests/smoke/ui.smoke.spec.js --project=chromium --workers=1 --reporter=line`
+2) Full run (for dead-code candidates):
+   - `npm run test:all`
+3) Max visibility run (for mapping failures clearly):
+   - `npx playwright test --headed --workers=1 --reporter=line`
+
+Then we will map:
+- executed entrypoints → used framework modules
+- never executed modules → *candidates* for removal (only after verifying they are truly unused)
+
+---
+
+## 5) How we will find missing features (real execution)
+
+### What we observed on real execution (06-Apr-2026)
+
+Current blocker (must fix first):
+- **Missing runtime module**: `./utils/base/cleanup-helper` required by `global-setup.js`
+
+Classification:
+- Missing feature / missing implementation
+- Also qualifies as legacy/obsolete reference (stale import)
+
+### Once unblocked: what failures will indicate
+
+Signals to collect while running (categorize each failure):
+- **Framework boot failures**
+  - missing modules, bad imports, wrong paths
+- **Auth/setup failures**
+  - `.auth/user.json` missing or not generated
+  - OTP / Google auth flow breakage
+- **Service config failures**
+  - missing/incorrect entries in `config/services.yaml`
+- **Locator/selector failures**
+  - missing entries in `locator-registry/`
+  - self-healing not triggering / not persisting learned locators
+- **Assertion/validation gaps**
+  - steps run but assertions are missing or too weak
+
+Run modes to use:
+- Debug mode (deep inspection):
+  - `npx playwright test <path> --debug --headed --workers=1`
+- UI mode (interactive runner):
+  - `npm run ui`
+
+---
+
+## 6) Next sections to fill (after first execution)
+
+- Actual observed UI flow: “1mg quick order rx processing”
+  - Entry spec: `specs/intent/1mg-quick-order-rx-processing.intent.yaml`
+  - Locator registry: `locator-registry/services/1mg-web/quick_order.yaml`
+  - Setup/auth flow: `.auth/user.json` generation source
+
+- Full execution trace (step-by-step):
+  - which CLI command
+  - which runner/engine invoked
+  - which pages/actions executed
+  - what gets generated/updated (if applicable)
+
+---
+
+## Appendix A — Common commands (copy/paste)
+
+- Clean reports:
+  - `npm run clean:reports`
+- Clean logs:
+  - `npm run clean:logs`
+- Show last HTML report:
+  - `npm run report`
+- Run only Chromium UI tests:
+  - `npx playwright test tests/ui --project=chromium`

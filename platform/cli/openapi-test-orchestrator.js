@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const minimist = require('minimist');
 const { execSync } = require('child_process');
 const { LLMClient } = require('../generators/llm-client');
 const { ContextGatherer } = require('../generators/context-gatherer');
@@ -574,3 +575,245 @@ Now generate the complete test file:
 }
 
 module.exports = { OpenApiTestOrchestrator };
+
+// -----------------------------------------------------------------------------
+// automation-core CLI entrypoint
+// -----------------------------------------------------------------------------
+// NOTE:
+// package.json bin currently points to this file. To support multiple commands
+// without breaking existing installs, we route based on argv._[0].
+if (require.main === module) {
+  (async () => {
+    // Load config/.env.<TEST_ENV> so GROQ_API_KEY/UI_BASE_URL/etc are available
+    // for generate-intent-spec / ground-spec / run-intent flows.
+    require('../../config/environment.config');
+
+    const argv = minimist(process.argv.slice(2));
+    const cmd = Array.isArray(argv._) && argv._.length > 0 ? String(argv._[0]) : null;
+
+    // -------------------------------------------------------------------------
+    // Phase 2: show prompt template (QA-friendly)
+    // -------------------------------------------------------------------------
+    if (cmd === 'intent-prompt-template') {
+      const template = [
+        'INTENT_PROMPT_TEMPLATE (copy/paste and fill):',
+        '',
+        'ENVIRONMENT:',
+        '- env: stag | prod | dev',
+        '- base_url: https://<env-host>/',
+        '',
+        'SERVICE:',
+        '- service_name: <service>',
+        '- flow_name: <short_name>',
+        '',
+        'AUTH:',
+        '- required: yes/no',
+        '- method: password | otp | sso',
+        '- prereq_ui_state: e.g. "Login form appears only after clicking Login link"',
+        '',
+        'START STATE:',
+        '- start_url: / (or full URL)',
+        '- known popups: cookie banner / location modal / etc',
+        '',
+        'HAPPY PATH STEPS:',
+        '1) ...',
+        '2) ...',
+        '3) ...',
+        '',
+        'ASSERTIONS:',
+        '- url_contains: ...',
+        '- visible_text_contains: ...',
+        '- element_visible: ...',
+        '',
+        'CONSTRAINTS:',
+        '- avoid_otp: true',
+        '- avoid_payment: true',
+        '- do_not_log_secrets: true',
+      ].join('\n');
+
+      // eslint-disable-next-line no-console
+      console.log(template);
+      return;
+    }
+
+    // -------------------------------------------------------------------------
+    // Phase 2: validate intent prompt file (QA-friendly)
+    // -------------------------------------------------------------------------
+    if (cmd === 'validate-intent-prompt') {
+      const promptFile = argv['prompt-file'] || argv.promptFile || null;
+      if (!promptFile) {
+        throw new Error('Missing required argument: --prompt-file <path>');
+      }
+
+      const absolutePromptPath = path.resolve(promptFile);
+      if (!fs.existsSync(absolutePromptPath)) {
+        throw new Error(`Prompt file not found: ${absolutePromptPath}`);
+      }
+
+      const promptText = fs.readFileSync(absolutePromptPath, 'utf8');
+      const { validateIntentPromptText } = require('../generators/prompt-to-intent-spec-generator');
+
+      validateIntentPromptText(promptText);
+
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify({ success: true, promptFile: absolutePromptPath }, null, 2));
+      return;
+    }
+
+    // -------------------------------------------------------------------------
+    // Phase 2: prompt -> intent spec
+    // -------------------------------------------------------------------------
+    if (cmd === 'generate-intent-spec') {
+      const promptArg = argv.prompt || argv.p || null;
+      const promptFile = argv['prompt-file'] || argv.promptFile || null;
+      const service = argv.service || argv.svc || null;
+      const out = argv.out || null;
+      const llmProvider = argv['llm-provider'] || argv.llmProvider || 'groq';
+      const allowFallback = Boolean(argv['allow-fallback'] || argv.allowFallback);
+      const strict = argv.strict === undefined ? true : Boolean(argv.strict);
+
+      const prompt = promptFile
+        ? fs.readFileSync(path.resolve(promptFile), 'utf8')
+        : promptArg;
+
+      if (!prompt) throw new Error('Missing required argument: --prompt <text> or --prompt-file <path>');
+      if (!service) throw new Error('Missing required argument: --service <name>');
+
+      const { generateIntentSpecFromPrompt } = require('../generators/prompt-to-intent-spec-generator');
+      const result = await generateIntentSpecFromPrompt(prompt, service, out, {
+        llmProvider,
+        allowFallback,
+        strict,
+        validatePrompt: true,
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify({ success: true, ...result }, null, 2));
+      return;
+    }
+
+    // -------------------------------------------------------------------------
+    // Phase 2: intent spec -> locator registry
+    // -------------------------------------------------------------------------
+    if (cmd === 'ground-spec') {
+      const specPath = argv.spec || argv.s || null;
+      const service = argv.service || argv.svc || null;
+      const baseUrl = argv['base-url'] || argv.baseUrl || null;
+      const storageStatePath = argv['storage-state'] || argv.storageState || null;
+      const headed = Boolean(argv.headed);
+      const preStepsPath = argv['pre-steps'] || argv.preSteps || null;
+
+      // Option A enforcement: auto-presteps is required.
+      // We keep CLI flags for max steps tuning, but disallow disabling.
+      if (argv['auto-presteps'] === false || argv['auto-presteps'] === 'false') {
+        throw new Error('Option A enforced: --auto-presteps cannot be set to false.');
+      }
+
+      const autoPreSteps = true;
+      const autoPreStepsMax = argv['auto-presteps-max'] ? Number(argv['auto-presteps-max']) : 6;
+
+      if (!specPath) {
+        throw new Error('Missing required argument: --spec <path>');
+      }
+
+      const preSteps = preStepsPath
+        ? yaml.load(fs.readFileSync(path.resolve(preStepsPath), 'utf8'))
+        : null;
+
+      const { groundSpec } = require('../core/ground-spec');
+      const result = await groundSpec({
+        specPath,
+        service,
+        baseUrl,
+        storageStatePath,
+        headless: !headed,
+        preSteps,
+        autoPreSteps,
+        autoPreStepsMax,
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify({ success: true, ...result }, null, 2));
+      return;
+    }
+
+    // -------------------------------------------------------------------------
+    // Phase 2: run intent spec using locator registry + self-healing
+    // -------------------------------------------------------------------------
+    if (cmd === 'run-intent') {
+      const specPath = argv.spec || argv.s || null;
+      const service = argv.service || argv.svc || null;
+      const baseUrl = argv['base-url'] || argv.baseUrl || null;
+      const storageStatePath = argv['storage-state'] || argv.storageState || null;
+      const headed = Boolean(argv.headed);
+      const smoke = Boolean(argv.smoke);
+      const strict = Boolean(argv.strict);
+
+      if (!specPath) {
+        throw new Error('Missing required argument: --spec <path>');
+      }
+
+      const { runIntentSpec } = require('../core/intent-runner');
+      const result = await runIntentSpec({
+        specPath,
+        service,
+        baseUrl,
+        storageStatePath,
+        headless: !headed,
+        smoke,
+        strict,
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify({ success: true, ...result }, null, 2));
+      return;
+    }
+
+    // -------------------------------------------------------------------------
+    // Phase 2: intent spec -> Playwright wrapper spec.js
+    // -------------------------------------------------------------------------
+    if (cmd === 'generate-intent-test') {
+      const specPath = argv.spec || argv.s || null;
+      const service = argv.service || argv.svc || null;
+      const outDir = argv.out || argv.output || null;
+
+      if (!specPath) {
+        throw new Error('Missing required argument: --spec <path>');
+      }
+      if (!service) {
+        throw new Error('Missing required argument: --service <name>');
+      }
+
+      const { writeIntentPlaywrightSpec } = require('../core/intent-test-writer');
+      const result = writeIntentPlaywrightSpec({
+        specPath,
+        service,
+        outDir: outDir || undefined,
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify({ success: true, ...result }, null, 2));
+      return;
+    }
+
+    // Default behavior (existing): run YAML spec through Orchestrator
+    const specPath = argv.spec || argv.s || null;
+    const service = argv.service || argv.svc || null;
+
+    if (!specPath) {
+      throw new Error('Missing required argument: --spec <path>');
+    }
+
+    const { Orchestrator } = require('../core/orchestrator');
+    const orchestrator = new Orchestrator();
+
+    await orchestrator.run({
+      specPath,
+      service,
+    });
+  })().catch(err => {
+    // eslint-disable-next-line no-console
+    console.error(err);
+    process.exit(1);
+  });
+}

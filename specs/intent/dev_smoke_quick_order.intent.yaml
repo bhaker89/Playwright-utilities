@@ -1,0 +1,41 @@
+metadata:
+  service: 1mg-web
+intent:
+  primary_action: quick_order
+  feature: quick_order
+  domain: smoke
+testSuite:
+  name: dev_smoke_quick_order
+  description: Smoke flow - open homepage and navigate to Quick Order page (no auth)
+steps:
+  - action: goto
+    target: null
+    value: null
+    url: https://stag.1mg.com/
+
+  # Wait for the Quick order entry point to be visible before clicking.
+  - action: wait
+    target: quick_order_button
+    value: visible
+
+  # Prompt: "Click Quick order entry point"
+  - action: click
+    target: quick_order_button
+
+  # Prompt: "Wait for quick order page to load"
+  - action: wait
+    target: quick_order_page
+    value: visible
+
+assertions:
+  - type: url_contains
+    target: quick_order_page
+    expected: /done-in-one/prescription-order
+
+  - type: visible
+    target: quick_order_page
+    expected: true
+
+  - type: text
+    target: quick_order_page
+    expected: Upload prescription

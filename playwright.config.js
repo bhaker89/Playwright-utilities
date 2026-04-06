@@ -1,10 +1,23 @@
 const { defineConfig, devices } = require('@playwright/test');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 
-// Load environment variables
+// Env resolution order:
+// 1) config/.env.local (team default, created by bootstrap)
+// 2) config/.env.<TEST_ENV> (defaults to stag)
 const environment = process.env.TEST_ENV || 'stag';
-dotenv.config({ path: path.resolve(__dirname, `config/.env.${environment}`) });
+const envLocalPath = path.resolve(__dirname, 'config/.env.local');
+const envNamedPath = path.resolve(__dirname, `config/.env.${environment}`);
+
+if (fs.existsSync(envLocalPath)) {
+  dotenv.config({ path: envLocalPath });
+}
+
+if (fs.existsSync(envNamedPath)) {
+  // Allow explicit TEST_ENV configs to override local defaults
+  dotenv.config({ path: envNamedPath, override: true });
+}
 
 /**
  * Playwright Test Configuration
@@ -37,9 +50,7 @@ module.exports = defineConfig({
       detail: true,
       suiteTitle: true
     }],
-    ['./platform/core/healing-reporter.js', { 
-      outputFile: 'reports/healing-analytics.json' 
-    }]
+    // Legacy 3-stage healing reporter removed. LIE has its own telemetry store.
   ],
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -143,19 +154,6 @@ module.exports = defineConfig({
         ...devices['Desktop Edge'],
         viewport: { width: 1920, height: 1080 },
         channel: 'msedge',
-        storageState: '.auth/user.json',
-      },
-    },
-
-
-    // Desktop Browsers - excludes API tests
-    {
-      name: 'chromium',
-      testIgnore: /.*\/api\/.*\.spec\.js/,
-      dependencies: ['setup'],
-      use: {
-        ...devices['Desktop Chrome'],
-        viewport: { width: 1920, height: 1080 },
         storageState: '.auth/user.json',
       },
     },

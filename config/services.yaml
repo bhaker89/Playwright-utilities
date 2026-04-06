@@ -3,6 +3,14 @@
 # Environment-specific values can be overridden using .env files
 
 services:
+  # 1mg Web (UI) - used by intent-runner
+  1mg-web:
+    name: "1mg Web"
+    base_url: "${UI_BASE_URL}"
+    ui_auth:
+      mode: "otp"                # otp | google (future)
+      storage_state: ".auth/user.json"
+
   # Nexus Repository Service
   nexus:
     name: "Nexus Repository Manager"

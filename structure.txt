@@ -1,0 +1,257 @@
+.
+├── .auth/
+│   ├── ui-registry.json
+│   └── user.json
+├── .github/
+│   └── workflows/
+│       └── playwright.yml
+├── .qodo/
+│   ├── agents/
+│   └── workflows/
+├── components/
+│   └── base.component.js
+├── config/
+│   ├── .env.dev
+│   ├── .env.example
+│   ├── .env.prod
+│   ├── .env.stag
+│   ├── .env.steve
+│   ├── environment.config.js
+│   ├── services.config.js
+│   └── services.yaml
+├── docs/
+├── fixtures/
+│   └── base-test.js
+├── framework/
+│   └── locator-intelligence/
+│       ├── adaptive-wait-context.js
+│       ├── candidate-extractor.js
+│       ├── component-boundary-detector.js
+│       ├── confidence-engine.js
+│       ├── dom-volatility-detector.js
+│       ├── environment-context-engine.js
+│       ├── execution-context-detector.js
+│       ├── failure-classifier.js
+│       ├── healing-engine.js
+│       ├── locator-factory.js
+│       ├── locator-map-registry.js
+│       ├── locator-map.json
+│       ├── locator-memory-store.js
+│       ├── locator-memory.db
+│       ├── locator-memory.db-shm
+│       ├── locator-memory.db-wal
+│       ├── locator-orchestrator.js
+│       ├── locator-ranker.js
+│       ├── locator-telemetry-engine.js
+│       ├── locator-upgrade-suggester.js
+│       ├── locator-version-manager.js
+│       ├── selector-stability-evaluator.js
+│       └── wait-strategy-engine.js
+├── generated-tests/
+│   ├── playwright/
+│   └── yaml/
+│       └── 1mg-order-placement-test-suite.yaml
+├── locator-registry/
+│   ├── global/
+│   │   └── .gitkeep
+│   ├── services/
+│   │   ├── pharma/
+│   │   │   └── .gitkeep
+│   │   └── .gitkeep
+│   └── .gitkeep
+├── no-code-tests/
+│   ├── api/
+│   │   ├── _templates/
+│   │   │   ├── advanced-examples.yaml
+│   │   │   ├── authenticated-api.yaml
+│   │   │   ├── data-driven-login.yaml
+│   │   │   └── README.md
+│   │   ├── nexus-tests.yaml
+│   │   └── payment_check.yaml
+│   ├── generated/
+│   │   ├── ai_generated_suite.yaml
+│   │   ├── generated_login_test.yaml
+│   │   └── generated_suite.yaml
+│   └── ui/
+│       └── self-healing-demo.yaml
+├── pages/
+│   ├── admin-dashboard-page.page.js
+│   ├── base.page.js
+│   ├── checkout-page.page.js
+│   ├── google-auth-page.page.js
+│   ├── login-page.page.js
+│   ├── login.page.js
+│   ├── order-success-page.page.js
+│   └── search-result-page.page.js
+├── platform/
+│   ├── cli/
+│   │   ├── generate-ui-tests.js
+│   │   ├── index.js
+│   │   ├── openapi-test-orchestrator.js
+│   │   └── ui-test-generator-cli.js
+│   ├── core/
+│   │   ├── ai-engine.js
+│   │   ├── component-registry.js
+│   │   ├── ground-spec.js
+│   │   ├── healing-reporter.js
+│   │   ├── intent-runner.js
+│   │   ├── locator-registry-loader.js
+│   │   ├── locator-registry-resolver.js
+│   │   ├── locator-registry-writer.js
+│   │   ├── mcp-manager.js
+│   │   ├── orchestrator.js
+│   │   ├── service-config-loader.js
+│   │   ├── shared-test-context.js
+│   │   ├── smart-locator.js
+│   │   ├── test-runner.js
+│   │   └── workspace-root.js
+│   ├── engines/
+│   │   ├── api-executor.js
+│   │   ├── assertion-engine.js
+│   │   ├── data-provider.js
+│   │   ├── request-modifier.js
+│   │   ├── self-healer.js
+│   │   ├── ui-engine.js
+│   │   └── variable-manager.js
+│   ├── generators/
+│   │   ├── api-helper-generator.js
+│   │   ├── context-gatherer.js
+│   │   ├── llm-client.js
+│   │   ├── openapi-generator.js
+│   │   ├── prompt-builder.js
+│   │   ├── prompt-to-intent-spec-generator.js
+│   │   ├── prompt-to-spec-generator.js
+│   │   ├── README.md
+│   │   ├── test-code-generator.js
+│   │   ├── ui-generator.js
+│   │   └── ui-test-code-generator.js
+│   ├── parsers/
+│   │   ├── curl-parser.js
+│   │   ├── excel-parser.js
+│   │   ├── postman-parser.js
+│   │   └── test-suite-loader.js
+│   ├── samples/
+│   │   └── add-to-cart.csv
+│   ├── templates/
+│   └── index.js
+├── services/
+│   ├── _template/
+│   │   ├── api/
+│   │   ├── config/
+│   │   └── ui/
+│   │       ├── flows/
+│   │       └── pages/
+│   ├── dweb/
+│   ├── groot/
+│   │   ├── apis/
+│   │   │   └── get-task-by-id/
+│   │   └── groot-helper.js
+│   ├── inventory_vendor_management/
+│   │   ├── apis/
+│   │   │   ├── check-sku-availability/
+│   │   │   └── skus_availability/
+│   │   └── inventory_vendor_management-helper.js
+│   ├── jsonplaceholder-service/
+│   │   ├── apis/
+│   │   │   └── get-single-post/
+│   │   └── jsonplaceholder-service-helper.js
+│   ├── order-nexus/
+│   │   ├── nexus-helper.js
+│   │   └── nexus-payloads.js
+│   ├── payment-service/
+│   │   └── payment-helper.js
+│   └── registry.js
+├── specs/
+│   └── login_with_valid_credentials.yaml
+├── test-data/
+│   ├── 1mg-locators.json
+│   ├── api-endpoints.json
+│   ├── auth-credentials.json
+│   ├── login-data.csv
+│   ├── README.md
+│   ├── test-cases-documentation.json
+│   └── users.json
+├── tests/
+│   ├── api/
+│   │   ├── groot/
+│   │   │   └── get-task-by-id.spec.js
+│   │   ├── inventory_vendor_management/
+│   │   │   └── check-sku-availability.spec.js
+│   │   ├── jsonplaceholder-service/
+│   │   │   └── get-single-post.spec.js
+│   │   ├── payment-service/
+│   │   ├── order-nexus.spec.js
+│   │   └── user.spec.js
+│   ├── e2e/
+│   ├── examples/
+│   │   └── ui-bridge-pattern.spec.js
+│   ├── generated/
+│   │   └── 1mg-order-placement-test-suite.spec.js
+│   ├── integrated/
+│   │   ├── demo-api-login-flow.spec.js
+│   │   └── demo-smart-locator.spec.js
+│   ├── integration/
+│   │   └── self-healing.spec.js
+│   ├── setup/
+│   │   └── auth.setup.js
+│   ├── ui/
+│   │   └── generated/
+│   │       ├── pages/
+│   │       ├── specs/
+│   │       ├── .gitkeep
+│   │       └── google-sign-in-flow-test-suite.spec.js
+│   └── lie-enterprise-scaling.spec.js
+├── utils/
+│   ├── api/
+│   │   ├── api-client.js
+│   │   ├── auth-helper.js
+│   │   ├── auth-seeder.js
+│   │   └── multi-service-api-client.js
+│   ├── base/
+│   │   ├── cleanup-helper.js
+│   │   ├── data-factory.js
+│   │   ├── logger.js
+│   │   ├── schema-validator.js
+│   │   └── test-helpers.js
+│   ├── database/
+│   │   ├── db-assertions.js
+│   │   ├── db-client-factory.js
+│   │   ├── db-client.base.js
+│   │   ├── index.js
+│   │   ├── mongo-client.js
+│   │   └── postgres-client.js
+│   ├── network/
+│   │   ├── index.js
+│   │   └── network-actions.js
+│   ├── reporting/
+│   │   ├── custom-reporter.js
+│   │   └── visual-testing.js
+│   ├── ui/
+│   │   ├── assert-wrapper.js
+│   │   ├── bridge.js
+│   │   ├── index.js
+│   │   ├── playwright-wrapper.js
+│   │   └── ui-actions.js
+│   └── clean-logs.js
+├── .DS_Store
+├── .env
+├── .env.example
+├── .eslintrc.json
+├── .gitignore
+├── .gitlab-ci.yml
+├── .prettierrc.json
+├── debug_after_direct_click.png
+├── docker-compose.yml
+├── Dockerfile
+├── global-setup.js
+├── index.js
+├── LIE_DOCUMENTATION.md
+├── package-lock.json
+├── package.json
+├── Playwright-Automation-framework.zip
+├── playwright.config.js
+├── README.md
+├── run-e2e-test.sh
+├── setup-self-healing.sh
+├── structure.txt
+└── tsconfig.json

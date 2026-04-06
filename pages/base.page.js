@@ -1,6 +1,7 @@
 const { logger } = require('../utils/base/logger');
 const { takeScreenshot } = require('../utils/ui/ui-actions');
 const { SharedTestContext } = require('../platform/core/shared-test-context');
+const { SmartLocator } = require('../platform/core/smart-locator');
 
 /**
  * Base Page Object Model class
@@ -30,15 +31,19 @@ class BasePage {
     /** @protected @type {SharedTestContext} */
     this.context = SharedTestContext.getInstance();
 
-    // Initialize Locator Intelligence Engine (LIE) via Factory (10xquality Refinement)
+    // Self-healing bridge expected by generated Page Objects.
+    // This wraps the LIE factory when ENABLE_LIE=true.
+    this.healer = new SmartLocator(page, this.constructor?.name || 'BasePage');
+
+    // Initialize Locator Intelligence Engine (LIE) via Factory (used by BasePage.click/fill)
     this.lie = null;
     if (process.env.ENABLE_LIE === 'true') {
-        try {
-            const LocatorFactory = require('../framework/locator-intelligence/locator-factory');
-            this.lie = new LocatorFactory(page);
-        } catch (err) {
-            console.error(`[BasePage] ❌ Failed to initialize LIE: ${err.message}`, err);
-        }
+      try {
+        const LocatorFactory = require('../framework/locator-intelligence/locator-factory');
+        this.lie = new LocatorFactory(page, this.constructor?.name || 'BasePage');
+      } catch (err) {
+        console.error(`[BasePage] ❌ Failed to initialize LIE: ${err.message}`, err);
+      }
     }
 
     // Initialize PlaywrightWrapper for high-level actions
