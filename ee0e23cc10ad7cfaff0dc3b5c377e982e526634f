@@ -1,0 +1,41 @@
+platform/cli/generate-from-dsl.js
+  2ebe1b55bde4fcc3 1-215
+platform/core/dsl-normalizer/tokenizer.js
+  2ebe1b55bde4fcc3 1-223
+platform/core/dsl-normalizer/dsl-normalizer.js
+  2ebe1b55bde4fcc3 1-244
+platform/core/dsl-normalizer/parameter-extractor.js
+  2ebe1b55bde4fcc3 1-244
+platform/core/dsl-normalizer/target-resolver.js
+  2ebe1b55bde4fcc3 1-228
+platform/generators/prompt-to-intent-spec-generator.js
+  2ebe1b55bde4fcc3 7,220-221,223-226,315-409,412
+platform/core/dsl-normalizer/index.js
+  2ebe1b55bde4fcc3 1-55
+platform/core/action-dictionary.js
+  2ebe1b55bde4fcc3 1-99
+platform/core/dsl-normalizer/action-normalizer.js
+  2ebe1b55bde4fcc3 1-132
+examples/dsl-flow-example.txt
+  2ebe1b55bde4fcc3 1-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "ee0e23cc10ad7cfaff0dc3b5c377e982e526634f",
+  "prompts": {
+    "2ebe1b55bde4fcc3": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "406957",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 1593,
+      "total_deletions": 3,
+      "accepted_lines": 1591,
+      "overriden_lines": 0
+    }
+  }
+}
