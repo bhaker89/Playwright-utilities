@@ -1,0 +1,29 @@
+platform/cli/index.js
+  71f240394905b34c 290-293,295-337,339,361-364,366-396,398-404,407-408
+platform/core/execution-surface-validator.js
+  71f240394905b34c 57-60,99-107
+scripts/doctor.js
+  71f240394905b34c 1-10
+platform/cli/doctor.js
+  71f240394905b34c 65-66,70,92-101,140-150,166-176,184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "7fcc89713154f8847afe7d499f235238ab250adb",
+  "prompts": {
+    "71f240394905b34c": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "406975",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 190,
+      "total_deletions": 104,
+      "accepted_lines": 152,
+      "overriden_lines": 0
+    }
+  }
+}
