@@ -62,8 +62,13 @@ async function runDoctor() {
     const { ServiceConfigLoader } = require('../core/service-config-loader');
     const loader = new ServiceConfigLoader();
     await loader.loadConfig();
-    const services = loader.getAllServices();
-    checks.push({ name: 'Service Config', status: '✓', detail: `${services.length} service(s) loaded` });
+
+    const serviceNames = typeof loader.getServiceNames === 'function' ? loader.getServiceNames() : [];
+    checks.push({
+      name: 'Service Config',
+      status: '✓',
+      detail: serviceNames.length > 0 ? `${serviceNames.length} service(s) loaded` : 'Loaded (no services found)',
+    });
   } catch (error) {
     checks.push({ name: 'Service Config', status: '✗', detail: error.message });
     allPassed = false;
@@ -84,8 +89,16 @@ async function runDoctor() {
 
   // Check 6: DSL Normalizer
   try {
-    const { DSLNormalizer } = require('../core/dsl-normalizer');
-    const normalizer = new DSLNormalizer();
+    const normalizerModule = require('../core/dsl-normalizer');
+    const hasCoreApis =
+      typeof normalizerModule?.normalizeStep === 'function' &&
+      typeof normalizerModule?.parseFlow === 'function' &&
+      typeof normalizerModule?.validate === 'function';
+
+    if (!hasCoreApis) {
+      throw new Error('Missing expected DSL normalizer exports (normalizeStep/parseFlow/validate)');
+    }
+
     checks.push({ name: 'DSL Normalizer', status: '✓', detail: 'Loaded successfully' });
   } catch (error) {
     checks.push({ name: 'DSL Normalizer', status: '✗', detail: error.message });
@@ -124,10 +137,17 @@ async function runDoctor() {
 
   // Check 10: Action Dictionary
   try {
-    const { loadActionDictionary } = require('../core/action-dictionary');
-    const dictionary = loadActionDictionary();
-    const actionCount = Object.keys(dictionary).length;
-    checks.push({ name: 'Action Dictionary', status: '✓', detail: `${actionCount} canonical action(s)` });
+    const actionDictionary = require('../core/action-dictionary');
+    const canonicalActions =
+      typeof actionDictionary?.getCanonicalActions === 'function'
+        ? actionDictionary.getCanonicalActions()
+        : [];
+
+    if (canonicalActions.length === 0) {
+      throw new Error('No canonical actions detected');
+    }
+
+    checks.push({ name: 'Action Dictionary', status: '✓', detail: `${canonicalActions.length} canonical action(s)` });
   } catch (error) {
     checks.push({ name: 'Action Dictionary', status: '✗', detail: error.message });
     allPassed = false;
@@ -143,13 +163,25 @@ async function runDoctor() {
   });
   console.log('='.repeat(80));
 
+  // Check 11: Execution surface validator (execution path integrity)
+  try {
+    execSync('node platform/core/execution-surface-validator.js', {
+      stdio: 'pipe',
+      cwd: path.resolve(__dirname, '../..'),
+    });
+    checks.push({ name: 'Execution Path Integrity', status: '✓', detail: 'Execution surface validated' });
+  } catch (error) {
+    checks.push({ name: 'Execution Path Integrity', status: '✗', detail: 'Execution surface validator failed' });
+    allPassed = false;
+  }
+
   if (allPassed) {
     console.log('\n✅ All critical checks passed. System ready for execution.');
     console.log('\n📋 Recommended flow:');
     console.log('   1. Write TXT DSL flow → flows/my-flow.txt');
     console.log('   2. Generate intent spec → npm run generate-from-dsl flows/my-flow.txt');
     console.log('   3. Ground spec → npm run ground-spec');
-    console.log('   4. Execute → npm run run-intent specs/my-flow.intent.yaml');
+    console.log('   4. Execute → node platform/cli/index.js run-intent specs/my-flow.intent.yaml --service <service>');
   } else {
     console.log('\n❌ Some checks failed. Review errors above and fix configuration.');
     throw new Error('Doctor check failed');

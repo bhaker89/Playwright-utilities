@@ -286,18 +286,57 @@ class CLI {
       process.exit(1);
     }
 
-    console.log('🔍 Validating TXT DSL flow...');
-
     try {
-      const { DSLNormalizer } = require('../core/dsl-normalizer');
-      const normalizer = new DSLNormalizer();
-      const fs = require('fs');
+      const tokenizer = require('../core/dsl-normalizer/tokenizer');
+      const actionNormalizer = require('../core/dsl-normalizer/action-normalizer');
+      const parameterExtractor = require('../core/dsl-normalizer/parameter-extractor');
+
       const dslContent = fs.readFileSync(dslPath, 'utf8');
-      
-      const result = normalizer.normalize(dslContent);
-      
+      const lines = dslContent
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .filter((line) => !line.startsWith('#'));
+
+      if (lines.length === 0) {
+        throw new Error('No valid DSL steps found (empty file or only comments).');
+      }
+
+      const normalizedTokens = lines.map((line, idx) => {
+        const tokens = tokenizer.tokenize(line);
+        const normalized = actionNormalizer.normalizeTokens(tokens, { strict: true });
+
+        // Parameter extraction can fail for shorthand DSL like: `search paracetamol`
+        // In that case, we treat the object as the value for syntax-validation purposes.
+        let params = {};
+        try {
+          params = parameterExtractor.extractParameters(normalized);
+        } catch (error) {
+          if (normalized.verb === 'fill' && !normalized.value && normalized.object) {
+            params = { value: normalized.object };
+          } else {
+            throw new Error(`Step ${idx + 1} ("${line}"): ${error.message}`);
+          }
+        }
+
+        // Minimal semantic validation without registry resolution.
+        if (['click', 'fill', 'type', 'check', 'uncheck', 'select'].includes(normalized.verb) && !normalized.object) {
+          throw new Error(`Step ${idx + 1}: '${normalized.verb}' requires a target (object).`);
+        }
+
+        if (['fill', 'type', 'select', 'press'].includes(normalized.verb) && !params.value && !params.key) {
+          throw new Error(`Step ${idx + 1}: '${normalized.verb}' requires a value.`);
+        }
+
+        if (['navigate', 'goto'].includes(normalized.verb) && !params.url) {
+          throw new Error(`Step ${idx + 1}: '${normalized.verb}' requires a url.`);
+        }
+
+        return { raw: line, verb: normalized.verb, object: normalized.object, params };
+      });
+
       console.log('✓ DSL syntax is valid!');
-      console.log(`  Actions: ${result.actions.length}`);
+      console.log(`  Steps: ${normalizedTokens.length}`);
       console.log(`  Flow: ${dslPath}`);
       process.exit(0);
     } catch (error) {
@@ -318,23 +357,55 @@ class CLI {
       process.exit(1);
     }
 
-    console.log('👁️  Previewing normalized intent from DSL...\n');
-
     try {
-      const { DSLNormalizer } = require('../core/dsl-normalizer');
-      const normalizer = new DSLNormalizer();
-      const fs = require('fs');
+      const tokenizer = require('../core/dsl-normalizer/tokenizer');
+      const actionNormalizer = require('../core/dsl-normalizer/action-normalizer');
+      const parameterExtractor = require('../core/dsl-normalizer/parameter-extractor');
+
       const dslContent = fs.readFileSync(dslPath, 'utf8');
-      
-      const result = normalizer.normalize(dslContent);
-      
-      console.log('Normalized Actions:');
+      const lines = dslContent
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .filter((line) => !line.startsWith('#'));
+
+      const preview = lines.map((line, idx) => {
+        const tokens = tokenizer.tokenize(line);
+        const normalized = actionNormalizer.normalizeTokens(tokens, { strict: true });
+
+        let params = {};
+        try {
+          params = parameterExtractor.extractParameters(normalized);
+        } catch (error) {
+          if (normalized.verb === 'fill' && !normalized.value && normalized.object) {
+            params = { value: normalized.object };
+          } else {
+            throw new Error(`Step ${idx + 1} ("${line}"): ${error.message}`);
+          }
+        }
+
+        return {
+          verb: normalized.verb,
+          object: normalized.object || null,
+          url: params.url || null,
+          value: params.value || null,
+          key: params.key || null,
+        };
+      });
+
+      console.log('Normalized (registry-unresolved) Steps:');
       console.log('='.repeat(80));
-      result.actions.forEach((action, idx) => {
-        console.log(`${idx + 1}. ${action.canonical} ${action.target ? `-> ${action.target}` : ''} ${action.value ? `(${action.value})` : ''}`);
+      preview.forEach((step, idx) => {
+        const parts = [step.verb];
+        if (step.object) parts.push(`target="${step.object}"`);
+        if (step.url) parts.push(`url="${step.url}"`);
+        if (step.value) parts.push(`value="${step.value}"`);
+        if (step.key) parts.push(`key="${step.key}"`);
+        console.log(`${idx + 1}. ${parts.join(' ')}`);
       });
       console.log('='.repeat(80));
-      
+      console.log('\nNote: This preview does NOT resolve targets against locator registry.');
+
       process.exit(0);
     } catch (error) {
       console.error('✗ Preview failed:');

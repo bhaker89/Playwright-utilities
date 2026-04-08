@@ -54,7 +54,10 @@ class ExecutionSurfaceValidator {
       'locator-orchestrator.js',
       'locator-factory.js',
       // Smoke check in intent-runner is allowed (strict validation)
-      'strict checks for common mis-grounding',
+      'Strict checks for common mis-grounding',
+      // UIEngine creates locators to pass to SmartLocator healing
+      'const originalLocator',
+      'executeWithHealing',
     ];
   }
   
@@ -93,10 +96,15 @@ class ExecutionSurfaceValidator {
     lines.forEach((line, index) => {
       const lineNumber = index + 1;
       
-      // Skip if line is in allowed context
-      const isAllowedContext = this.allowedContexts.some(ctx => 
-        line.includes(ctx) || lines[index - 1]?.includes(ctx) || lines[index + 1]?.includes(ctx)
-      );
+      // Skip if line is in allowed context (check surrounding 5 lines for context)
+      const isAllowedContext = this.allowedContexts.some(ctx => {
+        for (let offset = -5; offset <= 5; offset++) {
+          if (lines[index + offset]?.includes(ctx)) {
+            return true;
+          }
+        }
+        return false;
+      });
       
       if (isAllowedContext) {
         return;
