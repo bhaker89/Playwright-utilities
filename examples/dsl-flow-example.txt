@@ -1,0 +1,48 @@
+# Example Natural Language DSL Flow
+# This demonstrates the human-readable syntax supported by the normalization layer
+
+# Navigation (multiple synonyms supported)
+navigate to https://stag.1mg.com/
+# You can also use: go to, goto, open
+
+# Fill inputs (natural language)
+fill mobile number input with 9599612806
+# Synonyms: enter, type, input, write
+
+# Click actions
+click submit login button
+# Synonyms: tap, press
+
+# Wait actions
+wait for dashboard header
+# Or with timeout: wait 5s, wait 500ms
+
+# More fill examples
+enter email with test@example.com
+type password with secretPass123
+
+# Checkbox actions
+check terms checkbox
+uncheck newsletter checkbox
+
+# Dropdown/select
+select country with United States
+
+# Search with multi-word queries (quoted values)
+search "crocin advance"
+search 'aspirin 500mg'
+search paracetamol
+
+# Flow composition (include other flows)
+include login-user
+include setup-profile
+
+# Complex flow example
+click quick order button
+click select files button
+click done button
+click continue button
+click place medicine request button
+
+# Comments are ignored
+# Natural language is preserved while execution is deterministic

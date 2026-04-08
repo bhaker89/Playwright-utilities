@@ -4,6 +4,7 @@ const yaml = require('js-yaml');
 
 const { LLMClient } = require('./llm-client');
 const { resolveFromRoot } = require('../core/workspace-root');
+const { normalizeStepsWithRegistry } = require('../core/dsl-normalizer');
 
 function slugify(value) {
   return String(value || '')
@@ -216,8 +217,13 @@ async function generateIntentSpecFromPrompt(prompt, service, outputPath, options
     '- all non-goto UI actions must use steps[].target (no selectors)',
     '- assertions must use assertions[].target (no selectors)',
     '- Use concise snake_case target keys like: email_input, submit_button, dashboard_header',
-    '- Keep actions within: goto, click, fill, type, press, check, uncheck, select, wait',
+    '- Keep actions within: goto, navigate, click, fill, type, press, check, uncheck, select, wait',
+    '- You can also use natural language synonyms like: enter (→fill), tap (→click), open (→navigate)',
     '- For assertions types, prefer: visible, text',
+    '',
+    'Natural Language Support:',
+    '- Steps can be written naturally: "fill email with test@example.com" or "click login button"',
+    '- The normalization layer will convert these to canonical format automatically',
   ].join('\n');
 
   const userPrompt = [
@@ -306,7 +312,103 @@ async function generateIntentSpecFromPrompt(prompt, service, outputPath, options
   };
 }
 
+/**
+ * Generate Intent Spec from natural language DSL steps (bypasses LLM)
+ * @param {Object} options
+ * @param {string[]} options.steps - Array of natural language steps
+ * @param {string} options.service - Service name
+ * @param {string} options.feature - Feature name
+ * @param {string} options.outputPath - Output path for spec
+ * @param {Object} options.metadata - Additional metadata
+ * @returns {Promise<Object>}
+ */
+async function generateIntentSpecFromDSL(options) {
+  const {
+    steps,
+    service,
+    feature,
+    outputPath,
+    metadata = {},
+    assertions = [],
+  } = options;
+
+  if (!Array.isArray(steps) || steps.length === 0) {
+    throw new Error('DSL generation requires non-empty steps array');
+  }
+
+  if (!service || typeof service !== 'string') {
+    throw new Error('DSL generation requires service name');
+  }
+
+  if (!feature || typeof feature !== 'string') {
+    throw new Error('DSL generation requires feature name');
+  }
+
+  // Normalize steps using DSL normalizer
+  let normalizedSteps;
+  try {
+    normalizedSteps = await normalizeStepsWithRegistry(steps, service, feature);
+  } catch (err) {
+    throw new Error(
+      `DSL normalization failed: ${err.message}. ` +
+      `Ensure locator registry exists at: locator-registry/services/${service}/${feature}.yaml`
+    );
+  }
+
+  // Build intent spec
+  const spec = {
+    metadata: {
+      service,
+      generated_by: 'dsl-normalizer',
+      created_at: new Date().toISOString(),
+      ...metadata,
+    },
+    intent: {
+      primary_action: metadata.primary_action || feature,
+      feature,
+      domain: metadata.domain || null,
+    },
+    testSuite: {
+      name: metadata.testSuiteName || `${feature} flow`,
+      description: metadata.description || `Generated from DSL for ${feature}`,
+    },
+    steps: normalizedSteps,
+    assertions: assertions,
+  };
+
+  // Validate spec
+  validateGeneratedIntentSpec(spec);
+
+  // Determine output path
+  const absoluteOutputPath = outputPath
+    ? path.resolve(outputPath)
+    : resolveFromRoot('specs', 'intent', `${slugify(feature)}.yaml`);
+
+  // Ensure directory exists
+  const outDir = path.dirname(absoluteOutputPath);
+  if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir, { recursive: true });
+  }
+
+  // Write YAML
+  const yamlText = yaml.dump(spec, {
+    indent: 2,
+    lineWidth: -1,
+    noRefs: true,
+    sortKeys: false,
+  });
+
+  fs.writeFileSync(absoluteOutputPath, yamlText, 'utf8');
+
+  return {
+    outputPath: absoluteOutputPath,
+    spec,
+    normalizedSteps,
+  };
+}
+
 module.exports = {
   generateIntentSpecFromPrompt,
+  generateIntentSpecFromDSL,
   validateIntentPromptText,
 };
