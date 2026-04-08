@@ -1,3 +1,14 @@
+// -----------------------------------------------------------------------------
+// PHASE 4 LOCK: This module must NOT be used to generate executable Playwright specs.
+// If invoked directly, fail fast BEFORE loading any other modules (to keep output clean).
+// -----------------------------------------------------------------------------
+if (require.main === module) {
+    if (process.argv.includes('--direct')) {
+        console.error('Direct spec generation deprecated. Use intent spec pipeline.');
+        process.exit(1);
+    }
+}
+
 const aiEngine = require('../core/ai-engine');
 const { logger } = require('../../utils/base/logger');
 const fs = require('fs');
@@ -17,6 +28,21 @@ const { resolveFromRoot } = require('../core/workspace-root');
  * - Self-healing integration
  * - Best practices enforcement
  */
+// -----------------------------------------------------------------------------
+// PHASE 4 LOCK: This module is NOT an executable spec generator CLI.
+// If invoked directly (e.g. `node ui-test-code-generator.js --direct`),
+// it must fail with a clear migration message.
+// -----------------------------------------------------------------------------
+if (require.main === module) {
+    if (process.argv.includes('--direct')) {
+        console.error('Direct spec generation deprecated. Use intent spec pipeline.');
+        process.exit(1);
+    }
+
+    console.error('Direct spec generation deprecated. Use intent spec pipeline.');
+    process.exit(1);
+}
+
 class UITestGenerator {
     constructor() {
         // YAML output can remain in generated-tests (no Playwright discovery needed)
