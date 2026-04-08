@@ -1,0 +1,39 @@
+platform/core/test-runner.js
+  71f240394905b34c 35-41
+platform/cli/index.js
+  71f240394905b34c 27-28,75-76,153-154,156-157,160-161,165-166,169-172,176,180-184,188-193,197,201-207,210,213-216,226-347
+platform/core/execution-surface-validator.js
+  71f240394905b34c 1-166
+config/environment.config.js
+  71f240394905b34c 112-119
+platform/generators/ui-test-code-generator.js
+  71f240394905b34c 83-87
+platform/generators/ui-generator.js
+  71f240394905b34c 154-162,167-170,175,177-178,180-182,186-187
+platform/core/intent-runner.js
+  71f240394905b34c 231-235,239,263-272
+platform/cli/doctor.js
+  71f240394905b34c 1-159
+platform/generators/test-code-generator.js
+  71f240394905b34c 54-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "5c3debc9d8c07d3807dd2e651cc12e2a6bc81ca6",
+  "prompts": {
+    "71f240394905b34c": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "406975",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 569,
+      "total_deletions": 73,
+      "accepted_lines": 557,
+      "overriden_lines": 0
+    }
+  }
+}
