@@ -80,14 +80,11 @@ class UITestGenerator {
             }
 
             if (format === 'playwright' || format === 'both') {
-                if (withPageObjects) {
-                    generatedFiles.pageObjects = await this._generatePageObjects(testSuite);
-                }
-                generatedFiles.playwright = await this._generatePlaywrightTest(
-                    testSuite, 
-                    withPageObjects,
-                    withSelfHealing,
-                    outputPath
+                // PHASE 4 LOCK: Direct Playwright spec generation deprecated
+                throw new Error(
+                    'Direct spec generation deprecated. Use intent spec pipeline.\n' +
+                    'Expected flow: TXT DSL → intent spec YAML → ground-spec → run-intent\n' +
+                    'Generators may only output intent spec YAML, not executable Playwright specs.'
                 );
             }
 

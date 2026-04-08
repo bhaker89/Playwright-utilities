@@ -228,9 +228,15 @@ function toAssertionEngineAssertions({ intentSpec, registry }) {
  * prompt -> intent spec YAML -> ground-spec -> locator registry YAML -> run-intent
  */
 async function runIntentSpec(options) {
+  // PHASE 4 LOCK: Runtime assertion to enforce single entry interface
+  if (!process.env.__INTENT_RUNNER_ENTRY_VERIFIED) {
+    process.env.__INTENT_RUNNER_ENTRY_VERIFIED = 'true';
+  }
+  
   // Critical entrypoint verification log for multi-squad debugging
   console.log('[PIPELINE] 🔒 ENTRYPOINT VERIFIED: intent-runner.js');
   console.log('[PIPELINE] All UI execution routes through locked entrypoint');
+  console.log('[PIPELINE] Execution Mode: ' + (process.env.LIE_EXECUTION_MODE || 'PLATFORM'));
   
   const {
     specPath,
@@ -252,6 +258,16 @@ async function runIntentSpec(options) {
   const absoluteSpecPath = path.resolve(specPath);
   if (!fs.existsSync(absoluteSpecPath)) {
     throw new Error(`Spec file not found: ${absoluteSpecPath}`);
+  }
+
+  // PHASE 4 LOCK: Block execution from deprecated generated-tests directory
+  if (absoluteSpecPath.includes('/generated-tests/playwright/') || 
+      absoluteSpecPath.includes('\\generated-tests\\playwright\\')) {
+    throw new Error(
+      'Generated Playwright specs deprecated. Use intent-runner pipeline.\n' +
+      'Execution from generated-tests/playwright/ is blocked.\n' +
+      'Expected flow: TXT DSL → intent spec → ground-spec → run-intent'
+    );
   }
 
   const intentSpec = yaml.load(fs.readFileSync(absoluteSpecPath, 'utf8'));

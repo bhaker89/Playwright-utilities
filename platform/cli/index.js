@@ -24,26 +24,8 @@ class CLI {
         describe: 'Workspace root (child repo root). Defaults to current directory.',
         type: 'string',
       })
-      .command(
-        'run <testFile>',
-        'Run a test suite from YAML/JSON file',
-        (yargs) => {
-          return yargs
-            .positional('testFile', {
-              describe: 'Path to test suite file (YAML or JSON)',
-              type: 'string',
-            })
-            .option('verbose', {
-              alias: 'v',
-              describe: 'Enable verbose output',
-              type: 'boolean',
-              default: false,
-            });
-        },
-        async (argv) => {
-          await this.runCommand(argv);
-        }
-      )
+      // PHASE 4 LOCK: Removed deprecated 'run' command
+      // Legacy YAML execution is disabled. Use run-intent for TXT DSL pipeline.
       .command(
         'validate <testFile>',
         'Validate test suite file without running tests',
@@ -90,18 +72,8 @@ class CLI {
           await this.importCommand(argv);
         }
       )
-      .command(
-        'generate <type> <prompt>',
-        'Generate test from natural language prompt',
-        (yargs) => {
-          return yargs
-            .positional('type', { choices: ['ui', 'api'] })
-            .positional('prompt', { type: 'string' });
-        },
-        async (argv) => {
-          await this.generateCommand(argv);
-        }
-      )
+      // PHASE 4 LOCK: Removed legacy 'generate' command
+      // Use TXT DSL pipeline: generate-from-dsl → ground-spec → run-intent
       .command(
         'generate-from-curl',
         'Generate API test from cURL command (complete flow)',
@@ -178,41 +150,70 @@ class CLI {
           await this.generateFromOpenApiCommand(argv);
         }
       )
+      // PHASE 4 LOCK: Removed 'generate-spec' command
+      // Direct Playwright spec generation is deprecated. Use intent spec pipeline.
       .command(
-        'generate-spec',
-        'Generate a no-code YAML spec from a natural language prompt (TestSuiteLoader schema)',
+        'run-intent <specPath>',
+        'Execute intent spec via registry-backed pipeline (ONLY valid entry)',
         (yargs) => {
           return yargs
-            .option('prompt', {
-              describe: 'Natural language prompt (e.g. "login with valid credentials")',
+            .positional('specPath', {
+              describe: 'Path to intent spec YAML file',
               type: 'string',
-              demandOption: true
-            })
-            .option('out', {
-              describe: 'Optional output YAML path. If omitted, writes to specs/<prompt-slug>.yaml',
-              type: 'string'
             })
             .option('service', {
-              describe: 'Service name (e.g., psp)',
+              alias: 's',
+              describe: 'Service name override',
               type: 'string',
-              demandOption: true
             })
-            .option('llm-provider', {
-              describe: 'LLM provider to use',
-              choices: ['openai', 'claude', 'groq'],
-              default: 'groq'
+            .option('headless', {
+              describe: 'Run in headless mode',
+              type: 'boolean',
+              default: true,
             });
         },
         async (argv) => {
-          await this.generateSpecCommand(argv);
+          await this.runIntentCommand(argv);
         }
       )
-      .example('$0 generate ui "Login and verify dashboard"', 'Generate UI test')
-      .example('$0 generate-from-curl --curl "curl -X POST..." --service payment-service --api process-payment', 'Generate from cURL')
-      .example('$0 generate-from-openapi --spec services/order/openapi.yaml --service order-service --api create-order --llm-provider groq', 'Generate tests from OpenAPI spec using Groq')
-      .example('$0 run tests/api-tests.yaml', 'Run tests from YAML file')
-      .example('$0 run tests/api-tests.json', 'Run tests from JSON file')
-      .example('$0 validate tests/api-tests.yaml', 'Validate test file')
+      .command(
+        'doctor',
+        'Validate execution environment and configuration',
+        (yargs) => yargs,
+        async (argv) => {
+          await this.doctorCommand(argv);
+        }
+      )
+      .command(
+        'validate-flow <dslFile>',
+        'Validate TXT DSL syntax without execution',
+        (yargs) => {
+          return yargs.positional('dslFile', {
+            describe: 'Path to TXT DSL file',
+            type: 'string',
+          });
+        },
+        async (argv) => {
+          await this.validateFlowCommand(argv);
+        }
+      )
+      .command(
+        'preview-flow <dslFile>',
+        'Preview normalized intent from TXT DSL',
+        (yargs) => {
+          return yargs.positional('dslFile', {
+            describe: 'Path to TXT DSL file',
+            type: 'string',
+          });
+        },
+        async (argv) => {
+          await this.previewFlowCommand(argv);
+        }
+      )
+      .example('$0 run-intent specs/login-flow.intent.yaml --service psp', 'Run intent spec')
+      .example('$0 doctor', 'Check environment health')
+      .example('$0 validate-flow flows/login.txt', 'Validate DSL syntax')
+      .example('$0 preview-flow flows/login.txt', 'Preview normalized intent')
       .demandCommand(1, 'You must provide a command')
       .help('h')
       .alias('h', 'help')
@@ -222,7 +223,128 @@ class CLI {
   }
 
   /**
-   * Run test suite command
+   * Run intent spec command (LOCKED ENTRYPOINT)
+   */
+  async runIntentCommand(argv) {
+    if (argv.workspaceRoot) {
+      process.env.AUTOMATION_ROOT = path.resolve(argv.workspaceRoot);
+    }
+
+    const specPath = path.resolve(argv.specPath);
+
+    if (!fs.existsSync(specPath)) {
+      console.error(`Error: Intent spec file not found: ${specPath}`);
+      process.exit(1);
+    }
+
+    console.log('🚀 Intent Runner - Locked Execution Pipeline');
+    console.log('='.repeat(80));
+
+    try {
+      const { runIntentSpec } = require('../core/intent-runner');
+      await runIntentSpec({
+        specPath,
+        service: argv.service,
+        headless: argv.headless,
+      });
+      console.log('\n✓ Intent execution completed successfully!');
+      process.exit(0);
+    } catch (error) {
+      console.error('\n✗ Intent execution failed:');
+      console.error(error.message);
+      if (argv.verbose) {
+        console.error(error.stack);
+      }
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Doctor command - Environment validation
+   */
+  async doctorCommand(argv) {
+    console.log('🏥 Running environment diagnostics...\n');
+    
+    try {
+      const { runDoctor } = require('../cli/doctor');
+      await runDoctor();
+      process.exit(0);
+    } catch (error) {
+      console.error('✗ Doctor command failed:', error.message);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Validate DSL flow command
+   */
+  async validateFlowCommand(argv) {
+    const dslPath = path.resolve(argv.dslFile);
+
+    if (!fs.existsSync(dslPath)) {
+      console.error(`Error: DSL file not found: ${dslPath}`);
+      process.exit(1);
+    }
+
+    console.log('🔍 Validating TXT DSL flow...');
+
+    try {
+      const { DSLNormalizer } = require('../core/dsl-normalizer');
+      const normalizer = new DSLNormalizer();
+      const fs = require('fs');
+      const dslContent = fs.readFileSync(dslPath, 'utf8');
+      
+      const result = normalizer.normalize(dslContent);
+      
+      console.log('✓ DSL syntax is valid!');
+      console.log(`  Actions: ${result.actions.length}`);
+      console.log(`  Flow: ${dslPath}`);
+      process.exit(0);
+    } catch (error) {
+      console.error('✗ Validation failed:');
+      console.error(error.message);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Preview DSL flow command
+   */
+  async previewFlowCommand(argv) {
+    const dslPath = path.resolve(argv.dslFile);
+
+    if (!fs.existsSync(dslPath)) {
+      console.error(`Error: DSL file not found: ${dslPath}`);
+      process.exit(1);
+    }
+
+    console.log('👁️  Previewing normalized intent from DSL...\n');
+
+    try {
+      const { DSLNormalizer } = require('../core/dsl-normalizer');
+      const normalizer = new DSLNormalizer();
+      const fs = require('fs');
+      const dslContent = fs.readFileSync(dslPath, 'utf8');
+      
+      const result = normalizer.normalize(dslContent);
+      
+      console.log('Normalized Actions:');
+      console.log('='.repeat(80));
+      result.actions.forEach((action, idx) => {
+        console.log(`${idx + 1}. ${action.canonical} ${action.target ? `-> ${action.target}` : ''} ${action.value ? `(${action.value})` : ''}`);
+      });
+      console.log('='.repeat(80));
+      
+      process.exit(0);
+    } catch (error) {
+      console.error('✗ Preview failed:');
+      console.error(error.message);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Run test suite command (DEPRECATED - LEGACY)
    */
   async runCommand(argv) {
     const testFilePath = path.resolve(argv.testFile);

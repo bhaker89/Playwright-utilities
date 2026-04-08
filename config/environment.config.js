@@ -109,6 +109,14 @@ function loadEnvironment() {
  */
 const env = loadEnvironment();
 
+// PHASE 4: Enable PLATFORM mode by default
+// This ensures healing, telemetry, and registry-backed execution
+if (!process.env.LIE_EXECUTION_MODE) {
+  process.env.LIE_EXECUTION_MODE = 'PLATFORM';
+}
+
+console.log(`[CONFIG] LIE_EXECUTION_MODE: ${process.env.LIE_EXECUTION_MODE}`);
+
 module.exports = {
   loadEnvironment,
   env

@@ -151,28 +151,40 @@ class UIGenerator {
     }
 
     /**
-     * Discover logical target names (not raw selectors)
-     * Returns registry mapping for intent specs
+     * PHASE 4 LOCK: Discover logical target names for REGISTRY CREATION ONLY
+     * 
+     * This function must generate locator registry candidates ONLY.
+     * It must NOT generate runtime selectors.
+     * 
+     * Execution-time selectors must always come from:
+     * locator registry → SmartLocator → LocatorOrchestrator
+     * 
+     * Returns registry mapping template (NOT runtime selectors)
      */
     async discoverTargets(pageName, steps) {
         const targetRegistry = {};
+        
+        // PHASE 4: Discovery is ONLY for registry template generation
+        // NOT for runtime execution
+        console.log('[DISCOVERY] Generating locator registry candidates (NOT runtime selectors)');
         
         for (const step of steps) {
             const entity = this._extractEntity(step);
             const targetKey = this._toKebabCase(entity);
             
-            let locator = componentRegistry.get(pageName, entity);
-            if (!locator) {
-                locator = this._simulateDiscovery(step, entity);
-                componentRegistry.register(pageName, entity, locator);
-            }
-            
+            // Generate registry entry template (no actual selector resolution)
             targetRegistry[targetKey] = {
-                selector: this._locatorToSelector(locator),
+                // Placeholder - child repo must fill real selectors
+                selector: 'SELECTOR_REQUIRED',
                 description: `${entity} for ${step}`,
-                fallbacks: this._generateFallbackSelectors(locator),
+                // No fallbacks - registry authority belongs to child repo
+                fallbacks: [],
+                _note: 'This is a template. Child repo must provide actual selectors.'
             };
         }
+        
+        console.log('[DISCOVERY] Generated registry template with', Object.keys(targetRegistry).length, 'targets');
+        console.log('[DISCOVERY] Child repo must populate selectors before execution');
         
         return targetRegistry;
     }

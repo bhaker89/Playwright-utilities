@@ -51,6 +51,12 @@ class TestCodeGenerator {
    * @returns {Promise<string>} Path to generated test file
    */
   async generate(options) {
+    // PHASE 4 LOCK: Direct Playwright spec generation deprecated
+    throw new Error(
+      'Direct spec generation deprecated. Use intent spec pipeline.\n' +
+      'TestCodeGenerator can only output intent spec YAML, not executable Playwright specs.\n' +
+      'Expected flow: TXT DSL → intent spec → ground-spec → run-intent'
+    );
     const {
       serviceName,
       apiName,

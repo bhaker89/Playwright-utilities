@@ -32,6 +32,13 @@ class TestRunner {
    * @returns {Promise<void>}
    */
   async runTestSuite(testFilePath, options = {}) {
+    // PHASE 4 LOCK: Disable direct YAML execution
+    throw new Error(
+      'Direct YAML execution disabled. Use TXT DSL pipeline.\n' +
+      'Expected flow: TXT → intent spec YAML → execution\n' +
+      'Run: npm run generate-from-dsl <dsl-file.txt> && npm run run-intent <intent-spec.yaml>'
+    );
+
     console.log(`\n${'='.repeat(80)}`);
     console.log(`Loading test suite: ${testFilePath}`);
     console.log('='.repeat(80));
