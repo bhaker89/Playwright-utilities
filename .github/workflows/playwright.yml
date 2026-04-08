@@ -45,6 +45,9 @@ jobs:
       - name: Run type checking
         run: npm run type-check
 
+      - name: Validate execution surface (Phase 4)
+        run: node platform/core/execution-surface-validator.js
+
       - name: Run tests
         run: npm test -- --project=${{ matrix.browser }}
         env:
