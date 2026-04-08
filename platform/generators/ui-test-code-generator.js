@@ -318,40 +318,140 @@ User Request: "${prompt}"`;
     }
 
     /**
-     * Generate Page Object classes
+     * DEPRECATED: Generate page objects for test suite
+     * @deprecated Page Objects with direct locators bypass the LIE
      * @private
      */
     async _generatePageObjects(testSuite) {
-        const generatedFiles = [];
-
-        for (const pageConfig of testSuite.pages) {
-            const pageClassName = pageConfig.name;
-            const pageFilename = this._toKebabCase(pageClassName) + '.page.js';
-            const filepath = path.join(this.pagesDir, pageFilename);
-
-            const pageObjectCode = this._generatePageObjectCode(pageConfig, testSuite.baseUrl);
-
-            fs.writeFileSync(filepath, pageObjectCode, 'utf8');
-            logger.info(`📦 Page Object created: ${filepath}`);
-
-            generatedFiles.push({
-                className: pageClassName,
-                filename: pageFilename,
-                filepath
-            });
-        }
-
-        return generatedFiles;
+        logger.warn('⚠️  Page Object generation with hardcoded selectors is deprecated.');
+        logger.warn('⚠️  Use intent specs with locator registry for proper LIE routing.');
+        logger.warn('⚠️  Execution path must be: intent-runner → orchestrator → LIE');
+        
+        // Validate locator registry exists (child repo owns locators)
+        return this._validateLocatorRegistryFromTestSuite(testSuite);
     }
 
     /**
-     * Generate Page Object class code
+     * Validate locator registry exists (child repo ownership)
+     * 
+     * ARCHITECTURE CONTRACT:
+     * - Child repos own locators (locator authority)
+     * - Core repo owns flows (flow authority)
+     * - Platform validates, does NOT generate
+     * 
+     * @private
+     */
+    async _validateLocatorRegistryFromTestSuite(testSuite) {
+        logger.info('🔍 Validating locator registry (child repo ownership)...');
+        
+        const missingTargets = [];
+        const registryDir = path.join(process.cwd(), 'locator-registry', 'services', 'default');
+        
+        for (const page of testSuite.pages) {
+            const feature = this._toKebabCase(page.name);
+            const registryPath = path.join(registryDir, `${feature}.yaml`);
+            
+            // Check if registry file exists
+            if (!fs.existsSync(registryPath)) {
+                logger.error(`❌ Missing locator registry: ${registryPath}`);
+                logger.error(`   Create this file in your child repo with required targets.`);
+                
+                // Collect all missing targets from this page
+                for (const element of page.elements) {
+                    const targetKey = this._elementToTargetKey(element.name);
+                    missingTargets.push({
+                        feature,
+                        target: targetKey,
+                        description: element.name,
+                        type: element.type,
+                        registryPath
+                    });
+                }
+                continue;
+            }
+            
+            // Load existing registry and validate targets
+            const existingRegistry = yaml.load(fs.readFileSync(registryPath, 'utf8'));
+            
+            for (const element of page.elements) {
+                const targetKey = this._elementToTargetKey(element.name);
+                
+                if (!existingRegistry[targetKey]) {
+                    missingTargets.push({
+                        feature,
+                        target: targetKey,
+                        description: element.name,
+                        type: element.type,
+                        registryPath
+                    });
+                }
+            }
+        }
+        
+        // If any targets are missing, fail with clear instructions
+        if (missingTargets.length > 0) {
+            logger.error('\n' + '='.repeat(80));
+            logger.error('❌ LOCATOR REGISTRY VALIDATION FAILED');
+            logger.error('='.repeat(80));
+            logger.error('\nMissing locator targets in child repo registry:\n');
+            
+            // Group by registry file
+            const byRegistry = {};
+            for (const missing of missingTargets) {
+                if (!byRegistry[missing.registryPath]) {
+                    byRegistry[missing.registryPath] = [];
+                }
+                byRegistry[missing.registryPath].push(missing);
+            }
+            
+            for (const [registryPath, targets] of Object.entries(byRegistry)) {
+                logger.error(`📁 ${registryPath}`);
+                logger.error('   Add these targets:\n');
+                
+                for (const target of targets) {
+                    logger.error(`   ${target.target}:`);
+                    logger.error(`     primary: 'SELECTOR_HERE'  # ${target.description}`);
+                    logger.error(`     fallbacks: []`);
+                    logger.error(`     description: ${target.description}`);
+                    logger.error(`     type: ${target.type}\n`);
+                }
+            }
+            
+            logger.error('='.repeat(80));
+            logger.error('ARCHITECTURE CONTRACT:');
+            logger.error('  ✅ Child repos = locator authority (you define selectors)');
+            logger.error('  ✅ Core repo = flow authority (platform manages execution)');
+            logger.error('  ❌ Platform does NOT auto-generate selectors');
+            logger.error('='.repeat(80) + '\n');
+            
+            throw new Error(
+                `Locator registry validation failed: ${missingTargets.length} missing target(s). ` +
+                `Create locator definitions in child repo: locator-registry/services/<service>/<feature>.yaml`
+            );
+        }
+        
+        logger.info(`✅ Locator registry validation passed`);
+        return [];
+    }
+
+
+    /**
+     * DEPRECATED: Generate Page Object class code
+     * @deprecated This generates code with direct page.locator() calls that bypass LIE
      * @private
      */
     _generatePageObjectCode(pageConfig, baseUrl) {
+        throw new Error(
+            '❌ EXECUTION PATH LOCKED: Page Object generation with direct locators is disabled.\n' +
+            '✅ Use locator registry instead:\n' +
+            '   - Locator registry defines selectors: locator-registry/services/<service>/<feature>.yaml\n' +
+            '   - Intent specs reference logical targets\n' +
+            '   - Execution: intent-runner → orchestrator → locator-orchestrator → LIE'
+        );
+        
         const { name, url, elements } = pageConfig;
 
-        // Generate element locator methods
+        // Generate element locator methods (DEPRECATED - bypasses orchestrator)
         const elementMethods = elements.map(el => {
             const methodName = this._toCamelCase(el.name);
             const selectorComment = `// ${el.name}: ${el.selector}`;
@@ -470,32 +570,181 @@ module.exports = { ${name} };
     }
 
     /**
-     * Generate Playwright test file
+     * Generate Intent Spec YAML instead of direct Playwright code
+     * 
+     * EXECUTION PATH ENFORCEMENT:
+     * Prompt → Intent Spec YAML → intent-runner → UIEngine → orchestrator → LIE
+     * 
      * @private
      */
     async _generatePlaywrightTest(testSuite, withPageObjects, withSelfHealing, customPath = null) {
-        const filename = this._sanitizeFilename(testSuite.name) + '.spec.js';
-
-        // Default location: under ./tests so Playwright auto-discovers it.
-        // If a customPath is provided explicitly, we respect it.
-        const filepath = customPath || path.join(this.generatedUiSpecDir, filename);
-
-        const testCode = withPageObjects
-            ? this._generatePOMTest(testSuite, withSelfHealing, filepath)
-            : this._generateDirectTest(testSuite, withSelfHealing, filepath);
-
-        this._ensureDirectory(path.dirname(filepath));
-        fs.writeFileSync(filepath, testCode, 'utf8');
-
-        logger.info(`🎭 Playwright test saved: ${filepath}`);
-        return filepath;
+        const filename = this._sanitizeFilename(testSuite.name) + '.intent.yaml';
+        
+        // Generate intent spec YAML that will be executed via intent-runner.js
+        const intentSpecPath = customPath || path.join(this.outputDir, filename);
+        
+        const intentSpec = this._generateIntentSpec(testSuite);
+        
+        this._ensureDirectory(path.dirname(intentSpecPath));
+        fs.writeFileSync(intentSpecPath, yaml.dump(intentSpec), 'utf8');
+        
+        logger.info(`📋 Intent spec saved: ${intentSpecPath}`);
+        logger.info(`ℹ️  Execute with: node platform/cli/run-intent.js --spec ${intentSpecPath}`);
+        logger.info(`⚠️  Direct Playwright code generation is deprecated. All execution must go through intent-runner.js`);
+        
+        return intentSpecPath;
     }
 
     /**
-     * Generate POM-style Playwright test
+     * Generate Intent Spec from test suite
+     * @private
+     */
+    _generateIntentSpec(testSuite) {
+        const feature = this._sanitizeFilename(testSuite.name);
+        
+        return {
+            metadata: {
+                service: 'default',
+                generated_by: 'ui-test-code-generator',
+                created_at: new Date().toISOString(),
+                description: testSuite.description,
+            },
+            intent: {
+                primary_action: testSuite.name,
+                feature: feature,
+                description: testSuite.description,
+            },
+            testSuite: {
+                name: testSuite.name,
+                baseUrl: testSuite.baseUrl,
+            },
+            steps: this._convertTestSuiteToIntentSteps(testSuite),
+            assertions: this._convertTestSuiteToIntentAssertions(testSuite),
+        };
+    }
+
+    /**
+     * Convert test suite to intent spec steps
+     * @private
+     */
+    _convertTestSuiteToIntentSteps(testSuite) {
+        const allSteps = [];
+        
+        // Combine all test case steps into a single flow for intent execution
+        for (const test of testSuite.tests) {
+            for (const step of test.steps) {
+                if (step.action === 'navigate') {
+                    const pageUrl = this._findPageUrl(step.page, testSuite.pages);
+                    allSteps.push({
+                        action: 'navigate',
+                        url: pageUrl || '/',
+                    });
+                } else if (step.action === 'fill') {
+                    const targetKey = this._elementToTargetKey(step.element);
+                    const value = this._resolveTestDataValue(step.value, testSuite.testData);
+                    allSteps.push({
+                        action: 'fill',
+                        target: targetKey,
+                        value: value,
+                    });
+                } else if (step.action === 'click') {
+                    const targetKey = this._elementToTargetKey(step.element);
+                    allSteps.push({
+                        action: 'click',
+                        target: targetKey,
+                    });
+                } else if (step.action === 'waitForUrl') {
+                    // Skip waitForUrl, it's handled by intent-runner's navigation
+                    continue;
+                }
+            }
+        }
+        
+        return allSteps;
+    }
+
+    /**
+     * Convert test suite to intent spec assertions
+     * @private
+     */
+    _convertTestSuiteToIntentAssertions(testSuite) {
+        const allAssertions = [];
+        
+        for (const test of testSuite.tests) {
+            for (const assertion of test.assertions || []) {
+                if (assertion.type === 'url') {
+                    allAssertions.push({
+                        type: 'url_contains',
+                        target: 'current-page',
+                        expected: assertion.expected,
+                    });
+                } else if (assertion.type === 'visible') {
+                    const targetKey = assertion.element 
+                        ? this._elementToTargetKey(assertion.element)
+                        : 'visible-element';
+                    allAssertions.push({
+                        type: 'visible',
+                        target: targetKey,
+                        expected: true,
+                    });
+                } else if (assertion.type === 'text') {
+                    const targetKey = assertion.element 
+                        ? this._elementToTargetKey(assertion.element)
+                        : 'text-element';
+                    allAssertions.push({
+                        type: 'text',
+                        target: targetKey,
+                        expected: assertion.expected,
+                    });
+                }
+            }
+        }
+        
+        return allAssertions;
+    }
+
+    /**
+     * Convert element name to target key (kebab-case)
+     * @private
+     */
+    _elementToTargetKey(elementName) {
+        return String(elementName || 'element')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    /**
+     * Find page URL from pages array
+     * @private
+     */
+    _findPageUrl(pageName, pages) {
+        const page = pages.find(p => p.name === pageName);
+        return page?.url || '/';
+    }
+
+    /**
+     * Resolve test data value (replace {{variables}})
+     * @private
+     */
+    _resolveTestDataValue(value, testData) {
+        return String(value).replace(/\{\{(\w+)\}\}/g, (match, key) => {
+            return testData[key] || match;
+        });
+    }
+
+    /**
+     * DEPRECATED: Generate POM-style Playwright test
+     * @deprecated Use _generateIntentSpec instead
      * @private
      */
     _generatePOMTest(testSuite, withSelfHealing, specFilePath) {
+        throw new Error(
+            '❌ EXECUTION PATH LOCKED: Direct Playwright spec generation is disabled.\n' +
+            '✅ Use intent spec pipeline instead:\n' +
+            '   TXT → intent-spec → intent-runner → orchestrator → LIE\n' +
+            '   Call generateFromPrompt() with format="yaml" or format="both"'
+        );
         const specDir = path.dirname(specFilePath);
         const pagesRelativeDir = path.relative(specDir, this.pagesDir).split(path.sep).join('/');
         const pagesRequireBase = pagesRelativeDir.startsWith('.') ? pagesRelativeDir : `./${pagesRelativeDir}`;
@@ -623,100 +872,17 @@ ${testCases}
     }
 
     /**
-     * Generate direct Playwright test (no POM)
+     * DEPRECATED: Generate direct Playwright test (no POM)
+     * @deprecated Use _generateIntentSpec instead
      * @private
      */
     _generateDirectTest(testSuite, withSelfHealing) {
-        const healingImport = withSelfHealing 
-            ? `const { SmartLocator } = require('../../platform/core/smart-locator');\n`
-            : '';
-
-        // Group tests by category if available
-        const hasCategories = testSuite.testsByCategory && 
-            (testSuite.testsByCategory.negative.length > 0 || testSuite.testsByCategory.edge.length > 0);
-
-        const generateTestCase = (test) => {
-            const healerInit = withSelfHealing
-                ? `\n        const healer = new SmartLocator(page, '${testSuite.name}');`
-                : '';
-
-            const steps = test.steps.map(step => {
-                if (step.action === 'navigate') {
-                    return `await page.goto('${testSuite.baseUrl}${step.page}');`;
-                } else if (step.action === 'fill') {
-                    const locator = this._findElementSelector(step.element, testSuite.pages);
-                    const value = step.value.replace(/\{\{(\w+)\}\}/, (_, key) => {
-                        return `\${testData.${key}}`;
-                    });
-
-                    if (withSelfHealing) {
-                        return `await healer.executeWithHealing('${step.element}', page.locator('${locator}'), async (loc) => await loc.fill('${value}'));`;
-                    }
-                    return `await page.locator('${locator}').fill('${value}');`;
-                } else if (step.action === 'click') {
-                    const locator = this._findElementSelector(step.element, testSuite.pages);
-                    
-                    if (withSelfHealing) {
-                        return `await healer.executeWithHealing('${step.element}', page.locator('${locator}'), async (loc) => await loc.click());`;
-                    }
-                    return `await page.locator('${locator}').click();`;
-                } else if (step.action === 'waitForUrl') {
-                    return `await page.waitForURL('**${step.url}**');`;
-                }
-                return `// TODO: Handle ${step.action}`;
-            }).join('\n        ');
-
-            const assertions = test.assertions.map(assertion => {
-                if (assertion.type === 'url') {
-                    return `expect(page.url()).toContain('${assertion.expected}');`;
-                } else if (assertion.type === 'visible') {
-                    return `await expect(page.locator('${assertion.selector}')).toBeVisible();`;
-                } else if (assertion.type === 'text') {
-                    return `await expect(page.locator('${assertion.selector}')).toHaveText('${assertion.expected}');`;
-                } else if (assertion.type === 'error') {
-                    // Error message assertion for negative tests
-                    const selector = assertion.selector || this._findElementSelector(assertion.element, testSuite.pages);
-                    return `await expect(page.locator('${selector}')).toContainText('${assertion.expected}');`;
-                }
-                return `// TODO: Handle ${assertion.type}`;
-            }).join('\n        ');
-
-            return `
-    test('${test.name}', async ({ page }) => {
-        // Test: ${test.description}${healerInit}
-        
-        const testData = ${JSON.stringify(testSuite.testData, null, 8)};
-
-        ${steps}
-
-        // Assertions
-        ${assertions}
-    });`;
-        };
-
-        // Generate organized test output
-        let testCases = '';
-        
-        if (hasCategories) {
-            // Organize by category
-            if (testSuite.testsByCategory.positive.length > 0) {
-                const positiveTests = testSuite.testsByCategory.positive.map(generateTestCase).join('\n');
-                testCases += `\n    test.describe('✅ Positive Tests', () => {${positiveTests}\n    });\n`;
-            }
-            
-            if (testSuite.testsByCategory.negative.length > 0) {
-                const negativeTests = testSuite.testsByCategory.negative.map(generateTestCase).join('\n');
-                testCases += `\n    test.describe('❌ Negative Tests', () => {${negativeTests}\n    });\n`;
-            }
-            
-            if (testSuite.testsByCategory.edge.length > 0) {
-                const edgeTests = testSuite.testsByCategory.edge.map(generateTestCase).join('\n');
-                testCases += `\n    test.describe('⚡ Edge Cases', () => {${edgeTests}\n    });\n`;
-            }
-        } else {
-            // No categories, generate flat list
-            testCases = testSuite.tests.map(generateTestCase).join('\n');
-        }
+        throw new Error(
+            '❌ EXECUTION PATH LOCKED: Direct page.locator() test generation is disabled.\n' +
+            '✅ Use intent spec pipeline instead:\n' +
+            '   TXT → intent-spec → intent-runner → orchestrator → LIE\n' +
+            '   This ensures all locator resolution goes through locator-orchestrator.js'
+        );
 
         return `const { test, expect } = require('@playwright/test');
 ${healingImport}

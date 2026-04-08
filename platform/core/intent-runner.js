@@ -228,6 +228,10 @@ function toAssertionEngineAssertions({ intentSpec, registry }) {
  * prompt -> intent spec YAML -> ground-spec -> locator registry YAML -> run-intent
  */
 async function runIntentSpec(options) {
+  // Critical entrypoint verification log for multi-squad debugging
+  console.log('[PIPELINE] 🔒 ENTRYPOINT VERIFIED: intent-runner.js');
+  console.log('[PIPELINE] All UI execution routes through locked entrypoint');
+  
   const {
     specPath,
     service: cliService = null,

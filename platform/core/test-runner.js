@@ -269,71 +269,75 @@ class TestRunner {
   }
 
   /**
-   * Execute UI test using UIEngine
+   * Execute UI test by delegating to intent-runner.js
+   * 
+   * LOCKED EXECUTION PATH:
+   * test-runner → intent-runner → UIEngine → SmartLocator → LocatorOrchestrator → LIE
+   * 
    * @private
    */
   async runUITest(testCase, suiteConfig, testFilePath, serviceName) {
     console.log(`\n--- Starting UI Test: ${testCase.name} ---`);
-    const browser = await chromium.launch({ headless: suiteConfig?.headless !== false });
-    const page = await browser.newPage();
-    const uiEngine = new UIEngine(page, testCase.name);
-
+    
+    // Convert legacy test-runner YAML format to intent spec format
+    const intentSpec = this._convertToIntentSpec(testCase, serviceName, testFilePath);
+    
+    // Delegate to intent-runner (the single entrypoint for all UI execution)
+    const { runIntentSpec } = require('./intent-runner');
+    
     try {
-      if (testCase.steps) {
-        const featureName = testFilePath
-          ? path.basename(testFilePath).replace(/\.(yaml|yml|json)$/i, '')
-          : null;
-
-        // Preprocess steps: allow YAML to use a logical target key that maps to a locator
-        // via locator-registry YAML, without modifying UIEngine/SmartLocator persistence.
-        const stepsWithResolvedSelectors = testCase.steps.map(step => {
-          if (!step || step.selector) return step;
-
-          const target = step.target || step.element;
-          if (!target || !featureName) return step;
-
-          let locator = registryLoader.loadServiceRegistry(serviceName, featureName)?.[target];
-          if (!locator) {
-            locator = registryLoader.loadGlobalRegistry(featureName)?.[target];
-          }
-
-          // If registry lookup failed, keep the step unchanged (backward compatible).
-          if (!locator) return step;
-
-          return {
-            ...step,
-            selector: locator,
-          };
-        });
-
-        await uiEngine.executeSteps(stepsWithResolvedSelectors);
+      // Create temporary intent spec file
+      const tempSpecPath = path.join(process.cwd(), '.temp', `${Date.now()}-${testCase.name.replace(/\s+/g, '-')}.intent.yaml`);
+      const fs = require('fs');
+      const yaml = require('js-yaml');
+      
+      if (!fs.existsSync(path.dirname(tempSpecPath))) {
+        fs.mkdirSync(path.dirname(tempSpecPath), { recursive: true });
       }
-
-      // Execute UI assertions
-      if (testCase.assertions && testCase.assertions.length > 0) {
-        console.log('Executing UI assertions...');
-        const assertionResults = await this.assertionEngine.executeAssertions(
-          null, // No API response
-          testCase.assertions,
-          Date.now(),
-          page
-        );
-
-        for (const result of assertionResults) {
-          const status = result.passed ? '✓ PASS' : '✗ FAIL';
-          console.log(`  ${status}: ${result.message}`);
-          if (!result.passed) throw new Error(`UI Assertion failed: ${result.message}`);
-        }
-      }
-
+      
+      fs.writeFileSync(tempSpecPath, yaml.dump(intentSpec), 'utf8');
+      
+      // Execute via intent-runner (enforced entrypoint)
+      await runIntentSpec({
+        specPath: tempSpecPath,
+        service: serviceName,
+        baseUrl: suiteConfig?.base_url,
+        headless: suiteConfig?.headless !== false,
+        strict: false,
+      });
+      
+      // Cleanup temp file
+      fs.unlinkSync(tempSpecPath);
+      
       console.log(`UI Test "${testCase.name}" completed successfully ✓`);
     } catch (error) {
       console.error(`UI Test "${testCase.name}" failed ✗`);
       console.error(`Error: ${error.message}`);
       throw error;
-    } finally {
-      await browser.close();
     }
+  }
+
+  /**
+   * Convert legacy test-runner test case to intent spec format
+   * @private
+   */
+  _convertToIntentSpec(testCase, serviceName, testFilePath) {
+    const featureName = testFilePath
+      ? path.basename(testFilePath).replace(/\.(yaml|yml|json)$/i, '')
+      : 'test-runner-legacy';
+
+    return {
+      metadata: {
+        service: serviceName,
+        generated_by: 'test-runner-adapter',
+      },
+      intent: {
+        primary_action: testCase.name,
+        feature: featureName,
+      },
+      steps: testCase.steps || [],
+      assertions: testCase.assertions || [],
+    };
   }
 
   /**
