@@ -1,0 +1,27 @@
+platform/cli/run-intent.js
+  71f240394905b34c 1-41
+platform/generators/ui-test-code-generator.js
+  71f240394905b34c 1-11,31-45
+platform/cli/run-yaml.js
+  71f240394905b34c 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "6c89b87090b383a212f55f93655c8c575e16a85c",
+  "prompts": {
+    "71f240394905b34c": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "406975",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 80,
+      "total_deletions": 0,
+      "accepted_lines": 80,
+      "overriden_lines": 0
+    }
+  }
+}
