@@ -1,0 +1,23 @@
+.github/workflows/playwright.yml
+  71f240394905b34c 48-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "7bdd93842eb2f79fe6475228c5b4db7c9cf3d054",
+  "prompts": {
+    "71f240394905b34c": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "406975",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
