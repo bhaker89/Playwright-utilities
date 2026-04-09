@@ -1,0 +1,25 @@
+platform/cli/index.js
+  d8888cf83bf9e15c 180-205,240-243,291-314
+package.json
+  d8888cf83bf9e15c 74-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "d9facf4b84971d93ab00eb883919dff1614a1047",
+  "prompts": {
+    "d8888cf83bf9e15c": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "407736",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 480,
+      "overriden_lines": 0
+    }
+  }
+}
