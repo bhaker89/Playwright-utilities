@@ -1,0 +1,43 @@
+platform/cli/validate-assertions.js
+  ceba96197608fe5b 1-227
+platform/generators/prompt-to-intent-spec-generator.js
+  ceba96197608fe5b 8,10-25,376-401,408,420
+flows/order/place-order.meta.yaml
+  ceba96197608fe5b 1-10
+flows/order/place-order.txt
+  ceba96197608fe5b 1-15
+examples/registry-with-assertions.yaml
+  ceba96197608fe5b 1-110
+platform/cli/preview-assertions.js
+  ceba96197608fe5b 1-183
+platform/core/assertion-engine/index.js
+  ceba96197608fe5b 1-321
+platform/core/assertion-engine/action-rules.js
+  ceba96197608fe5b 1-122
+package.json
+  ceba96197608fe5b 70-72
+platform/core/assertion-engine/flow-metadata-loader.js
+  ceba96197608fe5b 1-71
+platform/core/registry-schema-validator.js
+  ceba96197608fe5b 97-139,209-211,298
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "ed1ebd2379710886719dfac01b9f6b49409f1278",
+  "prompts": {
+    "ceba96197608fe5b": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "407382",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 1900,
+      "total_deletions": 91,
+      "accepted_lines": 1819,
+      "overriden_lines": 0
+    }
+  }
+}
