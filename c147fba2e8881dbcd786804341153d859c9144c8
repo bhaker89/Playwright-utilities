@@ -1,0 +1,57 @@
+examples/order-factory-example.txt
+  e7b2583cd9d075a6 1-25
+platform/domain/order-factory/telemetry.js
+  e7b2583cd9d075a6 1-153
+flows/order/attributes/split.txt
+  e7b2583cd9d075a6 1-13
+flows/order/create/mixed.txt
+  e7b2583cd9d075a6 1-36
+flows/order/create/otc.txt
+  e7b2583cd9d075a6 1-31
+flows/order/attributes/coupon.txt
+  e7b2583cd9d075a6 1-14
+platform/cli/test-order-factory.js
+  e7b2583cd9d075a6 1-136
+platform/core/dsl-normalizer/index.js
+  e7b2583cd9d075a6 38,56
+platform/generators/order-aware-intent-generator.js
+  e7b2583cd9d075a6 1-253
+flows/order/create/rx.txt
+  e7b2583cd9d075a6 1-35
+platform/domain/order-factory/ui-order-strategy.js
+  e7b2583cd9d075a6 1-219
+platform/domain/order-factory/index.js
+  e7b2583cd9d075a6 1-307
+tests/order-factory.test.js
+  e7b2583cd9d075a6 1-241
+platform/domain/order-factory/strategy-resolver.js
+  e7b2583cd9d075a6 1-157
+platform/core/dsl-normalizer/order-blueprint-parser.js
+  e7b2583cd9d075a6 1-207
+platform/domain/order-factory/api-order-strategy.js
+  e7b2583cd9d075a6 1-244
+platform/core/flow-composition-engine.js
+  e7b2583cd9d075a6 1-270
+flows/order/attributes/no-prescription.txt
+  e7b2583cd9d075a6 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "c147fba2e8881dbcd786804341153d859c9144c8",
+  "prompts": {
+    "e7b2583cd9d075a6": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "407448",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 2360,
+      "total_deletions": 4,
+      "accepted_lines": 2356,
+      "overriden_lines": 0
+    }
+  }
+}
