@@ -1,0 +1,35 @@
+# RX Order Creation Flow (with prescription)
+
+# Navigate to medicines page
+navigate to /medicines
+
+# Search for RX medicine
+search for "prescription medicine"
+
+# Click first product
+click on first product
+
+# Add to cart
+click on add to cart
+
+# View cart
+click on cart icon
+
+# Proceed to checkout
+click on checkout
+
+# Fill prescription details
+upload prescription
+fill prescription number
+
+# Fill address
+fill delivery address
+
+# Select payment
+select payment method cod
+
+# Place order
+click on place order
+
+# Wait for confirmation
+wait for order confirmation

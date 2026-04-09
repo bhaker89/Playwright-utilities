@@ -1,0 +1,13 @@
+# Split Order Attribute Flow
+
+# Enable split delivery
+click on split delivery option
+
+# Select split address
+fill second delivery address
+
+# Allocate items to addresses
+allocate items to split addresses
+
+# Confirm split
+confirm split delivery

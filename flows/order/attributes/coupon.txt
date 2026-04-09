@@ -1,0 +1,14 @@
+# Coupon Discount Attribute Flow
+
+# Apply coupon code
+click on apply coupon
+
+# Enter coupon code
+fill coupon code "FIRST100"
+
+# Apply and verify discount
+click on apply
+wait for discount applied message
+
+# Verify final amount
+verify discounted amount visible

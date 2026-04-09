@@ -1,0 +1,31 @@
+# OTC Order Creation Flow (no prescription)
+
+# Navigate to medicines page
+navigate to /medicines
+
+# Search for OTC medicine
+search for "over the counter medicine"
+
+# Click first product
+click on first product
+
+# Add to cart
+click on add to cart
+
+# View cart
+click on cart icon
+
+# Proceed to checkout
+click on checkout
+
+# Fill address
+fill delivery address
+
+# Select payment
+select payment method cod
+
+# Place order
+click on place order
+
+# Wait for confirmation
+wait for order confirmation

@@ -1,0 +1,25 @@
+# Example: Order Creation with Admin Validation
+# This demonstrates Phase-3 OrderFactory capabilities
+
+# Create RX order without prescription via API
+create order type=rx prescription=false
+
+# Validate order appears in admin portal
+navigate to /admin/orders
+wait for orders table
+verify order visible in list
+
+# Create split OTC order
+create order type=otc split=true
+
+# Validate split order
+navigate to /admin/orders
+wait for orders table
+verify order has split flag
+
+# Create mixed order with discount from Paytm
+create order type=mixed split=true discount=coupon source=paytm
+
+# Final validation
+navigate to /admin/dashboard
+verify total orders count increased

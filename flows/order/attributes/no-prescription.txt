@@ -1,0 +1,13 @@
+# No Prescription Required Flow (RX without prescription)
+
+# Skip prescription upload
+click on skip prescription
+
+# Select alternative verification
+select video verification option
+
+# Or select doctor consultation
+click on consult with doctor
+
+# Proceed without prescription
+confirm no prescription flow

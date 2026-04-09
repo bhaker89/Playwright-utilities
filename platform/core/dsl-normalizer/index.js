@@ -35,6 +35,7 @@ const tokenizer = require('./tokenizer');
 const actionNormalizer = require('./action-normalizer');
 const targetResolver = require('./target-resolver');
 const parameterExtractor = require('./parameter-extractor');
+const orderBlueprintParser = require('./order-blueprint-parser');
 
 // Export main functions
 module.exports = {
@@ -52,4 +53,5 @@ module.exports = {
   actionNormalizer,
   targetResolver,
   parameterExtractor,
+  orderBlueprintParser,
 };
