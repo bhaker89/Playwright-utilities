@@ -1,0 +1,23 @@
+docs/QA_AUTOMATION_PLATFORM_HANDBOOK.md
+  d8888cf83bf9e15c 54-128,137-163,238-290,296,298-340,355-357,359,363-428,430-446,448-457,465-468,470-589,591-592,594
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "dbbe76a1fc036a128a2b38fde7d1c6a413002a32",
+  "prompts": {
+    "d8888cf83bf9e15c": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "407736",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 423,
+      "overriden_lines": 0
+    }
+  }
+}
