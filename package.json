@@ -66,7 +66,8 @@
     "test:nocode": "node platform/cli/index.js run",
     "test:nocode:validate": "node platform/cli/index.js validate",
     "generate:from-curl": "node platform/cli/index.js generate-from-curl",
-    "generate:from-openapi": "node platform/cli/index.js generate-from-openapi"
+    "generate:from-openapi": "node platform/cli/index.js generate-from-openapi",
+    "validate-registry": "node platform/cli/validate-registry.js"
   },
   "keywords": [
     "playwright",

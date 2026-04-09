@@ -11,12 +11,15 @@
  * ARCHITECTURE CONTRACT:
  * - Registry is the single source of truth
  * - NO selector guessing (fail if not in registry)
+ * - Supports alias matching (before fuzzy matching)
+ * - Supports namespace resolution (auth/login-button)
  * - Supports fuzzy matching with confidence scoring
  * - Returns registry key or throws error
  */
 
 const path = require('path');
-const { loadLocatorRegistry } = require('../locator-registry-loader');
+const { loadLocatorRegistry, loadAllRegistries } = require('../locator-registry-loader');
+const { resolveRegistryPriority, detectOverrides } = require('../registry-resolution-order');
 
 /**
  * Calculate string similarity score (Levenshtein distance normalized)
@@ -76,16 +79,87 @@ function normalizeObjectName(name) {
 }
 
 /**
+ * Check if object name matches any alias in registry entry
+ * @param {string} objectName - Human-readable object name
+ * @param {Object} entry - Registry entry
+ * @returns {boolean} - True if alias matches
+ */
+function matchesAlias(objectName, entry) {
+  if (!entry || !entry.aliases || !Array.isArray(entry.aliases)) {
+    return false;
+  }
+
+  const normalized = normalizeObjectName(objectName);
+
+  for (const alias of entry.aliases) {
+    const normalizedAlias = normalizeObjectName(alias);
+    if (normalized === normalizedAlias) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Find registry key by alias match (highest priority)
+ * @param {string} objectName - Human-readable object name
+ * @param {Object} registry - Loaded locator registry
+ * @returns {string|null} - Registry key or null if no alias match
+ */
+function findByAlias(objectName, registry) {
+  if (!registry || typeof registry !== 'object') {
+    return null;
+  }
+
+  const normalized = normalizeObjectName(objectName);
+
+  for (const [key, entry] of Object.entries(registry)) {
+    // Check for exact alias match
+    if (matchesAlias(objectName, entry)) {
+      return key;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Parse namespace from target (e.g., "auth/login-button" -> { namespace: "auth", target: "login-button" })
+ * @param {string} objectName - Object name (may include namespace)
+ * @returns {Object} - { namespace, target }
+ */
+function parseNamespace(objectName) {
+  if (!objectName || typeof objectName !== 'string') {
+    return { namespace: null, target: objectName };
+  }
+
+  const parts = objectName.split('/');
+  
+  if (parts.length === 2) {
+    return {
+      namespace: parts[0].trim(),
+      target: parts[1].trim(),
+    };
+  }
+
+  return { namespace: null, target: objectName };
+}
+
+/**
  * Match object name against registry keys with fuzzy matching
+ * Supports alias matching (before fuzzy) and namespace resolution
  * @param {string} objectName - Human-readable object name
  * @param {Object} registry - Loaded locator registry
  * @param {Object} options - Options
- * @returns {Object} - { key, confidence, alternatives }
+ * @returns {Object} - { key, confidence, alternatives, matchType, source }
  */
 function matchAgainstRegistry(objectName, registry, options = {}) {
   const {
     minConfidence = 0.7,
     maxAlternatives = 3,
+    enableAliases = true,
+    enableNamespaces = true,
   } = options;
 
   if (!objectName || typeof objectName !== 'string') {
@@ -102,9 +176,44 @@ function matchAgainstRegistry(objectName, registry, options = {}) {
     throw new Error('TargetResolver: registry is empty');
   }
 
-  const normalized = normalizeObjectName(objectName);
+  // Parse namespace if enabled
+  let targetName = objectName;
+  let namespace = null;
+  
+  if (enableNamespaces) {
+    const parsed = parseNamespace(objectName);
+    namespace = parsed.namespace;
+    targetName = parsed.target;
+  }
 
-  // Score all registry keys
+  // STEP 1: Try exact alias match (highest priority)
+  if (enableAliases) {
+    const aliasMatch = findByAlias(targetName, registry);
+    if (aliasMatch) {
+      return {
+        key: aliasMatch,
+        confidence: 0.99, // Alias match gets very high confidence
+        matchType: 'alias',
+        alternatives: [],
+      };
+    }
+  }
+
+  const normalized = normalizeObjectName(targetName);
+
+  // STEP 2: Try exact key match
+  for (const key of registryKeys) {
+    if (normalizeObjectName(key) === normalized) {
+      return {
+        key,
+        confidence: 1.0,
+        matchType: 'exact',
+        alternatives: [],
+      };
+    }
+  }
+
+  // STEP 3: Fuzzy matching
   const matches = registryKeys.map(key => {
     const normalizedKey = normalizeObjectName(key);
     const similarity = calculateSimilarity(normalized, normalizedKey);
@@ -134,6 +243,7 @@ function matchAgainstRegistry(objectName, registry, options = {}) {
   return {
     key: best.key,
     confidence: best.confidence,
+    matchType: 'fuzzy',
     alternatives: matches.slice(1, maxAlternatives + 1),
   };
 }
@@ -225,4 +335,7 @@ module.exports = {
   resolveTargetWithRegistry,
   calculateSimilarity,
   normalizeObjectName,
+  findByAlias,
+  matchesAlias,
+  parseNamespace,
 };
