@@ -1,0 +1,101 @@
+{
+  "default": {
+    "userId": "test_user_default",
+    "email": "testuser@example.com",
+    "phone": "9999999999",
+    "name": "Test User",
+    "type": "test",
+    "password": "Test@123",
+    "otp": "123456"
+  },
+  "orderTypes": {
+    "rx": {
+      "userId": "test_user_rx",
+      "email": "rx.test@example.com",
+      "phone": "9999999991",
+      "name": "RX Test User",
+      "type": "rx",
+      "password": "Test@123"
+    },
+    "otc": {
+      "userId": "test_user_otc",
+      "email": "otc.test@example.com",
+      "phone": "9999999992",
+      "name": "OTC Test User",
+      "type": "otc",
+      "password": "Test@123"
+    },
+    "b2b": {
+      "userId": "test_user_b2b",
+      "email": "b2b.test@example.com",
+      "phone": "9999999993",
+      "name": "B2B Test User",
+      "type": "b2b",
+      "password": "Test@123",
+      "companyId": "COMP_001"
+    },
+    "corporate": {
+      "userId": "test_user_corporate",
+      "email": "corporate.test@example.com",
+      "phone": "9999999994",
+      "name": "Corporate Test User",
+      "type": "corporate",
+      "password": "Test@123",
+      "companyId": "CORP_001"
+    }
+  },
+  "userTypes": {
+    "corporate": {
+      "userId": "corporate_user",
+      "email": "corporate@example.com",
+      "phone": "9999999995",
+      "name": "Corporate User",
+      "type": "corporate",
+      "password": "Test@123",
+      "companyId": "CORP_001"
+    },
+    "test": {
+      "userId": "test_user",
+      "email": "test@example.com",
+      "phone": "9999999999",
+      "name": "Test User",
+      "type": "test",
+      "password": "Test@123"
+    }
+  },
+  "corporate": {
+    "userId": "corporate_default",
+    "email": "corporate.default@example.com",
+    "phone": "9999999996",
+    "name": "Corporate Default User",
+    "type": "corporate",
+    "password": "Test@123",
+    "companyId": "CORP_DEFAULT"
+  },
+  "environments": {
+    "test": {
+      "userId": "test_env_user",
+      "email": "test.env@example.com",
+      "phone": "9999999997",
+      "name": "Test Environment User",
+      "type": "test",
+      "password": "Test@123"
+    },
+    "staging": {
+      "userId": "staging_user",
+      "email": "staging@example.com",
+      "phone": "9999999998",
+      "name": "Staging User",
+      "type": "test",
+      "password": "Test@123"
+    },
+    "prod": {
+      "userId": "prod_user",
+      "email": "prod@example.com",
+      "phone": "9999999990",
+      "name": "Production User",
+      "type": "test",
+      "password": "Test@123"
+    }
+  }
+}

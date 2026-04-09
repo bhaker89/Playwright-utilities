@@ -1,0 +1,8 @@
+{
+  "default": "MED_RX_001",
+  "staging": "MED_RX_STAGE_01",
+  "prod": "MED_RX_PROD_01",
+  "mumbai": "MED_RX_MUM_001",
+  "bangalore": "MED_RX_BLR_001",
+  "delhi": "MED_RX_DEL_001"
+}

@@ -1,0 +1,80 @@
+{
+  "default": {
+    "line1": "123 Test Street",
+    "line2": "Near Test Landmark",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "pincode": "400001",
+    "country": "India",
+    "type": "home"
+  },
+  "cities": {
+    "mumbai": {
+      "line1": "456 Mumbai Test Avenue",
+      "line2": "Andheri West",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400050",
+      "country": "India",
+      "type": "home"
+    },
+    "bangalore": {
+      "line1": "789 Bangalore Test Road",
+      "line2": "Koramangala",
+      "city": "Bangalore",
+      "state": "Karnataka",
+      "pincode": "560001",
+      "country": "India",
+      "type": "home"
+    },
+    "delhi": {
+      "line1": "321 Delhi Test Colony",
+      "line2": "Connaught Place",
+      "city": "New Delhi",
+      "state": "Delhi",
+      "pincode": "110001",
+      "country": "India",
+      "type": "home"
+    }
+  },
+  "userTypes": {
+    "corporate": {
+      "line1": "100 Corporate Tower",
+      "line2": "Business District",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400013",
+      "country": "India",
+      "type": "office"
+    },
+    "test": {
+      "line1": "555 Test Colony",
+      "line2": "Test Area",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400001",
+      "country": "India",
+      "type": "home"
+    }
+  },
+  "environments": {
+    "prod": {
+      "line1": "Production Address",
+      "line2": "Main Street",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400001",
+      "country": "India",
+      "type": "home"
+    },
+    "staging": {
+      "line1": "Staging Address",
+      "line2": "Test Street",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400001",
+      "country": "India",
+      "type": "home"
+    }
+  }
+}

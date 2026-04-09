@@ -1,0 +1,5 @@
+{
+  "default": "MED_MIXED_001",
+  "staging": "MED_MIXED_STAGE_01",
+  "prod": "MED_MIXED_PROD_01"
+}

@@ -106,25 +106,48 @@ function buildAPIPayload(blueprint, context) {
     items = [],
     address = null,
     payment = 'cod',
-    attributes = {}
+    attributes = {},
+    dataset = {} // PHASE-7: Resolved dataset
   } = blueprint;
+
+  // PHASE-7: Use resolved dataset if available
+  const resolvedPayment = dataset.payment?.method || payment;
+  const resolvedAddress = dataset.address || address || context.defaultAddress || getDefaultAddress();
+  const resolvedUser = dataset.user || {};
+  const resolvedSku = dataset.sku;
+  const resolvedVendor = dataset.vendor;
+
+  console.log('[API_ORDER_STRATEGY] Using resolved dataset:');
+  console.log('  SKU:', resolvedSku);
+  console.log('  Vendor:', resolvedVendor);
+  console.log('  Payment:', resolvedPayment);
+  console.log('  User:', resolvedUser.userId);
 
   // Base payload
   const payload = {
     orderType: type,
     source,
-    payment,
+    payment: resolvedPayment, // Use dataset-resolved payment
     requiresPrescription: prescription,
     splitOrder: split,
     ...attributes
   };
 
+  // PHASE-7: Add dataset-resolved fields
+  if (resolvedSku) {
+    payload.sku = resolvedSku;
+  }
+
+  if (resolvedVendor) {
+    payload.vendor = resolvedVendor;
+  }
+
   // Add items
   if (items.length > 0) {
     payload.items = items;
   } else {
-    // Default items based on type
-    payload.items = getDefaultItemsForType(type);
+    // Default items based on type, enriched with SKU if available
+    payload.items = getDefaultItemsForType(type, resolvedSku);
   }
 
   // Add discount
@@ -135,20 +158,29 @@ function buildAPIPayload(blueprint, context) {
     };
   }
 
-  // Add address
-  if (address) {
-    payload.address = address;
-  } else {
-    payload.address = context.defaultAddress || getDefaultAddress();
-  }
+  // Add address (dataset-resolved)
+  payload.address = resolvedAddress;
 
-  // Add user context
-  if (context.userId) {
+  // Add user context (dataset-resolved)
+  if (resolvedUser.userId) {
+    payload.userId = resolvedUser.userId;
+    payload.userEmail = resolvedUser.email;
+    payload.userPhone = resolvedUser.phone;
+  } else if (context.userId) {
     payload.userId = context.userId;
   }
 
   // Add timestamp
   payload.createdAt = new Date().toISOString();
+
+  // PHASE-7: Add dataset metadata
+  if (dataset && Object.keys(dataset).length > 0) {
+    payload._dataset = {
+      resolved: true,
+      environment: dataset.environment,
+      resolvedAt: dataset.resolvedAt
+    };
+  }
 
   return payload;
 }
@@ -197,25 +229,29 @@ async function executeAPIRequest(payload, context) {
 /**
  * Get default items for order type
  * @param {string} type - Order type
+ * @param {string} sku - Optional SKU from dataset
  * @returns {Array} Default items
  */
-function getDefaultItemsForType(type) {
+function getDefaultItemsForType(type, resolvedSku = null) {
+  // PHASE-7: Use resolved SKU if available
+  const sku = resolvedSku || `MED_${type.toUpperCase()}_001`;
+  
   const defaults = {
     rx: [
-      { sku: 'MED_RX_001', name: 'Prescription Medicine', quantity: 1, price: 250 }
+      { sku: resolvedSku || 'MED_RX_001', name: 'Prescription Medicine', quantity: 1, price: 250 }
     ],
     otc: [
-      { sku: 'MED_OTC_001', name: 'OTC Medicine', quantity: 2, price: 100 }
+      { sku: resolvedSku || 'MED_OTC_001', name: 'OTC Medicine', quantity: 2, price: 100 }
     ],
     mixed: [
-      { sku: 'MED_RX_001', name: 'Prescription Medicine', quantity: 1, price: 250 },
+      { sku: resolvedSku || 'MED_RX_001', name: 'Prescription Medicine', quantity: 1, price: 250 },
       { sku: 'MED_OTC_001', name: 'OTC Medicine', quantity: 1, price: 100 }
     ],
     b2b: [
-      { sku: 'B2B_BULK_001', name: 'Bulk Order Item', quantity: 100, price: 5000 }
+      { sku: resolvedSku || 'B2B_BULK_001', name: 'Bulk Order Item', quantity: 100, price: 5000 }
     ],
     corporate: [
-      { sku: 'CORP_001', name: 'Corporate Package', quantity: 1, price: 1000 }
+      { sku: resolvedSku || 'CORP_001', name: 'Corporate Package', quantity: 1, price: 1000 }
     ]
   };
 

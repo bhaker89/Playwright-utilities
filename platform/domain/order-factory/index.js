@@ -27,6 +27,7 @@ const { resolveStrategy, validateStrategy } = require('./strategy-resolver');
 const { createOrderViaAPI } = require('./api-order-strategy');
 const { createOrderViaUI } = require('./ui-order-strategy');
 const { logOrderCreation } = require('./telemetry');
+const { resolveDataset } = require('../dataset-provider');
 
 /**
  * Create order using optimal strategy
@@ -68,9 +69,29 @@ async function createOrder(orderBlueprint, context = {}) {
     // Validate blueprint
     validateBlueprint(orderBlueprint);
 
-    // Resolve strategy
-    const strategy = resolveStrategy(orderBlueprint, context.options || {});
+    // PHASE-7: Resolve dataset BEFORE strategy resolution
+    console.log('[ORDER_FACTORY] Resolving datasets...');
+    const enrichedBlueprint = await resolveDataset(orderBlueprint, context);
+    
+    // Attach dataset to context for downstream use
+    if (enrichedBlueprint.dataset) {
+      context.dataset = enrichedBlueprint.dataset;
+      console.log('[ORDER_FACTORY] ✓ Dataset attached to execution context');
+    }
+
+    // Resolve strategy (now with enriched blueprint)
+    const strategy = resolveStrategy(enrichedBlueprint, context.options || {});
     console.log(`[ORDER_FACTORY] Resolved strategy: ${strategy}`);
+
+    // Attach execution blueprint metadata for downstream use
+    // Enables assertion inference and admin workflow validation reuse
+    context.executionBlueprint = {
+      orderBlueprint: enrichedBlueprint,
+      dataset: enrichedBlueprint.dataset,
+      strategy,
+      env: process.env.TEST_ENV || context.environment?.name || 'unknown'
+    };
+    console.log('[ORDER_FACTORY] ✓ Execution blueprint metadata attached to context');
 
     // Validate strategy can be executed
     const validation = validateStrategy(strategy, {
@@ -82,20 +103,20 @@ async function createOrder(orderBlueprint, context = {}) {
       throw new Error(`Strategy validation failed: ${validation.reason}`);
     }
 
-    // Execute strategy
+    // Execute strategy (use enriched blueprint)
     let result;
     
     switch (strategy) {
       case 'api':
-        result = await executeAPIStrategy(orderBlueprint, context);
+        result = await executeAPIStrategy(enrichedBlueprint, context);
         break;
         
       case 'ui':
-        result = await executeUIStrategy(orderBlueprint, context);
+        result = await executeUIStrategy(enrichedBlueprint, context);
         break;
         
       case 'hybrid':
-        result = await executeHybridStrategy(orderBlueprint, context);
+        result = await executeHybridStrategy(enrichedBlueprint, context);
         break;
         
       default:
@@ -104,11 +125,11 @@ async function createOrder(orderBlueprint, context = {}) {
 
     const totalDuration = Date.now() - startTime;
 
-    // Persist order blueprint in execution context
+    // Persist enriched order blueprint in execution context
     // This enables downstream assertion inference and validation reuse
     if (context) {
-      context.orderBlueprint = orderBlueprint;
-      console.log('[ORDER_FACTORY] ✓ Blueprint attached to execution context');
+      context.orderBlueprint = enrichedBlueprint;
+      console.log('[ORDER_FACTORY] ✓ Enriched blueprint attached to execution context');
     }
 
     console.log('='.repeat(60));
@@ -121,7 +142,7 @@ async function createOrder(orderBlueprint, context = {}) {
     return {
       ...result,
       totalDuration,
-      blueprint: orderBlueprint
+      blueprint: enrichedBlueprint
     };
 
   } catch (error) {
@@ -147,7 +168,7 @@ async function createOrder(orderBlueprint, context = {}) {
       success: false,
       error: error.message,
       duration,
-      blueprint: orderBlueprint
+      blueprint: orderBlueprint // Keep original on error
     };
   }
 }

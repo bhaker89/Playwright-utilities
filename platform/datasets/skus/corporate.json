@@ -1,0 +1,5 @@
+{
+  "default": "CORP_SKU_001",
+  "staging": "CORP_STAGE_01",
+  "prod": "CORP_PROD_01"
+}

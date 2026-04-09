@@ -1,0 +1,5 @@
+{
+  "default": "B2B_SKU_001",
+  "staging": "B2B_STAGE_01",
+  "prod": "B2B_PROD_01"
+}

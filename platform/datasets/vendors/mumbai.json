@@ -1,0 +1,14 @@
+{
+  "default": "warehouse_default",
+  "types": {
+    "rx": "warehouse_rx_main",
+    "otc": "warehouse_otc_main",
+    "b2b": "warehouse_b2b_hub",
+    "corporate": "warehouse_corporate_hub"
+  },
+  "pincodes": {
+    "400001": "warehouse_mumbai_central",
+    "400050": "warehouse_mumbai_west",
+    "400070": "warehouse_mumbai_east"
+  }
+}

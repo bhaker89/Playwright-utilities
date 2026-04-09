@@ -69,7 +69,9 @@
     "generate:from-openapi": "node platform/cli/index.js generate-from-openapi",
     "validate-registry": "node platform/cli/validate-registry.js",
     "validate-assertions": "node platform/cli/validate-assertions.js",
-    "preview-assertions": "node platform/cli/preview-assertions.js"
+    "preview-assertions": "node platform/cli/preview-assertions.js",
+    "validate-datasets": "node platform/cli/validate-datasets.js",
+    "test-dataset-provider": "node platform/cli/test-dataset-provider.js"
   },
   "keywords": [
     "playwright",
