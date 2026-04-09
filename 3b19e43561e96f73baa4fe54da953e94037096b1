@@ -1,0 +1,27 @@
+platform/generators/prompt-to-intent-spec-generator.js
+  ceba96197608fe5b 19
+platform/core/assertion-engine/index.js
+  ceba96197608fe5b 56-59,75-79,88,165-169
+platform/cli/preview-assertions.js
+  ceba96197608fe5b 96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "3b19e43561e96f73baa4fe54da953e94037096b1",
+  "prompts": {
+    "ceba96197608fe5b": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "407382",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 22,
+      "total_deletions": 13,
+      "accepted_lines": 17,
+      "overriden_lines": 0
+    }
+  }
+}
