@@ -168,27 +168,53 @@ Follow this 5-step loop for every new test. **Skipping step 2 is the #1 cause of
 
 The system works by matching your words to "Actions". To keep the pipeline stable, you must follow the contract.
 
+> [!NOTE]
+> ### TXT Flow Contract Summary
+> **Allowed Instructions:** `navigate`, `click`, `fill`, `assert`, `create order`, `include:flow`  
+> **Forbidden Syntax:** Raw selectors (#id, CSS, XPath), Loops, Conditions (If/Else), Wait statements, JavaScript snippets.
+
 ### 4.1 Syntax Rules
 - **One Instruction per Line**: Never use "and" or "then" to combine steps.
+- **Top-to-Bottom Execution**: Instructions execute sequentially in the order they are written.
+- **Comments**: Lines starting with `#` are ignored by the parser and should be used for documentation.
 - **No Raw Selectors**: Never use `#id` or `.class`. Use logical terms from your registry.
 - **Use Dataset Keys**: Never type raw emails or SKU IDs. Use a **`dataset_key`** (an alias like `default_user`).
+- **Relative Paths**: `include:flow` paths must be relative to the project root (e.g., `include:flow:flows/login.txt`).
 
 ### 4.2 Standard Grammar
 Use these patterns. The system will handle the "Grammar Normalization" (Standardizing "click", "tap", "press" into one action).
 
-- `navigate to [page_name]`
+- `navigate to [page_name]` (e.g., `navigate to home page`)
+- `navigate to [url]` (e.g., `navigate to https://1mg.com`)
 - `click [locator_name]`
 - `fill [locator_name] with [dataset_key]`
 - `assert [condition_name]`
-- `include:flow:[path]`
+- `include:flow:[relative_path]`
 
 ### 4.3 OrderFactory Syntax (The "Big Step")
-Standardize your transaction tests using this specific grammar:
+Modifiers follow a strict `with <modifier>` and `and <modifier>` structure. Do not use custom assignment syntax like `coupon=SAVE20`.
+
 ```text
 create order type=otc
 create order type=rx with prescription
+create order type=otc with coupon "SAVE20"
 create order type=mixed with split-delivery and coupon "SAVE20"
 ```
+
+### 4.4 dataset_key Naming Expectations
+To ensure the resolution layer works correctly, your keys must match the entries defined in your `datasets/` directory.
+
+- **Format**: Use `snake_case` (all lowercase with underscores).
+- ✅ **GOOD**: `default_user`, `default_address`, `rx_default_sku`, `admin_account`.
+- ❌ **BAD**: `userEmail1`, `Address-123`, `User 1`.
+
+### 4.5 Unsupported TXT Syntax (Non-Negotiable)
+The platform is an intentional abstraction. The following will **break** the normalization pipeline:
+
+- **No CSS/XPath**: `click "#submit-btn"` or `fill ".input" with user`
+- **No Wait Statements**: `wait 5 seconds` or `sleep 10s`
+- **No Logic/Loops**: `if condition true`, `loop 3 times`, `for each item`
+- **No Code Snippets**: `const x = 1`, `console.log("test")`
 
 ---
 
