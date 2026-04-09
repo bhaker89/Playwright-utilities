@@ -1,0 +1,25 @@
+platform/cli/quickstart.js
+  d8888cf83bf9e15c 1-264
+platform/cli/explain-flow.js
+  d8888cf83bf9e15c 1-251
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "b626213413a72353350fd1b9367b8032058f605e",
+  "prompts": {
+    "d8888cf83bf9e15c": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "407736",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 1004,
+      "total_deletions": 45,
+      "accepted_lines": 1000,
+      "overriden_lines": 0
+    }
+  }
+}
