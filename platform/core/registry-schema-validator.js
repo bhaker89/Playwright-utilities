@@ -94,6 +94,50 @@ function validateEnvironmentOverrides(selector, context) {
 }
 
 /**
+ * Validate assertions object
+ * @param {Object} asserts - Assertions object to validate
+ * @param {string} context - Context for error messages
+ * @returns {Array} - Array of error messages
+ */
+function validateAssertions(asserts, context) {
+  const errors = [];
+
+  if (!asserts || typeof asserts !== 'object') {
+    errors.push(`${context}: asserts must be an object`);
+    return errors;
+  }
+
+  const validEnvironments = ['default', 'staging', 'prod', 'dev', 'success'];
+
+  // Validate each environment/type key
+  for (const [key, value] of Object.entries(asserts)) {
+    if (!validEnvironments.includes(key)) {
+      errors.push(`${context}.${key}: invalid assertion key '${key}' (valid: ${validEnvironments.join(', ')})`);
+      continue;
+    }
+
+    // Value can be array or single item
+    const assertions = Array.isArray(value) ? value : [value];
+
+    for (let i = 0; i < assertions.length; i++) {
+      const assertion = assertions[i];
+      const assertContext = `${context}.${key}[${i}]`;
+
+      if (typeof assertion === 'string') {
+        // Simple string assertion is valid
+        continue;
+      }
+
+      if (typeof assertion !== 'string' && typeof assertion !== 'object') {
+        errors.push(`${assertContext}: assertion must be a string or object`);
+      }
+    }
+  }
+
+  return errors;
+}
+
+/**
  * Validate namespace format
  * @param {string} targetKey - Target key to validate
  * @returns {Array} - Array of error messages
@@ -162,10 +206,11 @@ function validateRegistryEntry(targetKey, entry) {
   // Validate namespace format
   errors.push(...validateNamespace(targetKey));
 
-  // Validate metadata (optional but recommended)
-  if (entry.confidence !== undefined && (typeof entry.confidence !== 'number' || entry.confidence < 0 || entry.confidence > 1)) {
-    errors.push(`${context}: confidence must be a number between 0 and 1`);
+  // Validate assertions (optional)
+  if (entry.asserts) {
+    errors.push(...validateAssertions(entry.asserts, `${context}.asserts`));
   }
+
 
   if (entry.score !== undefined && (typeof entry.score !== 'number' || entry.score < 0 || entry.score > 1)) {
     errors.push(`${context}: score must be a number between 0 and 1`);
@@ -202,10 +247,6 @@ function validateRegistry(registry, registryName = 'registry') {
     const entryErrors = validateRegistryEntry(targetKey, entry);
     errors.push(...entryErrors);
 
-    // Generate warnings for missing recommended fields
-    if (!entry.confidence) {
-      warnings.push(`${registryName}.${targetKey}: missing recommended field 'confidence'`);
-    }
 
     if (!entry.lastValidated) {
       warnings.push(`${registryName}.${targetKey}: missing recommended field 'lastValidated'`);
@@ -254,4 +295,5 @@ module.exports = {
   validateAliases,
   validateEnvironmentOverrides,
   validateNamespace,
+  validateAssertions,
 };

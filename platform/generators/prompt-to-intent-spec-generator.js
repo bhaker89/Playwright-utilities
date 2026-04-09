@@ -5,6 +5,24 @@ const yaml = require('js-yaml');
 const { LLMClient } = require('./llm-client');
 const { resolveFromRoot } = require('../core/workspace-root');
 const { normalizeStepsWithRegistry } = require('../core/dsl-normalizer');
+const assertionEngine = require('../core/assertion-engine');
+
+/**
+ * Load registries for assertion injection
+ * @param {string} service - Service name
+ * @param {string} feature - Feature name
+ * @returns {Promise<Object>} - Loaded registries
+ */
+async function loadRegistriesForService(service, feature) {
+  try {
+    const { loadAllRegistries } = require('../core/locator-registry-loader');
+    return await loadAllRegistries(service, feature);
+  } catch (err) {
+    // Non-fatal: return empty registries if loading fails
+    console.warn(`[REGISTRY] Warning: Could not load registries: ${err.message}`);
+    return { core: {}, fallback: {}, healing: {}, child: {} };
+  }
+}
 
 function slugify(value) {
   return String(value || '')
@@ -355,12 +373,39 @@ async function generateIntentSpecFromDSL(options) {
     );
   }
 
+  // PHASE 6: Inject assertions (compile-time enrichment)
+  // Position: AFTER registry resolution, BEFORE intent spec generation
+  let enrichedSteps;
+  try {
+    const registries = await loadRegistriesForService(service, feature);
+    
+    enrichedSteps = assertionEngine.injectAssertions(normalizedSteps, {
+      service,
+      feature,
+      registries,
+      flowPath: metadata.flowPath || null,
+      env: process.env.TEST_ENV || 'default',
+    }, {
+      telemetry: process.env.PLATFORM_MODE === 'true',
+    });
+
+    if (process.env.PLATFORM_MODE === 'true') {
+      const injectedCount = enrichedSteps.length - normalizedSteps.length;
+      console.log(`[ASSERTION] Injected ${injectedCount} assertions into intent spec`);
+    }
+  } catch (err) {
+    // Non-fatal: if assertion injection fails, continue with normalized steps
+    console.warn(`[ASSERTION] Warning: Assertion injection failed: ${err.message}`);
+    enrichedSteps = normalizedSteps;
+  }
+
   // Build intent spec
   const spec = {
     metadata: {
       service,
       generated_by: 'dsl-normalizer',
       created_at: new Date().toISOString(),
+      assertion_injection: true,
       ...metadata,
     },
     intent: {
@@ -372,7 +417,7 @@ async function generateIntentSpecFromDSL(options) {
       name: metadata.testSuiteName || `${feature} flow`,
       description: metadata.description || `Generated from DSL for ${feature}`,
     },
-    steps: normalizedSteps,
+    steps: enrichedSteps,
     assertions: assertions,
   };
 

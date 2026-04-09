@@ -1,0 +1,10 @@
+# Flow-Level Assertions for Place Order Flow
+# 
+# These assertions are appended AFTER the entire flow completes.
+# They validate the final expected state.
+
+asserts:
+  - order-success-banner-visible
+  - order-id-generated
+  - cart-cleared
+  - thank-you-message-visible

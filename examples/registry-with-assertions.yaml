@@ -1,0 +1,110 @@
+# Example: Locator Registry with Assertions (Lean Version)
+# 
+# This demonstrates how to define assertions in registry entries.
+# Assertions are automatically injected after actions are executed.
+# 
+# USAGE:
+# ------
+# When a test executes:
+#   click login-button
+# 
+# The assertion engine automatically injects:
+#   assert dashboard-page visible
+# 
+# No manual assertion writing required!
+
+# Example 1: Simple success assertions
+login-button:
+  primary:
+    type: css
+    value: "#login-btn"
+  aliases:
+    - login
+    - sign-in
+  asserts:
+    success:
+      - dashboard-page-visible
+      - user-menu-visible
+
+# Example 2: Logout button
+logout-button:
+  primary:
+    type: css
+    value: "#logout"
+  asserts:
+    success:
+      - login-page-visible
+
+# Example 3: Search button
+search-button:
+  primary:
+    type: css
+    value: "[data-testid='search-submit']"
+  aliases:
+    - search
+  asserts:
+    success:
+      - search-results-visible
+      - results-count-displayed
+
+# Example 4: Add to cart button
+add-to-cart-button:
+  primary:
+    type: css
+    value: ".add-to-cart"
+  asserts:
+    success:
+      - cart-item-count-updated
+      - success-notification
+
+# Example 5: Submit order button with multiple assertions
+submit-order-button:
+  primary:
+    type: css
+    value: "#submit-order"
+  asserts:
+    success:
+      - order-confirmation-visible
+      - order-id-generated
+      - cart-cleared
+      - thank-you-message-visible
+
+# Example 6: Environment-specific assertions
+api-submit-button:
+  primary:
+    type: css
+    selector:
+      default: "#submit"
+      staging: "#submit-staging"
+  asserts:
+    staging:
+      - staging-debug-panel-visible
+      - staging-api-response-shown
+    prod:
+      - success-message-visible
+    default:
+      - form-submitted-confirmation
+
+# ASSERTION INJECTION EXAMPLES:
+# ------------------------------
+#
+# Test Flow:
+#   navigate to login page
+#   fill email with test@example.com
+#   fill password with secret123
+#   click login-button
+#
+# After Assertion Injection:
+#   navigate to login page
+#   assert login-form-visible (from action rules)
+#   fill email with test@example.com
+#   fill password with secret123
+#   click login-button
+#   assert dashboard-page-visible (from registry)
+#   assert user-menu-visible (from registry)
+#
+# ENVIRONMENT-BASED INJECTION:
+# ----------------------------
+# TEST_ENV=staging: Uses staging-specific assertions
+# TEST_ENV=prod: Uses prod-specific assertions
+# Default: Uses default or success assertions

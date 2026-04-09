@@ -1,0 +1,15 @@
+# Example place order flow
+# This demonstrates how flow-level assertions work
+
+navigate to product page
+click add to cart button
+navigate to checkout page
+fill shipping address with "123 Main St"
+fill payment details with "4111111111111111"
+click submit order button
+
+# After assertion injection, these will be appended:
+# assert order-success-banner-visible
+# assert order-id-generated
+# assert cart-cleared
+# assert thank-you-message-visible
