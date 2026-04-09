@@ -1,0 +1,51 @@
+platform/core/registry-resolution-order.js
+  da589ffb88ec9c4b 1-148
+platform/core/dsl-normalizer/target-resolver.js
+  da589ffb88ec9c4b 14-15,21-22,82-148,151,155,161-162,179-214,216,246,338-340
+platform/cli/validate-registry.js
+  da589ffb88ec9c4b 1-198
+platform/core/locator-registry-loader.js
+  da589ffb88ec9c4b 1-14,16-17,24-25,31-44,46-50,56-63,66-71,84-90,93-97,99-102,109-130,133-157,159-165,167-180,184,187,216-311,313-321,327-333
+  ceba96197608fe5b 15,18-23,158,166,181-183,185-186,188-215
+platform/core/registry-schema-validator.js
+  da589ffb88ec9c4b 1-257
+platform/core/registry-telemetry.js
+  da589ffb88ec9c4b 1-221
+platform/core/registry-conflict-detector.js
+  da589ffb88ec9c4b 1-317
+package.json
+  da589ffb88ec9c4b 69-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "f0108568968b9e33ac0322e08fb2be9c2068dcb2",
+  "prompts": {
+    "ceba96197608fe5b": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "407382",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 42,
+      "total_deletions": 3,
+      "accepted_lines": 42,
+      "overriden_lines": 0
+    },
+    "da589ffb88ec9c4b": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "407121",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 1633,
+      "total_deletions": 8,
+      "accepted_lines": 1630,
+      "overriden_lines": 0
+    }
+  }
+}
