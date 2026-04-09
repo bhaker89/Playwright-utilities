@@ -71,7 +71,9 @@
     "validate-assertions": "node platform/cli/validate-assertions.js",
     "preview-assertions": "node platform/cli/preview-assertions.js",
     "validate-datasets": "node platform/cli/validate-datasets.js",
-    "test-dataset-provider": "node platform/cli/test-dataset-provider.js"
+    "test-dataset-provider": "node platform/cli/test-dataset-provider.js",
+    "quickstart": "node platform/cli/quickstart.js",
+    "explain-flow": "node platform/cli/explain-flow.js"
   },
   "keywords": [
     "playwright",

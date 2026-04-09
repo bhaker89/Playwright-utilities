@@ -177,6 +177,33 @@ class CLI {
         }
       )
       .command(
+        'quickstart [path]',
+        'Scaffold folder structure for a new squad child repo',
+        (yargs) => {
+          return yargs.positional('path', {
+            describe: 'Target directory for scaffolding (defaults to current directory)',
+            type: 'string',
+            default: process.cwd()
+          });
+        },
+        async (argv) => {
+          await this.quickstartCommand(argv);
+        }
+      )
+      .command(
+        'explain-flow <dslFile>',
+        'Provide natural language explanation of what a TXT flow does',
+        (yargs) => {
+          return yargs.positional('dslFile', {
+            describe: 'Path to TXT DSL file',
+            type: 'string',
+          });
+        },
+        async (argv) => {
+          await this.explainFlowCommand(argv);
+        }
+      )
+      .command(
         'doctor',
         'Validate execution environment and configuration',
         (yargs) => yargs,
@@ -210,10 +237,12 @@ class CLI {
           await this.previewFlowCommand(argv);
         }
       )
+      .example('$0 quickstart', 'Create new squad automation structure')
+      .example('$0 explain-flow flows/login.txt', 'Explain what a flow does')
+      .example('$0 preview-flow flows/login.txt', 'Preview normalized intent')
+      .example('$0 validate-flow flows/login.txt', 'Validate DSL syntax')
       .example('$0 run-intent specs/login-flow.intent.yaml --service psp', 'Run intent spec')
       .example('$0 doctor', 'Check environment health')
-      .example('$0 validate-flow flows/login.txt', 'Validate DSL syntax')
-      .example('$0 preview-flow flows/login.txt', 'Preview normalized intent')
       .demandCommand(1, 'You must provide a command')
       .help('h')
       .alias('h', 'help')
@@ -255,6 +284,34 @@ class CLI {
       if (argv.verbose) {
         console.error(error.stack);
       }
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Quickstart command - Scaffold structure
+   */
+  async quickstartCommand(argv) {
+    try {
+      const { runQuickstart } = require('./quickstart');
+      await runQuickstart(argv);
+      process.exit(0);
+    } catch (error) {
+      console.error('✗ Quickstart failed:', error.message);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Explain Flow command - Natural language explanation
+   */
+  async explainFlowCommand(argv) {
+    try {
+      const { runExplainFlow } = require('./explain-flow');
+      await runExplainFlow(argv);
+      process.exit(0);
+    } catch (error) {
+      console.error('✗ Explain flow failed:', error.message);
       process.exit(1);
     }
   }
