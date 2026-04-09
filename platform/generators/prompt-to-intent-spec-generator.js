@@ -16,7 +16,7 @@ const assertionEngine = require('../core/assertion-engine');
 async function loadRegistriesForService(service, feature) {
   try {
     const { loadAllRegistries } = require('../core/locator-registry-loader');
-    return await loadAllRegistries(service, feature);
+    return loadAllRegistries({ service, feature });
   } catch (err) {
     // Non-fatal: return empty registries if loading fails
     console.warn(`[REGISTRY] Warning: Could not load registries: ${err.message}`);

@@ -93,7 +93,7 @@ async function previewFlow(flowPath, options = {}) {
   console.log(`✓ Normalized ${normalized.length} steps`);
 
   // Load registries for assertion injection
-  const registries = await loadAllRegistries(service, feature);
+  const registries = loadAllRegistries({ service, feature });
   console.log('✓ Loaded registries');
 
   // Load flow metadata

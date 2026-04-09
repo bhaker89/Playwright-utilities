@@ -53,8 +53,10 @@ function assertionExists(steps, target, afterIndex) {
   
   for (let i = afterIndex + 1; i < endIndex; i++) {
     const step = steps[i];
-    if ((step.verb === 'assert' || step.verb === 'expect' || step.verb === 'verify') &&
-        (step.object === target || step.targetKey === target)) {
+    const verb = step.verb || step.action;
+    const stepTarget = step.object || step.targetKey || step.target;
+    
+    if ((verb === 'assert' || verb === 'expect' || verb === 'verify') && stepTarget === target) {
       return true;
     }
   }
@@ -70,9 +72,11 @@ function assertionExists(steps, target, afterIndex) {
  */
 function createAssertionStep(target, source) {
   return {
-    verb: 'assert',
-    object: target,
-    targetKey: target,
+    action: 'assert',      // DSL format
+    verb: 'assert',        // Intent format
+    target: target,        // DSL format
+    targetKey: target,     // Intent format
+    object: target,        // Legacy format
     parameters: {
       state: 'visible',
       timeout: 5000,
@@ -81,6 +85,7 @@ function createAssertionStep(target, source) {
       injected: true,
       source,
     },
+    _original: `assert ${target}`,
   };
 }
 
@@ -157,12 +162,16 @@ function injectRegistryAssertions(steps, registries, options = {}) {
     enrichedSteps.push(step);
 
     // Skip if no target or is already an assertion
-    if (!step.targetKey || step.verb === 'assert' || step.verb === 'expect') {
+    // Support both DSL format (action/target) and intent format (verb/targetKey)
+    const verb = step.verb || step.action;
+    const targetKey = step.targetKey || step.target;
+    
+    if (!targetKey || verb === 'assert' || verb === 'expect') {
       continue;
     }
 
     // Find registry entry
-    const registryEntry = findRegistryEntry(step.targetKey, registries);
+    const registryEntry = findRegistryEntry(targetKey, registries);
     if (!registryEntry) {
       continue;
     }
