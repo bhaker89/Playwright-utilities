@@ -1,0 +1,23 @@
+.gitignore
+  177ac174b0c2a78b 23-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "6399ba45a54b74baa8f54ade7feac07cdf7b3573",
+  "prompts": {
+    "177ac174b0c2a78b": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "408814",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 0,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
