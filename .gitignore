@@ -20,6 +20,10 @@ logs/
 .env
 .env.local
 .env.*.local
+.env.stag
+.env.prod
+config/.env.stag
+config/.env.prod
 
 # IDE
 .vscode/
