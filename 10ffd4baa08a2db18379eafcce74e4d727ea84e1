@@ -1,0 +1,160 @@
+platform/planner/scenario-expansion/txt-change-detector.js
+  986a361d80769c48 13,72-73,80,86-93
+platform/planner/scenario-expansion/scenario-matrix-builder.js
+  986a361d80769c48 145-147
+platform/engines/ui-engine.js
+  986a361d80769c48 3,27-28,32-33
+framework/locator-intelligence/locator-orchestrator.js
+  986a361d80769c48 11,42-43,69-74
+platform/cli/run-intent.js
+  986a361d80769c48 7-9,261-265,271-273,284-287,296,322,325-327,348-354,360-366
+platform/core/intent-runner.js
+  986a361d80769c48 6,289-290,478-482,488-494
+framework/locator-intelligence/healing-engine.js
+  986a361d80769c48 2,28,41-43
+platform/planner/scenario-expansion/scenario-expansion-engine.js
+  986a361d80769c48 21,66,98-100
+platform/core/execution-trace-logger.js
+  986a361d80769c48 1-212
+platform/engines/assertion-engine.js
+  986a361d80769c48 3,27-30,40-47,49-52
+platform/planner/dependency-resolver/dependency-resolver.js
+  986a361d80769c48 7,31-32,40-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "10ffd4baa08a2db18379eafcce74e4d727ea84e1",
+  "prompts": {
+    "2ebd09d5e9604212": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "413785",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 652,
+      "overriden_lines": 0
+    },
+    "4771f87278d62b09": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "416479",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 8,
+      "overriden_lines": 0
+    },
+    "5850729cbe8a57b3": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "413839",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1247,
+      "overriden_lines": 0
+    },
+    "986a361d80769c48": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "416591",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 482,
+      "total_deletions": 2,
+      "accepted_lines": 482,
+      "overriden_lines": 0
+    },
+    "c0c04ec73204b087": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "413110",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 362,
+      "overriden_lines": 0
+    },
+    "c9a488ac73441fd3": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "413917",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1364,
+      "overriden_lines": 0
+    },
+    "d3369411a1ef63dd": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "414888",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    },
+    "db88a980ee1a2cac": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "412971",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1404,
+      "overriden_lines": 0
+    },
+    "fdc91f1201060e6d": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "413977",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 13,
+      "overriden_lines": 0
+    },
+    "fe8b052c8d105ce5": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "412783",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 292,
+      "overriden_lines": 0
+    }
+  }
+}
