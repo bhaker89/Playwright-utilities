@@ -1,0 +1,59 @@
+platform/core/action-dictionary.js
+  51cb792091441110 36-38
+platform/core/dsl-normalizer/tokenizer.js
+  51cb792091441110 17
+tests/tolerant-normalizer.test.js
+  51cb792091441110 1-391
+platform/core/dsl-normalizer/tolerant-normalizer.js
+  51cb792091441110 1-174
+platform/core/dsl-normalizer/dsl-normalizer.js
+  51cb792091441110 29,39,41-49,52,149-150,162-164
+platform/core/dsl-normalizer/index.js
+  51cb792091441110 39,58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "e3f63d1b29a028404a6c8c7efc7b27dbae12611a",
+  "prompts": {
+    "40e1fabc19ac7af3": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417294",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1209,
+      "overriden_lines": 0
+    },
+    "51cb792091441110": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417500",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 936,
+      "total_deletions": 348,
+      "accepted_lines": 591,
+      "overriden_lines": 0
+    },
+    "62d23085eee4f96d": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417344",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 193,
+      "total_deletions": 0,
+      "accepted_lines": 193,
+      "overriden_lines": 0
+    }
+  }
+}
