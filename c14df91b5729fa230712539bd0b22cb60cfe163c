@@ -1,0 +1,38 @@
+package.json
+  62d23085eee4f96d 7
+docs/CHILD_REPO_PACKAGE_JSON_TEMPLATE.md
+  62d23085eee4f96d 1-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "c14df91b5729fa230712539bd0b22cb60cfe163c",
+  "prompts": {
+    "40e1fabc19ac7af3": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417294",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 1759,
+      "total_deletions": 564,
+      "accepted_lines": 1218,
+      "overriden_lines": 0
+    },
+    "62d23085eee4f96d": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417344",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 130,
+      "total_deletions": 1,
+      "accepted_lines": 130,
+      "overriden_lines": 0
+    }
+  }
+}
