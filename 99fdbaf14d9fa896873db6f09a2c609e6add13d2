@@ -1,0 +1,51 @@
+docs/15-execution-commands.md
+  204ab1a333ad4b88 13-134,323-423
+docs/QA_AUTOMATION_PLATFORM_HANDBOOK.md
+  204ab1a333ad4b88 306-471
+platform/cli/commands/version.js
+  83b9292252199df4 1-25
+package.json
+  83b9292252199df4 2,9-11,14,16-28
+docs/CORE_RUNTIME_INSTALLATION.md
+  83b9292252199df4 1-101
+platform/cli/core-runtime-cli.js
+  83b9292252199df4 42-43,570-604,607,611
+  204ab1a333ad4b88 41,338-485,542-564
+platform/cli/commands/doctor.js
+  83b9292252199df4 1-109
+platform/core/grammar-extractor.js
+  204ab1a333ad4b88 1-317
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "99fdbaf14d9fa896873db6f09a2c609e6add13d2",
+  "prompts": {
+    "204ab1a333ad4b88": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "416835",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 887,
+      "total_deletions": 3,
+      "accepted_lines": 884,
+      "overriden_lines": 0
+    },
+    "83b9292252199df4": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417217",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 360,
+      "total_deletions": 81,
+      "accepted_lines": 293,
+      "overriden_lines": 0
+    }
+  }
+}
