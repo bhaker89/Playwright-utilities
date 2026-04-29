@@ -1,0 +1,88 @@
+package.json
+  f2f0163c5baacd4a 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "78cc8985e0acb71ad05900e54840600a9a50eb20",
+  "prompts": {
+    "40e1fabc19ac7af3": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417294",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1195,
+      "overriden_lines": 0
+    },
+    "54dfac28ba649f5b": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417616",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 187,
+      "overriden_lines": 0
+    },
+    "62d23085eee4f96d": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417344",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 193,
+      "overriden_lines": 0
+    },
+    "79066198cfd01598": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417595",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 67,
+      "overriden_lines": 0
+    },
+    "ace1f73bec705fac": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417518",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 267,
+      "overriden_lines": 0
+    },
+    "f2f0163c5baacd4a": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417704",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 230,
+      "overriden_lines": 0
+    }
+  }
+}
