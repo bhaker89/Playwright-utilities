@@ -1,0 +1,109 @@
+framework/locator-intelligence/runtime-bootstrap-mode.js
+  f2f0163c5baacd4a 125-126,134-135,139-140,144-159,399-618,698-700,769-783
+platform/core/dsl-normalizer/tolerant-normalizer.js
+  f2f0163c5baacd4a 53,56
+platform/engines/ui-engine.js
+  54dfac28ba649f5b 50-59
+  17bc9bbbce3483a3 60-71
+  f2f0163c5baacd4a 127,131-132
+platform/core/smart-locator-resolver.js
+  f2f0163c5baacd4a 233-235
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "714c8b48a5c2d92f85ad1b361d1eed9d863f1430",
+  "prompts": {
+    "17bc9bbbce3483a3": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417688",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 12,
+      "overriden_lines": 0
+    },
+    "40e1fabc19ac7af3": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417294",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1195,
+      "overriden_lines": 0
+    },
+    "54dfac28ba649f5b": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417616",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 197,
+      "overriden_lines": 0
+    },
+    "62d23085eee4f96d": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417344",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 193,
+      "overriden_lines": 0
+    },
+    "79066198cfd01598": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417595",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 67,
+      "overriden_lines": 0
+    },
+    "ace1f73bec705fac": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417518",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 267,
+      "overriden_lines": 0
+    },
+    "f2f0163c5baacd4a": {
+      "agent_id": {
+        "tool": "DeputyDev",
+        "id": "417704",
+        "model": "AUTO"
+      },
+      "human_author": "varun bhaker <varun.bhaker@1mg.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 497,
+      "overriden_lines": 0
+    }
+  }
+}
