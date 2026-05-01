@@ -1,0 +1,21 @@
+scripts/test-sso-ui-verify.js
+  62d23085eee4f96d 1-193
+test-flows/admin-dashboard.txt
+  40e1fabc19ac7af3 1-9
+scripts/test-enhanced-bootstrap.js
+  f2f0163c5baacd4a 1-229
+scripts/test-auth-module.js
+  40e1fabc19ac7af3 1-73
+scripts/auth-cache-manager.js
+  40e1fabc19ac7af3 10-13,18,21-23,25-26,192-263,267,282-292,295,300-303,306
+scripts/dev-test-auth-bootstrap.js
+  40e1fabc19ac7af3 1-92
+docs/AUTH_SESSION_QUICK_REF.md
+  40e1fabc19ac7af3 1-126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.5",
+  "base_commit_sha": "a98b247c73bda8d1dd5d9f36c9a176f629bb774b",
+  "prompts": {}
+}
